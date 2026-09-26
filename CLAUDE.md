@@ -17,7 +17,9 @@ la estructura.
 - Botones que disparan una acción del juego: `data-action` + su `case` en `actionFor()`.
 - Diálogos y hojas: siempre con `createDialog()` (view/dialog.js), nada de manejar
   Escape o el foco a mano.
-- Colores: solo variables de `:root` en styles.css (así funcionan los temas).
+- Colores: solo variables de `:root` en styles.css (así funcionan los temas). Cada tema
+  (`data-palette`) define `--felt`, `--panel`, `--ink`, `--muted` y los `--accent*`, y su
+  variante oscura (`data-mode="dark"`) los cuatro primeros.
 - Probar: `npm test`. Local: `npm start`.
 - Agregar solo lo que la necesidad pida: nada de dependencias, herramientas, capas o
   abstracciones "por si acaso". Preferir código simple y robusto. Hoy no hay tests en el

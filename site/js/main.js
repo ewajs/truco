@@ -21,6 +21,7 @@ import { createShareDialog, createSharedGameOffer } from './view/share.js';
 import { setupInstallPrompt } from './view/install.js';
 import { createHelp } from './view/help.js';
 import { createHandChip } from './view/hand.js';
+import { createAppearance } from './view/appearance.js';
 import { gameFromHash } from './share.js';
 
 const AUTO_MANO_MS = 8000; // cuánto esperar después del último punto para pasar la mano
@@ -58,6 +59,7 @@ function scheduleManoPass(action, previous) {
 
 // ---- Vistas ----
 
+const appearance = createAppearance();
 const settings = createSettings({ dispatch });
 const winnerDialog = createWinnerDialog();
 const handChip = createHandChip({ dispatch });
@@ -82,6 +84,7 @@ scoreboard.boards.forEach((board, team) => {
 });
 
 function render() {
+  appearance.render(state);
   document.body.classList.toggle('hide-nums', !state.options.showNumbers);
   document.body.classList.toggle('no-quick', !state.options.quickButtons);
   document.body.classList.toggle('no-buttons', !state.options.showButtons);

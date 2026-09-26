@@ -1,24 +1,29 @@
-/* Anotador de truco. Colores y fuentes en variables de :root (tema claro y oscuro). */
+/*
+  Anotador de truco. Colores y fuentes en variables.
+
+  Temas: cada uno define sus colores en claro y en oscuro. El tema va en
+  data-palette="pano|madera|noche|argento" y el modo en data-mode="light|dark", los dos
+  sobre <html> (los pone js/view/appearance.js; antes de que cargue, un script chico en
+  index.html). Los selectores sirven también para cualquier elemento con data-palette:
+  así las muestras del selector de temas se pintan con los colores de su tema.
+
+  Cada tema define solo estos colores: felt (fondo), panel (tarjetas), ink (texto),
+  muted (texto secundario), accent (botones), accent-ink (texto sobre accent) y
+  accent-shadow (borde inferior de los botones). El resto sale de ahí o es común.
+*/
 
 :root {
   box-sizing: border-box;
   padding-top: env(safe-area-inset-top,0px);
   padding-bottom: env(safe-area-inset-bottom,0px);
-  --felt: #E3EBE0;
-  --panel: #F4F7F1;
-  --ink: #15281D;
-  --muted: #566E5F;
-  --line: rgba(21,40,29,.14);
-  --ghost: rgba(21,40,29,.13);
-  --press: rgba(21,40,29,.06);
+  --line: color-mix(in srgb, var(--ink) 13%, transparent);
+  --ghost: color-mix(in srgb, var(--ink) 13%, transparent);
+  --press: color-mix(in srgb, var(--ink) 6%, transparent);
   --stick: #E4C184;
   --stick-edge: #B48D52;
   --head: #B3312A;
   --head-hi: #E0604F;
-  --accent: #F2B42C;
-  --accent-ink: #2B1D00;
   --danger: #A8322B;
-  --accent-shadow: #C98E12;       /* borde inferior de los botones amarillos */
   --on-strong: #fff;              /* texto sobre fondos fuertes (rojo, peligro) */
   --scrim: rgba(8,18,12,.62);     /* velo detrás de los diálogos */
   --scrim-soft: rgba(8,18,12,.5); /* velo detrás de la hoja de ajustes */
@@ -33,26 +38,91 @@
   --ui: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --felt: #132A1F;
-    --panel: #1B3729;
-    --ink: #F1EAD7;
-    --muted: #97B1A1;
-    --line: rgba(241,234,215,.12);
-    --ghost: rgba(241,234,215,.13);
-    --press: rgba(241,234,215,.05);
-  }
+/* ---- Paño: verde de mesa de juego (el de siempre) ---- */
+:root,
+[data-palette="pano"] {
+  --felt: #E3EBE0;
+  --panel: #F4F7F1;
+  --ink: #15281D;
+  --muted: #566E5F;
+  --accent: #F2B42C;
+  --accent-ink: #2B1D00;
+  --accent-shadow: #C98E12;
 }
 
-:root[data-theme="dark"] {
+[data-mode="dark"],
+[data-mode="dark"] [data-palette="pano"] {
   --felt: #132A1F;
   --panel: #1B3729;
   --ink: #F1EAD7;
   --muted: #97B1A1;
-  --line: rgba(241,234,215,.12);
-  --ghost: rgba(241,234,215,.13);
-  --press: rgba(241,234,215,.05);
+}
+
+/* Antes de que corra el JS: seguir al celular */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode]) {
+    --felt: #132A1F;
+    --panel: #1B3729;
+    --ink: #F1EAD7;
+    --muted: #97B1A1;
+  }
+}
+
+/* ---- Madera: mesa de bodegón, cálida ---- */
+[data-palette="madera"] {
+  --felt: #EDE3D6;
+  --panel: #FAF5EE;
+  --ink: #3B2618;
+  --muted: #7D6150;
+  --accent: #E0873B;
+  --accent-ink: #2A1305;
+  --accent-shadow: #B8692A;
+}
+
+[data-mode="dark"][data-palette="madera"],
+[data-mode="dark"] [data-palette="madera"] {
+  --felt: #261A13;
+  --panel: #33241A;
+  --ink: #F4E8DA;
+  --muted: #C2A791;
+}
+
+/* ---- Noche: azul índigo con luna dorada ---- */
+[data-palette="noche"] {
+  --felt: #E4E6F1;
+  --panel: #F6F7FC;
+  --ink: #1A1D3A;
+  --muted: #5E6283;
+  --accent: #F0C24B;
+  --accent-ink: #221A00;
+  --accent-shadow: #C69A24;
+}
+
+[data-mode="dark"][data-palette="noche"],
+[data-mode="dark"] [data-palette="noche"] {
+  --felt: #121629;
+  --panel: #1B2038;
+  --ink: #E9EAF6;
+  --muted: #9A9FC0;
+}
+
+/* ---- Argento: celeste y blanco con el dorado del sol de mayo ---- */
+[data-palette="argento"] {
+  --felt: #E4EFF8;
+  --panel: #FAFCFE;
+  --ink: #173652;
+  --muted: #5C7891;
+  --accent: #F6B40E;
+  --accent-ink: #3A2500;
+  --accent-shadow: #C98F06;
+}
+
+[data-mode="dark"][data-palette="argento"],
+[data-mode="dark"] [data-palette="argento"] {
+  --felt: #102A40;
+  --panel: #183A55;
+  --ink: #EEF5FB;
+  --muted: #A3C4DD;
 }
 
 *, *::before, *::after {
@@ -1256,6 +1326,65 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   opacity: .35;
 }
 
+/* Selector de temas: una muestra en miniatura de cada uno */
+.palette-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.palette-picker button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 2px 8px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.palette-picker button[aria-checked="true"] {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+/* Mini tablero: fondo, una rayita de texto y un botón, con los colores del tema */
+.swatch {
+  position: relative;
+  width: 100%;
+  max-width: 64px;
+  aspect-ratio: 4 / 3;
+  display: grid;
+  place-items: end center;
+  padding-bottom: 18%;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
+  background: var(--felt);
+}
+
+.swatch::before {
+  content: "";
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  width: 36%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ink);
+}
+
+.swatch i {
+  width: 60%;
+  height: 26%;
+  border-radius: 5px;
+  background: var(--accent);
+  box-shadow: 0 2px 0 var(--accent-shadow);
+}
+
 /* Aclaración debajo de una opción deshabilitada, con un botón para habilitarla */
 .requires-note {
   display: flex;
@@ -1329,6 +1458,10 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 
 .toggle input:checked + i::after {
   transform: translateX(20px);
+}
+
+.toggle small[hidden] {
+  display: none;
 }
 
 .toggle small {

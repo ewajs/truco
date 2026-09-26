@@ -6,7 +6,7 @@
 // Las opciones son la excepción: se completan las que falten y se descartan las que ya no
 // existen, así agregar una opción nueva no borra la partida de nadie.
 
-import { createInitialState, TARGETS, PLAYER_COUNTS, HISTORY_LIMIT } from './game.js';
+import { createInitialState, TARGETS, PLAYER_COUNTS, HISTORY_LIMIT, OPTION_CHOICES } from './game.js';
 import { duelsPerPicaPica } from './hands.js';
 
 export const STORAGE_KEY = 'truco-anotador-v1';
@@ -71,10 +71,14 @@ function isValidGame(data) {
 }
 
 // Las opciones guardadas, completando las que falten (con su valor por defecto) y
-// descartando las que ya no existen o no son booleanas.
+// descartando las que ya no existen o traen un valor que no corresponde: las de
+// OPTION_CHOICES tienen que ser uno de sus valores; el resto, booleanas.
 function knownOptions(defaults, saved) {
   const source = saved && typeof saved === 'object' ? saved : {};
+  const valid = (key, value) => (OPTION_CHOICES[key]
+    ? OPTION_CHOICES[key].includes(value)
+    : typeof value === 'boolean');
   return Object.fromEntries(Object.entries(defaults).map(([key, value]) => (
-    [key, typeof source[key] === 'boolean' ? source[key] : value]
+    [key, valid(key, source[key]) ? source[key] : value]
   )));
 }
