@@ -1,6 +1,13 @@
 // Integraciones con el celular: vibración y mantener la pantalla encendida.
 // Si el navegador no las soporta, no hacen nada.
 
+// Qué soporta este navegador. En iPhone/iPad ningún navegador (tampoco Chrome, que por
+// dentro es Safari) puede vibrar, así que esa opción ni se muestra.
+export const SUPPORTS = {
+  vibrate: typeof navigator.vibrate === 'function',
+  keepAwake: 'wakeLock' in navigator,
+};
+
 export const VIBRATION = {
   point: 12,
   erase: 8,

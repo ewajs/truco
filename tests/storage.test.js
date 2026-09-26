@@ -49,8 +49,20 @@ test('migra una partida guardada por el prototipo (v1)', () => {
       { name: 'Tíos', score: 3, wins: 0 },
     ],
     history: [{ team: 0, delta: 4 }, { team: 1, delta: 3 }, { team: 0, delta: 3 }],
-    options: { showNumbers: false, quickButtons: true, vibrate: false, keepAwake: true },
+    mano: 0,
+    options: {
+      ...createInitialState().options,
+      showNumbers: false,
+      quickButtons: true,
+      vibrate: false,
+      keepAwake: true,
+    },
   });
+});
+
+test('mano: se guarda y un valor inválido vuelve al primer equipo', () => {
+  assert.equal(fromSaved({ version: 2, mano: 1 }).mano, 1);
+  assert.equal(fromSaved({ version: 2, mano: 7 }).mano, 0);
 });
 
 test('completa campos faltantes y corrige valores inválidos', () => {

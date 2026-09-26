@@ -10,6 +10,9 @@ Tocá la columna de un equipo para sumar, mantené apretado para borrar.
 - Todo se guarda en el navegador (`localStorage`)
 - Se instala como app y anda sin conexión
 - Compartir el anotador o la partida actual por link
+- Muestra quién es mano y la pasa sola después de anotar
+- Se pueden ocultar los botones y usar solo tocar y mantener
+- Ayuda corta con lo básico
 
 ## Correrlo local
 
@@ -51,6 +54,7 @@ site/                   lo que se publica en GitHub Pages, tal cual
       winner.js         cartel de ganador
       share.js          diálogo de compartir y aviso al abrir una partida compartida
       install.js        invitación a instalar la app
+      help.js           ayuda (carrusel)
 tests/                  tests de game.js, storage.js, share.js y view/matches.js
 ```
 

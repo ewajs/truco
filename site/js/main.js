@@ -18,7 +18,10 @@ import { createSettings } from './view/settings.js';
 import { createWinnerDialog } from './view/winner.js';
 import { createShareDialog, createSharedGameOffer } from './view/share.js';
 import { setupInstallPrompt } from './view/install.js';
+import { createHelp } from './view/help.js';
 import { gameFromHash } from './share.js';
+
+const AUTO_MANO_MS = 8000; // cuánto esperar después del último punto para pasar la mano
 
 let state = load();
 
@@ -30,6 +33,23 @@ function dispatch(action) {
   save(state);
   giveFeedback(previous, state);
   render();
+  scheduleManoPass(action);
+}
+
+// Pasar la mano sola: cada cambio de puntos reinicia la espera, así se anotan tranquilos
+// el envido y el truco de la misma mano y la mano pasa recién cuando terminan.
+let manoTimer = null;
+
+function scheduleManoPass(action) {
+  if (action.type === 'passMano') clearTimeout(manoTimer); // la cambiaron a mano: no pisarla
+  if (!['add', 'subtract', 'undo'].includes(action.type)) return;
+
+  clearTimeout(manoTimer);
+  const { showMano, autoMano } = state.options;
+  if (!showMano || !autoMano) return;
+  manoTimer = setTimeout(() => {
+    if (winner(state) === null) dispatch({ type: 'passMano' });
+  }, AUTO_MANO_MS);
 }
 
 // ---- Vistas ----
@@ -59,6 +79,8 @@ scoreboard.boards.forEach((board, team) => {
 function render() {
   document.body.classList.toggle('hide-nums', !state.options.showNumbers);
   document.body.classList.toggle('no-quick', !state.options.quickButtons);
+  document.body.classList.toggle('no-buttons', !state.options.showButtons);
+  document.body.classList.toggle('hide-mano', !state.options.showMano);
   undoButton.disabled = state.history.length === 0;
   scoreboard.render(state);
   settings.render(state);
@@ -67,8 +89,12 @@ function render() {
   wakeLock.setEnabled(state.options.keepAwake);
 }
 
-// Vibración y aviso para lectores de pantalla cuando cambia un puntaje.
+// Vibración y aviso para lectores de pantalla cuando cambia un puntaje o la mano.
 function giveFeedback(previous, next) {
+  if (next.mano !== previous.mano && next.options.showMano) {
+    announcer.textContent = `Es mano ${next.teams[next.mano].name}`;
+  }
+
   const changed = next.teams.findIndex((team, i) => team.score !== previous.teams[i].score);
   if (changed === -1) return;
 
@@ -94,6 +120,7 @@ function actionFor(button) {
     case 'undo': return { type: 'undo' };
     case 'newGame': return { type: 'newGame' };
     case 'setTarget': return { type: 'setTarget', target: Number(button.dataset.target) };
+    case 'passMano': return { type: 'passMano' };
     default: throw new Error(`data-action desconocida: ${button.dataset.action}`);
   }
 }
@@ -113,4 +140,5 @@ window.addEventListener('hashchange', offerSharedGame);
 render();
 offerSharedGame();
 setupInstallPrompt();
+createHelp();
 navigator.serviceWorker?.register('sw.js');
