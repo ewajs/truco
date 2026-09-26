@@ -1064,6 +1064,11 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   color: var(--ink);
 }
 
+/* después del pase, la cruz (cerrar) va al final */
+.toast[data-mode="done"] #mano-toast-cancel {
+  order: 1;
+}
+
 /* Barra rasante abajo que se vacía hasta que pasa la mano */
 .toast-bar {
   position: absolute;

@@ -1,7 +1,7 @@
 // Aviso del pase automático de la mano. Va arriba, sobre el encabezado: lejos de los
 // tableros y los botones de sumar, que es donde está el dedo. Tiene dos formas:
 //   - countdown(): "Mano para Ellos" con cancelar y "ya", y una barra abajo que se vacía
-//   - done(): "Es mano Ellos" con deshacer, unos segundos
+//   - done(): "Es mano Ellos" con deshacer y cerrar, unos segundos
 // Solo muestra: cuándo aparece y qué hace cada botón lo decide main.js.
 
 import { passNotice } from '../hands.js';
@@ -19,7 +19,8 @@ export function createManoToast({ onNow, onCancel, onUndo }) {
   let doneTimer = null;
 
   nowButton.addEventListener('click', onNow);
-  cancelButton.addEventListener('click', onCancel);
+  // la cruz cancela el pase pendiente, o cierra el "Es mano…"
+  cancelButton.addEventListener('click', () => (mode === 'done' ? hide() : onCancel()));
   undoButton.addEventListener('click', onUndo);
 
   function show(nextMode, message) {
@@ -27,8 +28,9 @@ export function createManoToast({ onNow, onCancel, onUndo }) {
     mode = nextMode;
     toast.dataset.mode = nextMode;
     text.textContent = message;
-    nowButton.hidden = cancelButton.hidden = nextMode !== 'countdown';
+    nowButton.hidden = nextMode !== 'countdown';
     undoButton.hidden = nextMode !== 'done';
+    cancelButton.setAttribute('aria-label', nextMode === 'done' ? 'Cerrar' : 'Cancelar el pase');
     if (toast.hidden) {
       toast.hidden = false;
       void toast.offsetWidth; // aplicar el estado inicial para que se vea la entrada
