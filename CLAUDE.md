@@ -38,5 +38,15 @@ repetir el diff ni contar el proceso. Secciones:
 - **Probado**: qué se probó (tests nuevos; a mano en el navegador, en qué tamaños y
   modos) y qué **no** (por ejemplo, un iPhone de verdad).
 - **Capturas**: solo si se tocó algo visible de forma significativa o se sacaron capturas
-  para validar. Se suben a la rama `screenshots` (no se mergea nunca), en `pr-<número>/`,
-  y se enlazan con su URL de raw.githubusercontent.com.
+  para validar. Van commiteadas en `docs/capturas/prs/<número>/` y se enlazan con su URL
+  de raw.githubusercontent.com (con el hash del commit, así no se rompen).
+
+## Capturas de referencia
+
+`docs/capturas/iphone/` (iPhone 15, 393×852) y `docs/capturas/samsung/` (Galaxy S24,
+360×780) muestran la intención del diseño: una partida normal a 30, de a 4 con nombres
+(Juan, Pedro, Ana, Sofi), en claro y en oscuro. Las usa el README. Si un cambio toca lo
+que se ve en ellas, se vuelven a sacar en el mismo PR: `tablero`, `tablero-oscuro`,
+`aviso` (el pase automático), `mesa` (Ajustes → Partida), `opciones` y `pica-pica` (de a
+6, tema Noche, oscuro). Los casos extremos (pantallas chicas, nombres largos, de a 8)
+son para validar y van solo en la carpeta del PR.
