@@ -14,7 +14,7 @@ import { createServer } from 'node:http';
 import { readFile, mkdir } from 'node:fs/promises';
 import { extname, join, normalize, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { chromium, devices } from 'playwright';
+import { chromium, devices, request } from 'playwright';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SITE = join(ROOT, 'site');
@@ -124,6 +124,10 @@ if (wanted.length === 0) throw new Error(`No hay escenas con esos nombres: ${arg
 
 const server = await serve(SITE);
 const browser = await chromium.launch();
+// Detrás de un proxy que re-firma HTTPS (el entorno de Claude Code en la nube), Chromium
+// no confía en su certificado y no carga Google Fonts: se piden desde Node, que sí.
+const proxy = process.env.HTTPS_PROXY || process.env.https_proxy;
+const fonts = proxy && await request.newContext({ proxy: { server: proxy } });
 const errors = [];
 try {
   for (const [deviceName, device] of Object.entries(DEVICES)) {
@@ -132,6 +136,11 @@ try {
       const context = await browser.newContext({ ...device, colorScheme: scene.dark ? 'dark' : 'light' });
       // sin la invitación a instalar la app
       await context.addInitScript(() => localStorage.setItem('truco-instalar-cerrado', '1'));
+      if (fonts) {
+        await context.route(/^https:\/\/fonts\.(googleapis|gstatic)\.com\//, async route => {
+          await route.fulfill({ response: await fonts.fetch(route.request()) });
+        });
+      }
       const page = await context.newPage();
       page.on('pageerror', error => errors.push(`${deviceName}/${scene.name}: ${error.message}`));
       await page.goto(server.url);
@@ -146,6 +155,7 @@ try {
   }
 } finally {
   await browser.close();
+  await fonts?.dispose();
   server.close();
 }
 if (errors.length) {

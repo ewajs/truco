@@ -118,7 +118,9 @@ npm run capturas -- --out docs/capturas/prs/23 mesa   # para un PR
 - Si un cambio toca lo que se ve en ellas, se vuelven a sacar en el mismo PR.
 - Los casos extremos (pantallas chicas, nombres largos, de a 8) son para validar y van
   solo en la carpeta del PR.
-- En el entorno de Claude Code en la nube npm no llega al registro; Playwright y Chromium
-  ya están instalados: `mkdir -p node_modules && ln -sfn /opt/node22/lib/node_modules/playwright node_modules/playwright`.
-  Tampoco llega a Google Fonts, así que las capturas salen con las fuentes de reemplazo
-  salvo que se habiliten `fonts.googleapis.com` y `fonts.gstatic.com` en el entorno.
+- En el entorno de Claude Code en la nube, si npm no llega al registro, Playwright y
+  Chromium ya están instalados: `mkdir -p node_modules && ln -sfn /opt/node22/lib/node_modules/playwright node_modules/playwright`.
+  El entorno necesita `fonts.googleapis.com` y `fonts.gstatic.com` en los dominios
+  permitidos; como su proxy re-firma HTTPS y Chromium no confía en él, el script pide las
+  fuentes desde Node (`HTTPS_PROXY`). Si las capturas salen con Georgia y la fuente del
+  sistema, no cargaron las fuentes: no subirlas así.
