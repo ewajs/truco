@@ -1,6 +1,9 @@
 // Manos, pica pica y pase automático de la mano. Funciones puras: se testean con Node.
 // game.js las usa desde reduce(); este módulo no depende de game.js.
 //
+// Pasar la mano la corre al lugar siguiente de la mesa (ver table.js), y con eso al otro
+// equipo.
+//
 // Cada pase de mano (el automático o tocando el badge) marca que terminó una mano, salvo
 // que no haya habido puntos desde el pase anterior: en truco toda mano da puntos, así que
 // eso es alguien corrigiendo quién es mano. Entonces solo cambia la mano, sin contar.
@@ -8,6 +11,8 @@
 // De a 6 u 8, entre los 5 y los 25 puntos se alterna una mano redonda y una de pica pica.
 // En el pica pica cada pase es un duelo terminado; la mano termina (y recién ahí pasa)
 // cuando se jugaron todos los duelos.
+
+import { nextMano } from './table.js';
 
 export const PICA_PICA_FROM = 5;   // el pica pica arranca cuando alguien llega a 5…
 export const PICA_PICA_UNTIL = 25; // …y se termina cuando alguien llega a 25
@@ -53,7 +58,7 @@ export function isPicaPicaHand(state) {
 export function passMano(state) {
   const scores = state.teams.map(team => team.score);
   const played = scores.some((score, i) => score !== state.hand.startScores[i]);
-  if (!played) return { ...state, mano: 1 - state.mano };
+  if (!played) return { ...state, ...nextMano(state) };
 
   if (isPicaPicaHand(state)) {
     const duels = state.hand.duels + 1;
@@ -63,7 +68,7 @@ export function passMano(state) {
   }
 
   const nextIsPica = picaPicaEnabled(state) && !state.hand.pica && inPicaPicaZone(scores);
-  return { ...state, mano: 1 - state.mano, hand: newHand(scores, state.hand.number + 1, nextIsPica) };
+  return { ...state, ...nextMano(state), hand: newHand(scores, state.hand.number + 1, nextIsPica) };
 }
 
 // { type: 'setHand', number, pica, duel }: corrección a mano de la mano actual, por si el
@@ -84,10 +89,10 @@ export function setHand(state, { number, pica, duel }) {
   return same ? state : { ...state, hand };
 }
 
-// { type: 'restoreHand', mano, hand }: vuelve a quién era mano y a la mano de antes de
-// un pase (el "Deshacer" del aviso del pase automático). Los puntos no se tocan.
-export function restoreHand(state, { mano, hand }) {
-  return { ...state, mano, hand };
+// { type: 'restoreHand', mano, manoSeat, hand }: vuelve a quién era mano y a la mano de
+// antes de un pase (el "Deshacer" del aviso del pase automático). Los puntos no se tocan.
+export function restoreHand(state, { mano, manoSeat, hand }) {
+  return { ...state, mano, manoSeat, hand };
 }
 
 // Alguien llegó a 5 y nadie a 25.

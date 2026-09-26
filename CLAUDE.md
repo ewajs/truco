@@ -8,12 +8,12 @@ la estructura.
   código también van en español.
 - Arquitectura: evento → `dispatch(action)` (main.js) → `reduce(state, action)` (game.js)
   → guardar + `render(state)` de cada vista. Las vistas no modifican el estado.
-- `game.js`, `hands.js`, `storage.js`, `share.js`, `view/matches.js` y `boardMetrics()`
-  (view/layout.js) no tocan el DOM: mantenerlos así, se testean
+- `game.js`, `hands.js`, `table.js`, `storage.js`, `share.js`, `view/matches.js` y
+  `boardMetrics()` (view/layout.js) no tocan el DOM: mantenerlos así, se testean
   con `npm test` (Node, `node:test`).
 - Cambios en la forma del estado: validar en `isValidGame()` y subir `VERSION`
   (storage.js). Todavía no migramos: lo guardado con otra versión o inválido se
-  descarta. No cambiar `STORAGE_KEY`.
+  descarta (salvo opciones y mesa, que se completan solas). No cambiar `STORAGE_KEY`.
 - Botones que disparan una acción del juego: `data-action` + su `case` en `actionFor()`.
 - Diálogos y hojas: siempre con `createDialog()` (view/dialog.js), nada de manejar
   Escape o el foco a mano.

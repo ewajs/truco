@@ -44,9 +44,14 @@
 
   <div class="app">
     <header class="bar">
-      <div class="brand">
-        <svg viewBox="0 0 18 26" aria-hidden="true"><rect x="7" y="7" width="4" height="18" rx="1" fill="var(--stick)"/><ellipse cx="9" cy="6.5" rx="4.6" ry="5.5" fill="var(--head)"/></svg>
-        Truco
+      <div class="bar-start">
+        <div class="brand">
+          <svg viewBox="0 0 18 26" aria-hidden="true"><rect x="7" y="7" width="4" height="18" rx="1" fill="var(--stick)"/><ellipse cx="9" cy="6.5" rx="4.6" ry="5.5" fill="var(--head)"/></svg>
+          Truco
+        </div>
+        <button class="icon-btn" id="open-table" aria-label="La mesa: jugadores, lugares y quién es mano">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="7" y="8" width="10" height="8" rx="2.5"/><circle cx="12" cy="3.5" r="1.5"/><circle cx="12" cy="20.5" r="1.5"/><circle cx="3.5" cy="12" r="1.5"/><circle cx="20.5" cy="12" r="1.5"/></svg>
+        </button>
       </div>
       <div class="bar-actions">
         <button class="icon-btn" id="undo-button" data-action="undo" aria-label="Deshacer último cambio">
@@ -211,6 +216,25 @@
     </div>
   </div>
 
+  <!-- La mesa (js/view/table.js): quién se sienta dónde, de qué equipo es y quién es mano -->
+  <div class="modal" id="table">
+    <div class="modal-card table-card" role="dialog" aria-modal="true" aria-labelledby="table-title">
+      <h2 id="table-title">La mesa</h2>
+      <p id="table-hint"></p>
+      <!-- Los lugares los arma table.js alrededor de la mesa, en el orden en que se juega -->
+      <div class="mesa" id="mesa">
+        <div class="mesa-felt" aria-hidden="true"></div>
+      </div>
+      <!-- Aparece al elegir un lugar -->
+      <div class="seat-editor" id="seat-editor" hidden>
+        <input id="seat-name" maxlength="14" autocomplete="off" enterkeyhint="done" aria-label="Nombre">
+        <button class="seat-mano" id="seat-mano">Es mano</button>
+      </div>
+      <button class="btn-accent" id="table-done">Listo</button>
+      <button class="btn-text" id="table-draw">Tirar reyes</button>
+    </div>
+  </div>
+
   <!-- Ayuda (js/view/help.js): carrusel que se desliza con el dedo o con "Siguiente" -->
   <div class="modal" id="help">
     <div class="modal-card help-card" role="dialog" aria-modal="true" aria-label="Cómo se usa">
@@ -236,7 +260,7 @@
             <span class="mano"><svg class="icon-mazo"><use href="#icon-mazo"/></svg></span>
           </div>
           <h2>Mano y mazo</h2>
-          <p>La mano pasa sola unos segundos después de anotar, con un aviso arriba para adelantarla o cancelarla. Tocá la mano o el mazo para cambiarla.</p>
+          <p>La mano pasa sola unos segundos después de anotar, con un aviso arriba para adelantarla o cancelarla. Tocá la mano o el mazo para cambiarla. En la mesa (arriba, al lado de "Truco") cargás los jugadores y tirás reyes.</p>
         </section>
         <section class="help-slide">
           <div class="help-art help-icons">

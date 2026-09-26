@@ -23,6 +23,7 @@ import { createHelp } from './view/help.js';
 import { createHandChip } from './view/hand.js';
 import { createAppearance } from './view/appearance.js';
 import { createManoToast } from './view/mano-toast.js';
+import { createTable } from './view/table.js';
 import { gameFromHash } from './share.js';
 
 let state = load();
@@ -44,7 +45,7 @@ function dispatch(action) {
 let autoMano = null;   // pase pendiente (ver autoManoAfter)
 let manoTimer = null;  // cuándo pasa
 let toastTimer = null; // cuándo aparece el aviso
-let lastPass = null;   // { mano, hand } de antes del último pase automático, para deshacerlo
+let lastPass = null;   // { mano, manoSeat, hand } de antes del último pase automático, para deshacerlo
 
 function scheduleManoPass(action, previous) {
   const { pending, restart } = autoManoAfter(autoMano, action, previous, state);
@@ -74,7 +75,7 @@ function passManoNow() {
   if (winner(state) !== null) return;
   const before = state;
   dispatch({ type: 'passMano' });
-  lastPass = { mano: before.mano, hand: before.hand };
+  lastPass = { mano: before.mano, manoSeat: before.manoSeat, hand: before.hand };
   if (state.options.autoManoNotice) manoToast.done(before, state);
 }
 
@@ -95,6 +96,7 @@ const manoToast = createManoToast({
 const settings = createSettings({ dispatch });
 const winnerDialog = createWinnerDialog();
 const handChip = createHandChip({ dispatch });
+const table = createTable({ dispatch });
 const shareDialog = createShareDialog();
 const sharedGameOffer = createSharedGameOffer({
   onAccept: game => dispatch({ type: 'loadGame', game }),
@@ -126,6 +128,7 @@ function render() {
   settings.render(state);
   winnerDialog.render(state);
   handChip.render(state);
+  table.render(state);
   shareDialog.render(state);
   wakeLock.setEnabled(state.options.keepAwake);
 }

@@ -237,6 +237,12 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   gap: 2px;
 }
 
+.bar-start {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .icon-btn {
   width: 44px;
   height: 44px;
@@ -1090,6 +1096,160 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 
 .toast[data-mode="done"] .toast-bar {
   display: none;
+}
+
+/*
+  La mesa (js/view/table.js): los lugares van alrededor de un paño ovalado. Cada lugar es
+  un botón con el nombre y el equipo; la mano lleva la mano y el que da, el mazo.
+*/
+.table-card {
+  max-width: 380px;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+}
+
+.mesa {
+  --seat-w: 88px;
+  position: relative;
+  aspect-ratio: 1 / 1.1;
+  margin: 0 -8px 12px;
+}
+
+/* de a 8 hay menos lugar: la letra un poco más chica para que entre "Jugador 8" */
+.mesa[data-count="8"] .seat-name {
+  font-size: 12px;
+}
+
+.mesa-felt {
+  position: absolute;
+  inset: 22% 30%;
+  border-radius: 28px;
+  background: var(--felt);
+  border: 1px solid var(--line);
+}
+
+.seat {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
+  width: var(--seat-w);
+  min-height: 48px;
+  padding: 5px 6px;
+  display: grid;
+  place-content: center;
+  border-radius: 16px;
+  background: var(--panel);
+  border: 2px solid var(--line);
+  box-shadow: 0 2px 6px var(--shadow);
+  transition: border-color .15s, left .3s, top .3s;
+}
+
+/* el segundo equipo, sobre el paño: se distinguen sin sumar colores */
+.seat[data-team="1"] {
+  background: var(--felt);
+}
+
+.seat[aria-pressed="true"] {
+  border-color: var(--accent);
+}
+
+.seat-name {
+  font-weight: 700;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seat-team {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* mano o mazo, en un circulito sobre la esquina */
+.seat-icon {
+  display: none;
+  position: absolute;
+  top: -18px;
+  right: -8px;
+  width: 26px;
+  height: 26px;
+  padding: 5px;
+  border-radius: 50%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.seat[data-role="mano"] .icon-mano {
+  display: block;
+  background: var(--sun);
+  color: var(--sun-ink);
+}
+
+.seat[data-role="mazo"] .icon-mazo {
+  display: block;
+  background: var(--panel);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+
+/* tirar reyes: los lugares se dan vuelta uno atrás del otro */
+.mesa.drawn .seat {
+  animation: seat-drawn .3s ease-out backwards;
+  animation-delay: calc(var(--i) * 30ms);
+}
+
+@keyframes seat-drawn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.6);
+  }
+}
+
+.seat-editor {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.seat-editor[hidden] {
+  display: none;
+}
+
+.seat-editor input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--line);
+  background: var(--felt);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.seat-mano {
+  flex: none;
+  height: 48px;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: var(--sun);
+  color: var(--sun-ink);
+  font-weight: 700;
+}
+
+.seat-mano:disabled {
+  opacity: .45;
 }
 
 /* Opción con varios valores debajo de un interruptor (p. ej. los segundos del pase) */
