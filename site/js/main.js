@@ -9,7 +9,7 @@
 // `state` es la única fuente de verdad. Las vistas nunca lo modifican: solo lo dibujan
 // y avisan lo que hizo el usuario llamando a dispatch().
 
-import { reduce, winner } from './game.js';
+import { reduce, winner, autoManoAfter } from './game.js';
 import { load, save } from './storage.js';
 import { VIBRATION, vibrate, createWakeLock } from './device.js';
 import { createScoreboard } from './view/scoreboard.js';
@@ -36,41 +36,22 @@ function dispatch(action) {
   scheduleManoPass(action, previous);
 }
 
-// Pasar la mano sola: cada punto sumado reinicia la espera, así se anotan tranquilos el
-// envido y el truco de la misma mano y la mano pasa recién cuando terminan.
-// Restar o deshacer son correcciones: demoran el pase pendiente pero nunca arrancan uno
-// nuevo (si la mano ya pasó, corregir un tap de más no la vuelve a pasar). Y si se
-// deshace todo lo anotado en esta mano, el pase se cancela.
+// Pase automático de la mano: qué hacer lo decide autoManoAfter() (game.js); acá solo
+// se maneja el timer.
+let autoMano = null; // pase pendiente (ver autoManoAfter)
 let manoTimer = null;
-let scoresBeforeHand = null; // puntajes antes del primer punto de esta mano
 
 function scheduleManoPass(action, previous) {
-  const isAdd = action.type === 'add';
-  const isCorrection = action.type === 'subtract' || action.type === 'undo';
-
-  if (action.type === 'passMano') return cancelManoPass(); // la cambiaron a mano: no pisarla
-  if (!isAdd && !isCorrection) return;
-  if (!state.options.showMano || !state.options.autoMano) return cancelManoPass();
-
-  const pending = manoTimer !== null;
-  if (isCorrection && !pending) return;
-  if (isAdd && !pending) scoresBeforeHand = scoresOf(previous);
-  if (isCorrection && scoresOf(state) === scoresBeforeHand) return cancelManoPass();
+  const { pending, restart } = autoManoAfter(autoMano, action, previous, state);
+  autoMano = pending;
+  if (!pending) clearTimeout(manoTimer);
+  if (!restart) return;
 
   clearTimeout(manoTimer);
   manoTimer = setTimeout(() => {
-    manoTimer = null;
+    autoMano = null;
     if (winner(state) === null) dispatch({ type: 'passMano' });
   }, AUTO_MANO_MS);
-}
-
-function cancelManoPass() {
-  clearTimeout(manoTimer);
-  manoTimer = null;
-}
-
-function scoresOf(someState) {
-  return someState.teams.map(team => team.score).join('-');
 }
 
 // ---- Vistas ----

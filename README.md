@@ -55,7 +55,7 @@ site/                   lo que se publica en GitHub Pages, tal cual
       share.js          diálogo de compartir y aviso al abrir una partida compartida
       install.js        invitación a instalar la app
       help.js           ayuda (carrusel)
-tests/                  tests de game.js, storage.js, share.js y view/matches.js
+tests/                  tests de las reglas (incluye el pase de mano), guardado, links y fósforos
 ```
 
 El flujo es siempre el mismo:

@@ -160,3 +160,39 @@ function rename(state, team, name) {
 function loadGame(state, game) {
   return { ...state, target: game.target, teams: game.teams.map(team => ({ ...team })), history: [] };
 }
+
+// ---- Pase automático de la mano ----
+//
+// Decide qué hacer con el pase automático después de cada acción. El timer vive en
+// main.js; esto solo dice si hay un pase pendiente y si hay que reiniciar la espera.
+//
+// - Sumar arranca la espera, o la reinicia si ya había una: así se anotan tranquilos el
+//   envido y el truco de la misma mano y la mano pasa recién cuando terminan.
+// - Restar o deshacer son correcciones: reinician la espera pendiente pero nunca
+//   arrancan una nueva (si la mano ya pasó, corregir un tap de más no la vuelve a pasar).
+//   Si con correcciones se vuelve a los puntajes de antes de la mano, se cancela.
+// - Pasar la mano a mano, empezar otra partida o apagar la opción cancelan lo pendiente.
+//
+// `pending` es null (nada pendiente) o { handStart } con los puntajes de antes del primer
+// punto de la mano. Devuelve { pending, restart }.
+export function autoManoAfter(pending, action, before, after) {
+  const enabled = after.options.showMano && after.options.autoMano;
+  const cancels = ['passMano', 'newGame', 'setTarget', 'loadGame'].includes(action.type);
+  if (!enabled || cancels) return { pending: null, restart: false };
+
+  if (action.type === 'add') {
+    return { pending: pending ?? { handStart: scoreKey(before) }, restart: true };
+  }
+
+  const isCorrection = action.type === 'subtract' || action.type === 'undo';
+  if (isCorrection && pending) {
+    if (scoreKey(after) === pending.handStart) return { pending: null, restart: false };
+    return { pending, restart: true };
+  }
+
+  return { pending, restart: false };
+}
+
+function scoreKey(state) {
+  return state.teams.map(team => team.score).join('-');
+}
