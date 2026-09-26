@@ -157,6 +157,16 @@
     </div>
   </div>
 
+  <!-- Aviso del pase automático de la mano (js/view/mano-toast.js) -->
+  <div class="toast" id="mano-toast" role="status" hidden>
+    <span class="toast-count" id="mano-toast-count" aria-hidden="true"></span>
+    <span class="toast-text" id="mano-toast-text"></span>
+    <button class="toast-button" id="mano-toast-now">Ya</button>
+    <button class="toast-button" id="mano-toast-cancel">Cancelar</button>
+    <button class="toast-button" id="mano-toast-undo">Deshacer</button>
+    <i class="toast-bar" id="mano-toast-bar"></i>
+  </div>
+
   <!-- Invitación a instalar la app (js/view/install.js) -->
   <div class="install" id="install" hidden>
     <img src="icon-192.png" alt="" width="40" height="40">
@@ -220,7 +230,7 @@
             <span class="mano"><svg class="icon-mazo"><use href="#icon-mazo"/></svg></span>
           </div>
           <h2>Mano y mazo</h2>
-          <p>La mano pasa sola unos segundos después de anotar. Tocá la mano o el mazo para cambiarla.</p>
+          <p>La mano pasa sola unos segundos después de anotar, con un aviso arriba para adelantarla o cancelarla. Tocá la mano o el mazo para cambiarla.</p>
         </section>
         <section class="help-slide">
           <div class="help-art help-icons">
@@ -339,7 +349,16 @@
             <span class="field-label">Mano</span>
             <label class="toggle"><span>Seguir las manos<small>Número de mano (tocalo para corregirlo), quién es mano y pica pica. Apagado, solo se cuentan los puntos</small></span><input type="checkbox" data-option="trackHands"><i></i></label>
             <label class="toggle sub"><span>Mostrar quién es mano<small>Tocá la mano o el mazo para pasarla</small></span><input type="checkbox" data-option="showMano" data-requires="trackHands"><i></i></label>
-            <label class="toggle sub"><span>Pasar la mano sola<small>Unos segundos después de anotar</small></span><input type="checkbox" data-option="autoMano" data-requires="trackHands"><i></i></label>
+            <label class="toggle sub"><span>Pasar la mano sola<small>Después de anotar, con un aviso para adelantarla o cancelarla</small></span><input type="checkbox" data-option="autoMano" data-requires="trackHands"><i></i></label>
+            <div class="sub-choice">
+              <span id="auto-mano-wait">Esperar</span>
+              <div class="seg" role="radiogroup" aria-labelledby="auto-mano-wait">
+                <button role="radio" data-choice="autoManoSeconds" data-value="3" data-requires="autoMano">3 s</button>
+                <button role="radio" data-choice="autoManoSeconds" data-value="5" data-requires="autoMano">5 s</button>
+                <button role="radio" data-choice="autoManoSeconds" data-value="8" data-requires="autoMano">8 s</button>
+                <button role="radio" data-choice="autoManoSeconds" data-value="12" data-requires="autoMano">12 s</button>
+              </div>
+            </div>
           </div>
 
           <div class="field" data-feature-group>

@@ -3,7 +3,7 @@
 // Los botones de "Partida a" y "De a cuántos" usan data-action y los maneja main.js; el
 // resto se maneja acá.
 
-import { isFresh, hasBuenas, playerCountLabel } from '../game.js';
+import { isFresh, hasBuenas, playerCountLabel, OPTION_CHOICES } from '../game.js';
 import { tracksHands } from '../hands.js';
 import { SUPPORTS } from '../device.js';
 import { createDialog } from './dialog.js';
@@ -17,6 +17,7 @@ const DRAG_CLOSE_SPEED = 0.5;  // o soltarla rápido (px/ms), aunque sea un tir�
 const REQUIREMENTS = {
   showButtons: state => state.options.showButtons,
   trackHands: tracksHands,
+  autoMano: state => tracksHands(state) && state.options.autoMano,
 };
 
 export function createSettings({ dispatch }) {
@@ -101,11 +102,14 @@ export function createSettings({ dispatch }) {
   const featureGroup = sheet.querySelector('[data-feature-group]');
   featureGroup.hidden = !featureGroup.querySelector('[data-feature]:not([hidden])');
 
-  // ---- Opciones con varios valores (tema, modo): data-choice + data-value ----
+  // ---- Opciones con varios valores (tema, modo, segundos): data-choice + data-value ----
 
   const choiceButtons = sheet.querySelectorAll('[data-choice]');
+  // data-value es texto: el valor de verdad es el de OPTION_CHOICES que se escribe igual
+  const choiceValue = button => OPTION_CHOICES[button.dataset.choice]
+    .find(value => String(value) === button.dataset.value);
   choiceButtons.forEach(button => button.addEventListener('click', () => {
-    dispatch({ type: 'setOption', option: button.dataset.choice, value: button.dataset.value });
+    dispatch({ type: 'setOption', option: button.dataset.choice, value: choiceValue(button) });
   }));
 
   // "Activar" en una aclaración: prende la opción que hace falta
@@ -163,8 +167,10 @@ export function createSettings({ dispatch }) {
     });
 
     choiceButtons.forEach(button => {
-      const selected = state.options[button.dataset.choice] === button.dataset.value;
+      const selected = state.options[button.dataset.choice] === choiceValue(button);
       button.setAttribute('aria-checked', String(selected));
+      const { requires } = button.dataset;
+      button.disabled = Boolean(requires) && !REQUIREMENTS[requires](state);
     });
 
     requireNotes.forEach(note => {

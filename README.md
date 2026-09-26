@@ -10,7 +10,8 @@ Tocá la columna de un equipo para sumar, mantené apretado para borrar.
 - Todo se guarda en el navegador (`localStorage`)
 - Se instala como app y anda sin conexión
 - Compartir el anotador o la partida actual por link
-- Muestra quién es mano y la pasa sola después de anotar
+- Muestra quién es mano y la pasa sola después de anotar (3 a 12 segundos), con un aviso
+  para adelantarla, cancelarla o deshacerla
 - Sigue las manos: número (se corrige tocándolo) y, de a 6 u 8, pica pica entre los 5 y los 25. Se puede apagar para solo contar puntos
 - Se pueden ocultar los botones y usar solo tocar y mantener
 - Ayuda corta con lo básico
@@ -60,6 +61,7 @@ site/                   lo que se publica en GitHub Pages, tal cual
       install.js        invitación a instalar la app
       help.js           ayuda (carrusel)
       hand.js           chip con el número de mano y el pica pica
+      mano-toast.js     aviso del pase automático (cuenta regresiva y deshacer)
       appearance.js     tema y modo oscuro (data-palette y data-mode en <html>)
 tests/                  reglas, manos y pica pica, guardado, links, fósforos, tamaño del
                         tablero e invariantes con acciones al azar

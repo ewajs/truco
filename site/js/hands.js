@@ -84,6 +84,12 @@ export function setHand(state, { number, pica, duel }) {
   return same ? state : { ...state, hand };
 }
 
+// { type: 'restoreHand', mano, hand }: vuelve a quién era mano y a la mano de antes de
+// un pase (el "Deshacer" del aviso del pase automático). Los puntos no se tocan.
+export function restoreHand(state, { mano, hand }) {
+  return { ...state, mano, hand };
+}
+
 // Alguien llegó a 5 y nadie a 25.
 function inPicaPicaZone(scores) {
   const highest = Math.max(...scores);

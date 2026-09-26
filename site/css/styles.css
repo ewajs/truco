@@ -996,6 +996,130 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   flex: none;
 }
 
+/*
+  Aviso del pase automático (js/view/mano-toast.js): baja desde arriba y tapa el
+  encabezado, no los tableros ni los botones de sumar.
+*/
+.toast {
+  position: fixed;
+  z-index: 16;
+  top: calc(env(safe-area-inset-top, 0px) + 6px);
+  left: 8px;
+  right: 8px;
+  max-width: 440px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 4px 4px 4px 14px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: 0 8px 24px var(--shadow);
+  opacity: 0;
+  transform: translateY(-16px);
+  transition: opacity .25s ease-out, transform .3s cubic-bezier(.2,.8,.2,1);
+}
+
+.toast[hidden] {
+  display: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: none;
+}
+
+.toast-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* segundos que faltan, en un circulito a la izquierda */
+.toast-count {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: var(--sun);
+  color: var(--sun-ink);
+  font-family: var(--display);
+  font-size: 16px;
+}
+
+.toast[data-mode="done"] .toast-count {
+  display: none;
+}
+
+.toast-button {
+  flex: none;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.toast-button[hidden] {
+  display: none;
+}
+
+#mano-toast-now,
+#mano-toast-undo {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+/* Barra que se vacía hasta que pasa la mano */
+.toast-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--sun);
+  transform-origin: left;
+}
+
+.toast[data-mode="done"] .toast-bar {
+  display: none;
+}
+
+/* Opción con varios valores debajo de un interruptor (p. ej. los segundos del pase) */
+.sub-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0 10px 14px;
+}
+
+.sub-choice > span {
+  flex: none;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.sub-choice .seg {
+  flex: 1;
+}
+
+.sub-choice .seg button {
+  height: 36px;
+}
+
+.seg button:disabled {
+  color: var(--muted);
+  opacity: .5;
+}
+
 /* Ayuda: carrusel con scroll-snap */
 .help-card {
   padding-left: 0;

@@ -148,3 +148,15 @@ test('con pica pica, las manos se siguen contando aunque no se muestre la mano',
   const { state: after } = simulate([add(0, 2), WAIT], state);
   assert.equal(after.hand.number, 2);
 });
+
+test('deshacer un pase vuelve a la mano de antes, sin tocar los puntos', () => {
+  const { state: before } = simulate([add(0, 2)]);
+  const passed = reduce(before, passMano);
+  assert.notEqual(passed.mano, before.mano);
+  const restored = reduce(passed, { type: 'restoreHand', mano: before.mano, hand: before.hand });
+  assert.equal(restored.mano, before.mano);
+  assert.deepEqual(restored.hand, before.hand);
+  assert.deepEqual(restored.teams, passed.teams);
+  // y no arranca otra espera: el pase no vuelve a pasar solo
+  assert.equal(autoManoAfter(null, { type: 'restoreHand' }, passed, restored).pending, null);
+});
