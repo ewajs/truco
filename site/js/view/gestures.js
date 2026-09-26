@@ -34,6 +34,7 @@ export function attachBoardGestures(board, { onTap, onErase, onEraseStart, canEr
     board.classList.replace('holding', 'erasing');
     onEraseStart();
     eraseOne();
+    if (!hold) return; // era el último punto: eraseOne() ya cortó
     hold.timer = setTimeout(() => {
       eraseOne();
       if (hold) hold.interval = setInterval(eraseOne, REPEAT_MS);
