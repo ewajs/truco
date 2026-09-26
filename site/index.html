@@ -265,7 +265,12 @@
           </div>
 
           <div class="field" id="pica-field">
-            <label class="toggle"><span>Pica pica<small>Del 5 al 25 alterna una mano redonda y una de pica pica<span class="requires-note">. Necesita «Seguir las manos» (en Opciones)</span></small></span><input type="checkbox" data-option="picaPica" data-requires="trackHands"><i></i></label>
+            <label class="toggle"><span>Pica pica<small>Del 5 al 25 alterna una mano redonda y una de pica pica</small></span><input type="checkbox" data-option="picaPica" data-requires="trackHands"><i></i></label>
+            <!-- Aparece solo si el pica pica está deshabilitado; "Activar" prende la opción que falta -->
+            <p class="requires-note" data-note-for="picaPica" hidden>
+              Necesita seguir las manos.
+              <button class="link" data-enable="trackHands">Activar</button>
+            </p>
           </div>
 
           <div class="field">

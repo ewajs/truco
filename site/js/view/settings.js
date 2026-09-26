@@ -26,6 +26,7 @@ export function createSettings({ dispatch }) {
   const picaField = document.getElementById('pica-field');
   const nameInputs = [0, 1].map(team => document.getElementById(`name-${team}`));
   const optionToggles = sheet.querySelectorAll('[data-option]');
+  const requireNotes = sheet.querySelectorAll('[data-note-for]');
   let current = null; // último estado renderizado
 
   // ---- Pestañas ----
@@ -100,6 +101,13 @@ export function createSettings({ dispatch }) {
   const featureGroup = sheet.querySelector('[data-feature-group]');
   featureGroup.hidden = !featureGroup.querySelector('[data-feature]:not([hidden])');
 
+  // "Activar" en una aclaración: prende la opción que hace falta
+  sheet.querySelectorAll('[data-enable]').forEach(button => {
+    button.addEventListener('click', () => {
+      dispatch({ type: 'setOption', option: button.dataset.enable, value: true });
+    });
+  });
+
   optionToggles.forEach(toggle => {
     toggle.addEventListener('change', () => {
       dispatch({ type: 'setOption', option: toggle.dataset.option, value: toggle.checked });
@@ -145,6 +153,11 @@ export function createSettings({ dispatch }) {
       toggle.checked = Boolean(state.options[toggle.dataset.option]);
       const { requires } = toggle.dataset;
       toggle.disabled = Boolean(requires) && !REQUIREMENTS[requires](state);
+    });
+
+    requireNotes.forEach(note => {
+      const toggle = sheet.querySelector(`[data-option="${note.dataset.noteFor}"]`);
+      note.hidden = !toggle.disabled;
     });
   }
 
