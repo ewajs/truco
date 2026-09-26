@@ -1,7 +1,7 @@
 // Aviso del pase automático de la mano. Va arriba, sobre el encabezado: lejos de los
 // tableros y los botones de sumar, que es donde está el dedo. Tiene dos formas:
-//   - countdown(): "Mano para Ellos" con los segundos en un anillo que se vacía, "Cancelar" y "Ya"
-//   - done(): "Es mano Ellos" con "Deshacer", unos segundos
+//   - countdown(): "Mano para Ellos" con cancelar y "ya", y una barra abajo que se vacía
+//   - done(): "Es mano Ellos" con deshacer, unos segundos
 // Solo muestra: cuándo aparece y qué hace cada botón lo decide main.js.
 
 import { duelsPerPicaPica, isPicaPicaHand } from '../hands.js';
@@ -11,13 +11,11 @@ const DONE_MS = 4000; // cuánto queda a la vista el "Es mano…"
 export function createManoToast({ onNow, onCancel, onUndo }) {
   const toast = document.getElementById('mano-toast');
   const text = document.getElementById('mano-toast-text');
-  const count = document.getElementById('mano-toast-count');
-  const ring = document.getElementById('mano-toast-ring');
+  const bar = document.getElementById('mano-toast-bar');
   const nowButton = document.getElementById('mano-toast-now');
   const cancelButton = document.getElementById('mano-toast-cancel');
   const undoButton = document.getElementById('mano-toast-undo');
   let mode = null; // 'countdown', 'done' o null (oculto)
-  let tick = null;
   let doneTimer = null;
 
   nowButton.addEventListener('click', onNow);
@@ -25,7 +23,6 @@ export function createManoToast({ onNow, onCancel, onUndo }) {
   undoButton.addEventListener('click', onUndo);
 
   function show(nextMode, message) {
-    clearInterval(tick);
     clearTimeout(doneTimer);
     mode = nextMode;
     toast.dataset.mode = nextMode;
@@ -41,7 +38,6 @@ export function createManoToast({ onNow, onCancel, onUndo }) {
 
   function hide() {
     if (!mode) return;
-    clearInterval(tick);
     clearTimeout(doneTimer);
     mode = null;
     toast.classList.remove('show');
@@ -55,12 +51,7 @@ export function createManoToast({ onNow, onCancel, onUndo }) {
     // `deadline`: cuándo pasa (Date.now() de ese momento).
     countdown(before, after, deadline) {
       show('countdown', describe(before, after).coming);
-      const update = () => {
-        count.textContent = Math.max(1, Math.ceil((deadline - Date.now()) / 1000));
-      };
-      update();
-      tick = setInterval(update, 200);
-      ring.animate([{ strokeDashoffset: 0 }, { strokeDashoffset: 1 }], {
+      bar.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], {
         duration: Math.max(0, deadline - Date.now()),
         easing: 'linear',
         fill: 'forwards',
@@ -69,7 +60,6 @@ export function createManoToast({ onNow, onCancel, onUndo }) {
 
     done(before, after) {
       show('done', describe(before, after).done);
-      count.textContent = '';
       doneTimer = setTimeout(hide, DONE_MS);
     },
 

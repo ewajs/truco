@@ -1010,10 +1010,11 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 4px;
   min-height: 52px;
-  padding: 6px 4px 6px 12px;
+  padding: 4px 4px 4px 16px;
   border-radius: 18px;
+  overflow: hidden;
   border: 1px solid var(--line);
   background: var(--panel);
   box-shadow: 0 10px 30px var(--shadow);
@@ -1031,43 +1032,6 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   transform: none;
 }
 
-.toast-count {
-  flex: none;
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-}
-
-.toast-count svg {
-  position: absolute;
-  inset: 0;
-  transform: rotate(-90deg); /* el anillo arranca arriba */
-  fill: none;
-  stroke-width: 3;
-}
-
-.toast-count circle:first-child {
-  stroke: var(--line);
-}
-
-.toast-count circle + circle {
-  stroke: var(--sun);
-  stroke-linecap: round;
-  stroke-dasharray: 1;
-}
-
-.toast-count b {
-  font-family: var(--display);
-  font-weight: 400;
-  font-size: 15px;
-}
-
-.toast[data-mode="done"] .toast-count {
-  display: none;
-}
-
 .toast-text {
   flex: 1;
   min-width: 0;
@@ -1076,34 +1040,42 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   line-height: 1.25;
 }
 
-/* Botones de texto, separados del mensaje por una línea */
-.toast-actions {
-  flex: none;
-  display: flex;
-  align-items: center;
-  padding-left: 2px;
-  border-left: 1px solid var(--line);
-}
-
 .toast-button {
-  height: 44px;
-  padding: 0 10px;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
+  flex: none;
   color: var(--muted);
 }
 
+/* "ya": la acción principal, redonda y con el color de acento */
 .toast-button.primary {
-  font-weight: 800;
-  color: var(--ink);
-}
-
-.toast-button:active {
-  background: var(--press);
+  width: 40px;
+  height: 40px;
+  margin: 0 4px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: 0 2px 0 var(--accent-shadow);
 }
 
 .toast-button[hidden] {
+  display: none;
+}
+
+#mano-toast-undo {
+  color: var(--ink);
+}
+
+/* Barra rasante abajo que se vacía hasta que pasa la mano */
+.toast-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--sun);
+  transform-origin: left;
+}
+
+.toast[data-mode="done"] .toast-bar {
   display: none;
 }
 
