@@ -10,6 +10,8 @@ quién es mano, el Pica Pica y quién gana.
 |:-:|:-:|:-:|:-:|
 | <img src="docs/capturas/iphone/tablero.png" width="180" alt="Tablero con una partida en buenas"> | <img src="docs/capturas/iphone/aviso.png" width="180" alt="Aviso del pase de mano"> | <img src="docs/capturas/iphone/pica-pica.png" width="180" alt="Pica Pica de a 6, tema Noche en oscuro"> | <img src="docs/capturas/iphone/mesa.png" width="180" alt="La mesa en Ajustes"> |
 | Una partida en buenas | La mano pasa sola | Pica Pica de a 6 | La mesa |
+| <img src="docs/capturas/iphone/tablero-oscuro.png" width="180" alt="Tablero en tema Argento, oscuro"> | <img src="docs/capturas/iphone/tema-pano.png" width="180" alt="Tablero en tema Paño"> | <img src="docs/capturas/iphone/tema-madera.png" width="180" alt="Tablero en tema Madera, oscuro"> | <img src="docs/capturas/iphone/opciones.png" width="180" alt="Opciones"> |
+| Argento en oscuro | Paño | Madera en oscuro | Opciones |
 
 - **Rápido**: un toque, un punto. +2, +3 y +4 para el envido o el truco de una vez.
 - **Sigue la mano**: quién es mano y quién da, la pasa solo después de anotar, y de a 6 u
@@ -63,8 +65,8 @@ falta. A 15 es una sola vuelta.
 - El círculo al lado del puntaje muestra qué equipo es **mano**; el otro tiene el
   **mazo**. Tocalo para pasar la mano a mano.
 - El **chip del medio** dice qué mano se juega ("Mano 7"), quién es mano y quién da, cada
-  uno del lado de su equipo. Tocalo para corregir cualquier cosa: quién es mano, el número
-  de mano o si es de Pica Pica.
+  uno del lado de su equipo. Tocalo para editar la mano: quién es mano, el número de mano
+  o si es de Pica Pica.
 - **La mano pasa sola** unos segundos después del último punto (3, 5, 8 o 12, se elige
   en Opciones). Antes de pasar aparece un aviso arriba con los puntos que se hicieron en
   la mano, para **pasarla ya** o **cancelar**; después, uno con la mano nueva, quién es
@@ -106,13 +108,14 @@ puntos, ganadas, nombres y la mesa. Quien abre el link elige si la carga.
 
 En **Ajustes → Opciones**:
 
-- **Tema** (Paño, Madera, Noche o Argento) y **modo** (Auto, que sigue al celular, Claro u Oscuro).
-- **Pantalla**: mostrar los números y los botones. Sin botones se anota solo tocando y
-  manteniendo.
 - **Mano**: seguir las manos (apagado, el anotador solo cuenta puntos), mostrar quién es
   mano, pasarla sola y cuánto esperar, y el aviso antes de pasarla.
-- **Celular**: vibrar al anotar y mantener la pantalla encendida, si el celular lo
-  permite.
+- **Pantalla**: mostrar los números y los botones. Sin botones se anota solo tocando y
+  manteniendo.
+- **Tema** (Argento, Paño, Madera o Noche) y **modo** (Auto, que sigue al dispositivo, Claro
+  u Oscuro).
+- **Dispositivo**: vibrar al anotar (en celulares que vibran) y mantener la pantalla
+  encendida. Solo aparece lo que el dispositivo permite.
 
 ### Tus datos
 

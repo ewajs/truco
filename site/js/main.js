@@ -18,7 +18,7 @@ import { attachBoardGestures } from './view/gestures.js';
 import { createSettings } from './view/settings.js';
 import { createWinnerDialog } from './view/winner.js';
 import { createShareDialog, createSharedGameOffer } from './view/share.js';
-import { setupInstallPrompt } from './view/install.js';
+import { setupInstall } from './view/install.js';
 import { createHelp } from './view/help.js';
 import { createHandChip } from './view/hand.js';
 import { createAppearance } from './view/appearance.js';
@@ -184,6 +184,6 @@ window.addEventListener('hashchange', offerSharedGame);
 
 render();
 offerSharedGame();
-setupInstallPrompt();
+setupInstall();
 createHelp();
 navigator.serviceWorker?.register('sw.js');

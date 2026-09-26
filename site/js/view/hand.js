@@ -6,7 +6,7 @@
 //   - abajo, quién es mano (con la mano) y quién da (con el mazo), cada uno del lado de su
 //     equipo. En una redonda y en un duelo de uno contra uno es una línea; en el Pica Pica
 //     de a 8, los cuatro del duelo en dos líneas, en orden de la mesa.
-// Tocarlo abre la corrección: quién es mano, número, tipo de mano y duelo.
+// Tocarlo abre la edición: quién es mano, número, tipo de mano y duelo.
 
 import {
   picaPicaEnabled, isPicaPicaHand, duelsPerPicaPica, tracksHands, currentDeal, duelOffset,
@@ -39,7 +39,7 @@ export function createHandChip({ dispatch }) {
     const deal = currentDeal(state);
     renderPlayers(players, state, deal);
     const who = `, es mano ${state.players[deal.mano]} y da ${state.players[deal.dealer]}`;
-    chip.setAttribute('aria-label', `${pica ? 'Pica Pica, ' : ''}mano ${hand.number}${who}. Tocá para corregir`);
+    chip.setAttribute('aria-label', `${pica ? 'Pica Pica, ' : ''}mano ${hand.number}${who}. Tocá para editar`);
 
     if (wasPica !== null && pica !== wasPica) {
       chip.classList.remove('pop');
@@ -72,7 +72,7 @@ function renderPlayers(container, state, deal) {
   container.replaceChildren(...cells);
 }
 
-// Popup de corrección. Trabaja sobre un borrador y recién "Listo" lo aplica.
+// Popup para editar la mano. Trabaja sobre un borrador y recién "Listo" lo aplica.
 function createHandEditor({ dispatch }) {
   const dialog = createDialog(document.getElementById('hand-editor'));
   const numberOutput = document.getElementById('hand-editor-number');
