@@ -30,7 +30,8 @@ export function boardSVG(score, target, animateFrom = score) {
   return html;
 }
 
-function groupSVG(group, score, animateFrom) {
+// Un cuadrado: el grupo número `group` (desde 0) de un tablero con `score` puntos.
+export function groupSVG(group, score, animateFrom = score) {
   const firstPoint = group * POINTS_PER_GROUP + 1;
   let matches = '';
   for (let side = 0; side < POINTS_PER_GROUP; side++) {

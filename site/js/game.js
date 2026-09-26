@@ -14,6 +14,7 @@
 //   { type: 'rename', team, name }
 //   { type: 'setOption', option, value }
 //   { type: 'loadGame', game }           cargar una partida compartida por link (ver share.js)
+//   { type: 'passMano' }                 la mano pasa al otro equipo
 
 export const TARGETS = [15, 30];
 export const POINTS_PER_GROUP = 5; // cada cuadrado de fósforos vale 5
@@ -26,7 +27,16 @@ export function createInitialState() {
     target: 30,
     teams: DEFAULT_NAMES.map(name => ({ name, score: 0, wins: 0 })),
     history: [], // [{ team, delta }], para deshacer
-    options: { showNumbers: true, quickButtons: true, vibrate: true, keepAwake: false },
+    mano: 0, // equipo que es mano en esta ronda
+    options: {
+      showNumbers: true,
+      showButtons: true,  // −, +1 y los rápidos; sin botones se usa tocar y mantener
+      quickButtons: true, // +2, +3 y +4 (solo si showButtons)
+      showMano: true,
+      autoMano: true,     // pasar la mano sola después de anotar (solo si showMano)
+      vibrate: true,
+      keepAwake: false,
+    },
   };
 }
 
@@ -78,6 +88,7 @@ export function reduce(state, action) {
     case 'rename': return rename(state, action.team, action.name);
     case 'setOption': return { ...state, options: { ...state.options, [action.option]: action.value } };
     case 'loadGame': return loadGame(state, action.game);
+    case 'passMano': return { ...state, mano: 1 - state.mano };
     default: throw new Error(`Acción desconocida: ${action.type}`);
   }
 }

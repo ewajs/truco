@@ -42,6 +42,8 @@ export function createScoreboard(container, { onNameClick }) {
       column.name.textContent = name;
       column.nameButton.setAttribute('aria-label', `Cambiar nombre de ${name}`);
       column.wins.textContent = wins === 0 ? '' : wins === 1 ? '1 ganada' : `${wins} ganadas`;
+      column.mano.hidden = state.mano !== team;
+      column.mano.setAttribute('aria-label', `${name} es mano. Tocá para pasarla`);
       column.score.textContent = score;
       column.standing.textContent = standing(state, team);
       if (score !== previous) restartAnimation(column.score, 'bump');

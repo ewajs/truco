@@ -93,6 +93,18 @@ test('nombres: se limpian los espacios y vacío vuelve al de siempre', () => {
   assert.equal(state.teams[1].name, 'Ellos');
 });
 
+test('la mano pasa de un equipo al otro', () => {
+  const state = createInitialState();
+  assert.equal(state.mano, 0);
+  assert.equal(reduce(state, { type: 'passMano' }).mano, 1);
+  assert.equal(play(state, { type: 'passMano' }, { type: 'passMano' }).mano, 0);
+});
+
+test('la mano no cambia al anotar ni con partida nueva', () => {
+  const state = reduce(createInitialState(), { type: 'passMano' });
+  assert.equal(play(state, add(0, 3), undo, { type: 'newGame' }).mano, 1);
+});
+
 test('opciones', () => {
   const state = reduce(createInitialState(), { type: 'setOption', option: 'vibrate', value: false });
   assert.equal(state.options.vibrate, false);

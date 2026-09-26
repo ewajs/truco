@@ -51,7 +51,10 @@
           <span class="name-text" data-ref="name"></span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/></svg>
         </button>
-        <div class="wins" data-ref="wins"></div>
+        <div class="meta">
+          <span class="wins" data-ref="wins"></span>
+          <button class="mano" data-ref="mano" data-action="passMano">Mano</button>
+        </div>
         <div class="score" data-ref="score" aria-hidden="true"></div>
         <div class="left" data-ref="standing"></div>
       </div>
@@ -134,14 +137,56 @@
     </button>
   </div>
 
+  <!-- Ayuda (js/view/help.js): carrusel que se desliza con el dedo o con "Siguiente" -->
+  <div class="modal" id="help">
+    <div class="modal-card help-card" role="dialog" aria-modal="true" aria-label="Cómo se usa">
+      <div class="help-track" id="help-track">
+        <section class="help-slide">
+          <div class="help-art" data-matches="5"></div>
+          <h2>Tocá para sumar</h2>
+          <p>Tocá la columna de un equipo y se suma un punto. Cada cuadrado de fósforos son 5.</p>
+        </section>
+        <section class="help-slide">
+          <div class="help-art" data-matches="3"><span class="help-tag">Borrando</span></div>
+          <h2>Mantené para borrar</h2>
+          <p>Dejá el dedo apretado para borrar. Si lo seguís apretando, sigue borrando.</p>
+        </section>
+        <section class="help-slide">
+          <div class="help-art"><div class="divider">Buenas</div></div>
+          <h2>Malas y buenas</h2>
+          <p>A 30 los primeros 15 son las malas y los otros 15, las buenas.</p>
+        </section>
+        <section class="help-slide">
+          <div class="help-art"><span class="mano">Mano</span></div>
+          <h2>Quién es mano</h2>
+          <p>La mano pasa sola unos segundos después de anotar. Tocá el cartel para cambiarla.</p>
+        </section>
+        <section class="help-slide">
+          <div class="help-art help-icons">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
+          </div>
+          <h2>Deshacer y compartir</h2>
+          <p>Si te equivocaste, deshacé desde arriba. También podés compartir la partida con un link.</p>
+        </section>
+      </div>
+      <div class="help-dots" id="help-dots"></div>
+      <button class="btn-accent" id="help-next">Siguiente</button>
+      <button class="btn-text" id="close-help">Cerrar</button>
+    </div>
+  </div>
+
   <!-- Ajustes (js/view/settings.js) -->
   <div class="sheet-wrap" id="settings">
     <div class="backdrop" id="settings-backdrop"></div>
     <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title">
-      <div class="grip"></div>
-      <div class="sheet-head">
-        <h2 id="settings-title">Ajustes</h2>
-        <button class="btn-done" id="close-settings">Listo</button>
+      <!-- Queda fija arriba al scrollear. Arrastrarla hacia abajo cierra la hoja. -->
+      <div class="sheet-top" id="settings-drag">
+        <div class="grip"></div>
+        <div class="sheet-head">
+          <h2 id="settings-title">Ajustes</h2>
+          <button class="btn-done" id="close-settings">Listo</button>
+        </div>
       </div>
 
       <div class="field">
@@ -161,11 +206,34 @@
         </div>
       </div>
 
+      <!--
+        data-requires: la opción solo se puede cambiar si la otra está activada.
+        data-feature: la opción se oculta si el navegador no lo soporta (ver device.js).
+      -->
       <div class="field">
+        <span class="field-label">Pantalla</span>
         <label class="toggle"><span>Mostrar números</span><input type="checkbox" data-option="showNumbers"><i></i></label>
-        <label class="toggle"><span>Botones +2, +3 y +4<small>Para anotar un truco o un envido de una</small></span><input type="checkbox" data-option="quickButtons"><i></i></label>
-        <label class="toggle"><span>Vibrar al anotar</span><input type="checkbox" data-option="vibrate"><i></i></label>
-        <label class="toggle"><span>Mantener la pantalla encendida<small>Útil con el celu apoyado en la mesa</small></span><input type="checkbox" data-option="keepAwake"><i></i></label>
+        <label class="toggle"><span>Mostrar botones<small>Sin botones: tocá la columna para sumar y mantené para borrar</small></span><input type="checkbox" data-option="showButtons"><i></i></label>
+        <label class="toggle sub"><span>Botones +2, +3 y +4<small>Para anotar un truco o un envido de una</small></span><input type="checkbox" data-option="quickButtons" data-requires="showButtons"><i></i></label>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Mano</span>
+        <label class="toggle"><span>Mostrar quién es mano<small>Tocá el cartel para pasarla</small></span><input type="checkbox" data-option="showMano"><i></i></label>
+        <label class="toggle sub"><span>Pasar la mano sola<small>Unos segundos después de anotar</small></span><input type="checkbox" data-option="autoMano" data-requires="showMano"><i></i></label>
+      </div>
+
+      <div class="field" data-feature-group>
+        <span class="field-label">Celular</span>
+        <label class="toggle" data-feature="vibrate"><span>Vibrar al anotar</span><input type="checkbox" data-option="vibrate"><i></i></label>
+        <label class="toggle" data-feature="keepAwake"><span>Mantener la pantalla encendida<small>Útil con el celu apoyado en la mesa</small></span><input type="checkbox" data-option="keepAwake"><i></i></label>
+      </div>
+
+      <div class="field">
+        <button class="option" id="open-help">
+          <strong>Cómo se usa</strong>
+          <small>Lo básico en un minuto</small>
+        </button>
       </div>
 
       <div class="field">

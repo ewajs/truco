@@ -34,6 +34,7 @@ export function fromSaved(saved) {
     target: TARGETS.includes(data.target) ? data.target : initial.target,
     teams: initial.teams.map((team, i) => ({ ...team, ...data.teams?.[i] })),
     history: Array.isArray(data.history) ? data.history : [],
+    mano: data.mano === 1 ? 1 : 0,
     options: { ...initial.options, ...data.options },
   };
 }
