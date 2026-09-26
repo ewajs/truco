@@ -37,9 +37,19 @@ export function seatedPlayers(state) {
     .map((name, seat) => ({ seat, name, team: teamOfSeat(seat) }));
 }
 
-// El que da: el anterior a la mano.
+// El que da: el anterior a la mano (el último en jugar).
 export function dealerSeat(state) {
   return (state.manoSeat - 1 + state.playerCount) % state.playerCount;
+}
+
+const TURNS = ['Mano', 'Segundo', 'Tercero', 'Cuarto', 'Quinto', 'Sexto'];
+
+// En qué turno juega el lugar `seat` en esta mano: "Mano", "Segundo", "Tercero"… y
+// "Pie" los dos últimos, que son los últimos de cada equipo en jugar (de a 2, el que
+// no es mano).
+export function seatTurn(state, seat) {
+  const order = (seat - state.manoSeat + state.playerCount) % state.playerCount;
+  return order > 0 && order >= state.playerCount - 2 ? 'Pie' : TURNS[order];
 }
 
 // La mano pasa al lugar siguiente (y con eso, al otro equipo).

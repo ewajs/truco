@@ -1,13 +1,13 @@
-// La mesa: los jugadores sentados alrededor, de qué equipo es cada uno, quién es mano y
-// quién da. Se abre con el botón de la mesa, arriba al lado de "Truco".
+// La mesa, en Ajustes → Partida: los jugadores sentados alrededor, de qué equipo es cada
+// uno (el fondo del lugar), en qué turno juega (Mano, Segundo… Pie) y quién da (el mazo).
 //
-// - Tocar un lugar lo elige: abajo aparece su nombre para cambiarlo y "Es mano".
+// - Tocar un lugar lo elige: debajo de la mesa aparece su nombre para cambiarlo y
+//   "Hacer mano", en el mismo lugar que la ayuda (así no salta nada).
 // - Con uno elegido, tocar otro los cambia de lugar (y puede que de equipo).
 // - "Tirar reyes" sortea los lugares y la mano.
-// Todo se aplica en el momento (también a mitad de partida); "Listo" solo cierra.
+// Todo se aplica en el momento, también a mitad de partida.
 
-import { seatedPlayers, dealerSeat, drawTable } from '../table.js';
-import { createDialog } from './dialog.js';
+import { seatedPlayers, dealerSeat, drawTable, seatTurn } from '../table.js';
 
 const DRAW_MS = 500; // cuánto dura la animación de tirar reyes (ver .mesa.drawn en CSS)
 
@@ -22,22 +22,15 @@ const SPOTS = {
 };
 
 export function createTable({ dispatch }) {
-  const dialog = createDialog(document.getElementById('table'));
   const mesa = document.getElementById('mesa');
-  const hint = document.getElementById('table-hint');
+  const hint = document.getElementById('seat-hint');
+  const legends = [0, 1].map(team => document.getElementById(`legend-${team}`));
   const editor = document.getElementById('seat-editor');
   const nameInput = document.getElementById('seat-name');
   const manoButton = document.getElementById('seat-mano');
   let current = null;
   let selected = null; // lugar elegido, o null
   let seats = [];      // botones de los lugares, en orden
-
-  document.getElementById('open-table').addEventListener('click', () => {
-    selected = null;
-    render(current);
-    dialog.open({ focus: document.getElementById('table-done') });
-  });
-  document.getElementById('table-done').addEventListener('click', () => dialog.close());
 
   document.getElementById('table-draw').addEventListener('click', () => {
     selected = null;
@@ -81,22 +74,25 @@ export function createTable({ dispatch }) {
     const dealer = dealerSeat(state);
     players.forEach(({ seat, name, team }) => {
       const button = seats[seat];
+      const turn = seatTurn(state, seat);
       button.querySelector('.seat-name').textContent = name;
-      button.querySelector('.seat-team').textContent = state.teams[team].name;
+      button.querySelector('.seat-turn').textContent = turn;
       button.dataset.team = team;
       button.dataset.role = seat === state.manoSeat ? 'mano' : seat === dealer ? 'mazo' : '';
       button.setAttribute('aria-pressed', String(seat === selected));
-      const role = seat === state.manoSeat ? ', es mano' : seat === dealer ? ', da' : '';
-      button.setAttribute('aria-label', `${name}, ${state.teams[team].name}${role}`);
+      const deals = seat === dealer ? ', da' : '';
+      button.setAttribute('aria-label', `${name}, ${state.teams[team].name}, ${turn}${deals}`);
     });
+    legends.forEach((legend, team) => { legend.textContent = state.teams[team].name; });
 
+    // la ayuda y el editor comparten el mismo lugar
+    hint.hidden = selected !== null;
     editor.hidden = selected === null;
-    hint.textContent = selected === null
-      ? 'Tocá un lugar para editarlo, o dos para cambiarlos.'
-      : 'Tocá otro lugar para cambiarlos de lugar.';
     if (selected !== null) {
       if (document.activeElement !== nameInput) nameInput.value = players[selected].name;
-      manoButton.disabled = selected === state.manoSeat;
+      const isMano = selected === state.manoSeat;
+      manoButton.disabled = isMano;
+      manoButton.textContent = isMano ? 'Es mano' : 'Hacer mano';
     }
   }
 
@@ -111,7 +107,7 @@ export function createTable({ dispatch }) {
       button.style.setProperty('--x', `${x}%`);
       button.style.setProperty('--y', `${y}%`);
       button.style.setProperty('--i', seat);
-      button.innerHTML = '<span class="seat-name"></span><span class="seat-team"></span>'
+      button.innerHTML = '<span class="seat-name"></span><span class="seat-turn"></span>'
         + '<svg class="seat-icon icon-mano" aria-hidden="true"><use href="#icon-mano"/></svg>'
         + '<svg class="seat-icon icon-mazo" aria-hidden="true"><use href="#icon-mazo"/></svg>';
       mesa.append(button);
