@@ -16,6 +16,9 @@ import { createScoreboard } from './view/scoreboard.js';
 import { attachBoardGestures } from './view/gestures.js';
 import { createSettings } from './view/settings.js';
 import { createWinnerDialog } from './view/winner.js';
+import { createShareDialog, createSharedGameOffer } from './view/share.js';
+import { setupInstallPrompt } from './view/install.js';
+import { gameFromHash } from './share.js';
 
 let state = load();
 
@@ -33,6 +36,10 @@ function dispatch(action) {
 
 const settings = createSettings({ dispatch });
 const winnerDialog = createWinnerDialog();
+const shareDialog = createShareDialog();
+const sharedGameOffer = createSharedGameOffer({
+  onAccept: game => dispatch({ type: 'loadGame', game }),
+});
 const scoreboard = createScoreboard(document.getElementById('teams'), {
   onNameClick: team => settings.open(team),
 });
@@ -56,6 +63,7 @@ function render() {
   scoreboard.render(state);
   settings.render(state);
   winnerDialog.render(state);
+  shareDialog.render(state);
   wakeLock.setEnabled(state.options.keepAwake);
 }
 
@@ -95,4 +103,14 @@ document.addEventListener('click', event => {
   if (button) dispatch(actionFor(button));
 });
 
+// Si se abrió un link con una partida compartida, ofrecer cargarla.
+function offerSharedGame() {
+  const game = gameFromHash(location.hash);
+  if (game) sharedGameOffer.offer(game, state);
+}
+window.addEventListener('hashchange', offerSharedGame);
+
 render();
+offerSharedGame();
+setupInstallPrompt();
+navigator.serviceWorker?.register('sw.js');

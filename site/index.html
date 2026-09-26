@@ -7,7 +7,7 @@
   <meta name="description" content="Anotador de truco con fósforos: tocá para sumar, mantené para borrar.">
   <title>Anotador de truco</title>
   <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,6 +30,9 @@
       <div class="bar-actions">
         <button class="icon-btn" id="undo-button" data-action="undo" aria-label="Deshacer último cambio">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+        </button>
+        <button class="icon-btn" id="open-share" aria-label="Compartir">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
         </button>
         <button class="icon-btn" id="open-settings" aria-label="Ajustes">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>
@@ -72,8 +75,8 @@
   <div class="sr" aria-live="polite" id="announcer"></div>
 
   <!-- Cartel de ganador (js/view/winner.js) -->
-  <div class="win" id="winner">
-    <div class="win-card" role="dialog" aria-modal="true" aria-labelledby="winner-title">
+  <div class="modal" id="winner">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="winner-title">
       <svg class="torch" viewBox="0 0 56 130" aria-hidden="true">
         <defs>
           <radialGradient id="flame-gradient" cx="50%" cy="72%" r="62%">
@@ -89,6 +92,46 @@
       <button class="btn-accent" id="rematch" data-action="newGame">Revancha</button>
       <button class="btn-text" data-action="undo">Deshacer último punto</button>
     </div>
+  </div>
+
+  <!-- Compartir (js/view/share.js) -->
+  <div class="modal" id="share">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="share-title">
+      <h2 id="share-title">Compartir</h2>
+      <button class="option" id="share-app">
+        <strong>El anotador</strong>
+        <small>Para que lo usen en otro celu</small>
+      </button>
+      <button class="option" id="share-game">
+        <strong>Esta partida</strong>
+        <small id="share-game-summary"></small>
+      </button>
+      <p class="status" id="share-status" aria-live="polite"></p>
+      <button class="btn-text" id="close-share">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- Partida recibida por link (js/view/share.js) -->
+  <div class="modal" id="shared-game">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="shared-game-title">
+      <h2 id="shared-game-title">Partida compartida</h2>
+      <p id="shared-game-summary"></p>
+      <button class="btn-accent" id="load-shared-game">Cargar partida</button>
+      <button class="btn-text" id="ignore-shared-game">No, gracias</button>
+    </div>
+  </div>
+
+  <!-- Invitación a instalar la app (js/view/install.js) -->
+  <div class="install" id="install" hidden>
+    <img src="icon-192.png" alt="" width="40" height="40">
+    <div class="install-text">
+      <strong>Instalá la app</strong>
+      <small id="install-hint">Anda sin conexión</small>
+    </div>
+    <button class="install-button" id="install-button">Instalar</button>
+    <button class="icon-btn install-close" id="install-close" aria-label="No mostrar más">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
   </div>
 
   <!-- Ajustes (js/view/settings.js) -->

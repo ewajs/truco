@@ -13,11 +13,13 @@
 //   { type: 'setTarget', target }        jugar a 15 o a 30 (reinicia si había puntos)
 //   { type: 'rename', team, name }
 //   { type: 'setOption', option, value }
+//   { type: 'loadGame', game }           cargar una partida compartida por link (ver share.js)
 
 export const TARGETS = [15, 30];
 export const POINTS_PER_GROUP = 5; // cada cuadrado de fósforos vale 5
 export const HISTORY_LIMIT = 300;
 export const DEFAULT_NAMES = ['Nosotros', 'Ellos'];
+export const MAX_NAME_LENGTH = 14;
 
 export function createInitialState() {
   return {
@@ -58,6 +60,11 @@ export function standing(state, team) {
   return score < target / 2 ? `En malas, faltan ${left}` : `En buenas, faltan ${left}`;
 }
 
+// Nombre sin espacios de más; vacío vuelve al nombre por defecto del equipo.
+export function cleanName(name, team) {
+  return name.trim().slice(0, MAX_NAME_LENGTH) || DEFAULT_NAMES[team];
+}
+
 // ---- Reducer ----
 
 export function reduce(state, action) {
@@ -70,6 +77,7 @@ export function reduce(state, action) {
     case 'setTarget': return setTarget(state, action.target);
     case 'rename': return rename(state, action.team, action.name);
     case 'setOption': return { ...state, options: { ...state.options, [action.option]: action.value } };
+    case 'loadGame': return loadGame(state, action.game);
     default: throw new Error(`Acción desconocida: ${action.type}`);
   }
 }
@@ -131,7 +139,13 @@ function setTarget(state, target) {
 }
 
 function rename(state, team, name) {
-  const clean = name.trim() || DEFAULT_NAMES[team];
+  const clean = cleanName(name, team);
   if (clean === state.teams[team].name) return state;
   return updateTeam(state, team, () => ({ name: clean }));
+}
+
+// `game` ya viene validado por share.js: { target, teams: [{ name, score, wins }] }.
+// Las opciones se conservan; el historial arranca de cero.
+function loadGame(state, game) {
+  return { ...state, target: game.target, teams: game.teams.map(team => ({ ...team })), history: [] };
 }

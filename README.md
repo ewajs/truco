@@ -8,6 +8,8 @@ Tocá la columna de un equipo para sumar, mantené apretado para borrar.
 - Deshacer, contador de partidas ganadas y nombres editables
 - Vibración y opción de mantener la pantalla encendida
 - Todo se guarda en el navegador (`localStorage`)
+- Se instala como app y anda sin conexión
+- Compartir el anotador o la partida actual por link
 
 ## Correrlo local
 
@@ -32,10 +34,13 @@ npm test         # reglas, guardado y dibujo de fósforos (Node 22+, sin depende
 site/                   lo que se publica en GitHub Pages, tal cual
   index.html            todo el markup (la columna de un equipo es un <template>)
   css/styles.css
+  sw.js                 service worker: primero la red, sin conexión usa la última copia
+  manifest.webmanifest  datos para instalarla como app (nombre, íconos, colores)
   js/
     main.js             arranque: estado, dispatch() y conexión de las vistas
     game.js             reglas del juego: reduce(state, action) y consultas
     storage.js          guardar/cargar en localStorage y migrar versiones viejas
+    share.js            partida ⇄ link (#a=30&equipo1=…&puntos1=…)
     device.js           vibración y wake lock
     view/
       scoreboard.js     columnas de los equipos
@@ -44,7 +49,9 @@ site/                   lo que se publica en GitHub Pages, tal cual
       gestures.js       tocar para sumar, mantener para borrar
       settings.js       hoja de ajustes
       winner.js         cartel de ganador
-tests/                  tests de game.js, storage.js y view/matches.js
+      share.js          diálogo de compartir y aviso al abrir una partida compartida
+      install.js        invitación a instalar la app
+tests/                  tests de game.js, storage.js, share.js y view/matches.js
 ```
 
 El flujo es siempre el mismo:
