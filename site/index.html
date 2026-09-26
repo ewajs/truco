@@ -20,11 +20,9 @@
   <script>
     try {
       const { options } = JSON.parse(localStorage.getItem('truco-anotador-v1'));
-      const dark = typeof options.darkMode === 'boolean'
-        ? options.darkMode
-        : matchMedia('(prefers-color-scheme: dark)').matches;
+      const system = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
       document.documentElement.dataset.palette = options.palette;
-      document.documentElement.dataset.mode = dark ? 'dark' : 'light';
+      document.documentElement.dataset.mode = options.mode === 'auto' ? system : options.mode;
     } catch {
       // nada guardado todavía: el CSS sigue al celular
     }
@@ -310,19 +308,24 @@
             data-feature: la opción se oculta si el navegador no lo soporta (ver device.js).
           -->
           <div class="field">
-            <span class="field-label">Apariencia</span>
+            <span class="field-label">Tema</span>
             <!-- Cada muestra se pinta con los colores de su tema (data-palette, ver styles.css) -->
             <div class="palette-picker" role="radiogroup" aria-label="Tema">
-              <button role="radio" data-palette-choice="pano"><span class="swatch" data-palette="pano"><i></i></span>Paño</button>
-              <button role="radio" data-palette-choice="madera"><span class="swatch" data-palette="madera"><i></i></span>Madera</button>
-              <button role="radio" data-palette-choice="noche"><span class="swatch" data-palette="noche"><i></i></span>Noche</button>
-              <button role="radio" data-palette-choice="argento"><span class="swatch" data-palette="argento"><i></i></span>Argento</button>
+              <button role="radio" data-choice="palette" data-value="pano"><span class="swatch" data-palette="pano"><i></i></span>Paño</button>
+              <button role="radio" data-choice="palette" data-value="madera"><span class="swatch" data-palette="madera"><i></i></span>Madera</button>
+              <button role="radio" data-choice="palette" data-value="noche"><span class="swatch" data-palette="noche"><i></i></span>Noche</button>
+              <button role="radio" data-choice="palette" data-value="argento"><span class="swatch" data-palette="argento"><i></i></span>Argento</button>
             </div>
-            <label class="toggle"><span>Modo oscuro<small id="dark-mode-hint">Sigue al celular</small></span><input type="checkbox" id="dark-mode"><i></i></label>
-            <p class="requires-note" id="dark-mode-manual" hidden>
-              Elegido a mano.
-              <button class="link" id="dark-mode-follow">Seguir al celular</button>
-            </p>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Modo</span>
+            <div class="seg" role="radiogroup" aria-label="Modo">
+              <button role="radio" data-choice="mode" data-value="auto">Automático</button>
+              <button role="radio" data-choice="mode" data-value="light">Claro</button>
+              <button role="radio" data-choice="mode" data-value="dark">Oscuro</button>
+            </div>
+            <p class="help">Automático sigue al celular.</p>
           </div>
 
           <div class="field">

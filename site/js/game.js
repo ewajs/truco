@@ -33,7 +33,7 @@ export const PALETTES = ['pano', 'madera', 'noche', 'argento'];
 // Opciones que no son de sí o no: los valores que aceptan (ver storage.js).
 export const OPTION_CHOICES = {
   palette: PALETTES,
-  darkMode: ['auto', true, false], // 'auto' sigue al celular
+  mode: ['auto', 'light', 'dark'], // 'auto' sigue al celular
 };
 
 export function createInitialState() {
@@ -56,7 +56,7 @@ export function createInitialState() {
       vibrate: true,
       keepAwake: false,
       palette: 'pano',    // tema de colores (PALETTES)
-      darkMode: 'auto',   // true, false o 'auto' (sigue al celular)
+      mode: 'auto',       // claro u oscuro: 'light', 'dark' o 'auto' (sigue al celular)
     },
   };
 }

@@ -7,7 +7,6 @@ import { isFresh, hasBuenas, playerCountLabel } from '../game.js';
 import { tracksHands } from '../hands.js';
 import { SUPPORTS } from '../device.js';
 import { createDialog } from './dialog.js';
-import { resolveMode } from './appearance.js';
 
 const SLIDE_MS = 320; // duración de la animación de apertura (ver .sheet en CSS)
 const CONFIRM_MS = 3000;
@@ -102,34 +101,12 @@ export function createSettings({ dispatch }) {
   const featureGroup = sheet.querySelector('[data-feature-group]');
   featureGroup.hidden = !featureGroup.querySelector('[data-feature]:not([hidden])');
 
-  // ---- Apariencia: tema y modo oscuro ----
+  // ---- Opciones con varios valores (tema, modo): data-choice + data-value ----
 
-  const paletteButtons = sheet.querySelectorAll('[data-palette-choice]');
-  const darkToggle = document.getElementById('dark-mode');
-  const darkHint = document.getElementById('dark-mode-hint');
-  const darkManual = document.getElementById('dark-mode-manual');
-  const systemDark = matchMedia('(prefers-color-scheme: dark)');
-
-  paletteButtons.forEach(button => button.addEventListener('click', () => {
-    dispatch({ type: 'setOption', option: 'palette', value: button.dataset.paletteChoice });
+  const choiceButtons = sheet.querySelectorAll('[data-choice]');
+  choiceButtons.forEach(button => button.addEventListener('click', () => {
+    dispatch({ type: 'setOption', option: button.dataset.choice, value: button.dataset.value });
   }));
-  darkToggle.addEventListener('change', () => {
-    dispatch({ type: 'setOption', option: 'darkMode', value: darkToggle.checked });
-  });
-  document.getElementById('dark-mode-follow').addEventListener('click', () => {
-    dispatch({ type: 'setOption', option: 'darkMode', value: 'auto' });
-  });
-  systemDark.addEventListener('change', () => current && renderAppearance(current));
-
-  function renderAppearance(state) {
-    const { palette, darkMode } = state.options;
-    paletteButtons.forEach(button => {
-      button.setAttribute('aria-checked', String(button.dataset.paletteChoice === palette));
-    });
-    darkToggle.checked = resolveMode(darkMode, systemDark.matches) === 'dark';
-    darkHint.hidden = darkMode !== 'auto';
-    darkManual.hidden = darkMode === 'auto';
-  }
 
   // "Activar" en una aclaración: prende la opción que hace falta
   sheet.querySelectorAll('[data-enable]').forEach(button => {
@@ -185,7 +162,10 @@ export function createSettings({ dispatch }) {
       toggle.disabled = Boolean(requires) && !REQUIREMENTS[requires](state);
     });
 
-    renderAppearance(state);
+    choiceButtons.forEach(button => {
+      const selected = state.options[button.dataset.choice] === button.dataset.value;
+      button.setAttribute('aria-checked', String(selected));
+    });
 
     requireNotes.forEach(note => {
       const toggle = sheet.querySelector(`[data-option="${note.dataset.noteFor}"]`);
