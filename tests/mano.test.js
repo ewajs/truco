@@ -81,14 +81,19 @@ test('con la opción apagada no pasa, aunque se apague con un pase pendiente', (
   assert.equal(simulate([add(0), off, WAIT]).state.mano, 0);
 });
 
-test('sin mostrar nada de la mano (ni quién es ni el número) no pasa sola', () => {
-  const hideMano = { type: 'setOption', option: 'showMano', value: false };
-  const hideNumber = { type: 'setOption', option: 'showHandNumber', value: false };
-  assert.equal(simulate([hideMano, hideNumber, add(0), WAIT]).state.mano, 0);
-  assert.equal(simulate([hideMano, hideNumber, add(0), WAIT]).state.hand.number, 1, 'ni cuenta');
+test('sin seguir las manos: solo puntos, ni pasa la mano ni cuenta', () => {
+  const off = { type: 'setOption', option: 'trackHands', value: false };
+  const { state } = simulate([off, add(0), WAIT]);
+  assert.equal(state.mano, 0);
+  assert.equal(state.hand.number, 1);
 });
 
-test('mostrando solo el número de mano, pasa sola y cuenta', () => {
+test('apagar el seguimiento con un pase pendiente lo cancela', () => {
+  const off = { type: 'setOption', option: 'trackHands', value: false };
+  assert.equal(simulate([add(0), off, WAIT]).state.mano, 0);
+});
+
+test('siguiendo las manos sin mostrar quién es mano, igual pasa y cuenta', () => {
   const hideMano = { type: 'setOption', option: 'showMano', value: false };
   assert.equal(simulate([hideMano, add(0), WAIT]).state.hand.number, 2);
 });

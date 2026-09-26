@@ -9,7 +9,7 @@
 // `state` es la única fuente de verdad. Las vistas nunca lo modifican: solo lo dibujan
 // y avisan lo que hizo el usuario llamando a dispatch().
 
-import { reduce, winner, autoManoAfter } from './game.js';
+import { reduce, winner, autoManoAfter, showsMano } from './game.js';
 import { load, save } from './storage.js';
 import { VIBRATION, vibrate, createWakeLock } from './device.js';
 import { createScoreboard } from './view/scoreboard.js';
@@ -84,7 +84,7 @@ function render() {
   document.body.classList.toggle('hide-nums', !state.options.showNumbers);
   document.body.classList.toggle('no-quick', !state.options.quickButtons);
   document.body.classList.toggle('no-buttons', !state.options.showButtons);
-  document.body.classList.toggle('hide-mano', !state.options.showMano);
+  document.body.classList.toggle('hide-mano', !showsMano(state));
   undoButton.disabled = state.history.length === 0;
   scoreboard.render(state);
   settings.render(state);
@@ -96,7 +96,7 @@ function render() {
 
 // Vibración y aviso para lectores de pantalla cuando cambia un puntaje o la mano.
 function giveFeedback(previous, next) {
-  if (next.mano !== previous.mano && next.options.showMano) {
+  if (next.mano !== previous.mano && showsMano(next)) {
     announcer.textContent = `Es mano ${next.teams[next.mano].name}`;
   }
 

@@ -12,6 +12,7 @@ function game(players = 6, target = 30) {
 
 const add = (team, points) => ({ type: 'add', team, points });
 const pass = { type: 'passMano' };
+const setHandAction = fields => ({ type: 'setHand', ...fields });
 
 // Una mano (o duelo) en la que `team` gana `points` y después se pasa la mano.
 function hand(state, team, points) {
@@ -124,6 +125,11 @@ test('a 15 hay pica pica hasta el final (nunca se llega a 25)', () => {
 test('de a 2 o 4 no hay pica pica', () => {
   assert.equal(isPicaPicaHand(hand(game(4), 0, 5)), false);
   assert.equal(isPicaPicaHand(hand(game(2), 0, 5)), false);
+});
+
+test('sin seguir las manos no hay pica pica', () => {
+  const off = reduce(game(6), { type: 'setOption', option: 'trackHands', value: false });
+  assert.equal(isPicaPicaHand(reduce(off, setHandAction({ number: 2, pica: true, duel: 1 }))), false);
 });
 
 test('con la opción apagada no hay pica pica', () => {

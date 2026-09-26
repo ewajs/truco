@@ -265,7 +265,7 @@
           </div>
 
           <div class="field" id="pica-field">
-            <label class="toggle"><span>Pica pica<small>Del 5 al 25 alterna una mano redonda y una de pica pica</small></span><input type="checkbox" data-option="picaPica"><i></i></label>
+            <label class="toggle"><span>Pica pica<small>Del 5 al 25 alterna una mano redonda y una de pica pica<span class="requires-note">. Necesita «Seguir las manos» (en Opciones)</span></small></span><input type="checkbox" data-option="picaPica" data-requires="trackHands"><i></i></label>
           </div>
 
           <div class="field">
@@ -297,9 +297,9 @@
 
           <div class="field">
             <span class="field-label">Mano</span>
-            <label class="toggle"><span>Mostrar quién es mano<small>Tocá la mano o el mazo para pasarla</small></span><input type="checkbox" data-option="showMano"><i></i></label>
-            <label class="toggle"><span>Mostrar número de mano<small>Con pica pica se muestra siempre. Tocalo para corregirlo</small></span><input type="checkbox" data-option="showHandNumber"><i></i></label>
-            <label class="toggle"><span>Pasar la mano sola<small>Unos segundos después de anotar</small></span><input type="checkbox" data-option="autoMano" data-requires="autoManoUseful"><i></i></label>
+            <label class="toggle"><span>Seguir las manos<small>Número de mano (tocalo para corregirlo), quién es mano y pica pica. Apagado, solo se cuentan los puntos</small></span><input type="checkbox" data-option="trackHands"><i></i></label>
+            <label class="toggle sub"><span>Mostrar quién es mano<small>Tocá la mano o el mazo para pasarla</small></span><input type="checkbox" data-option="showMano" data-requires="trackHands"><i></i></label>
+            <label class="toggle sub"><span>Pasar la mano sola<small>Unos segundos después de anotar</small></span><input type="checkbox" data-option="autoMano" data-requires="trackHands"><i></i></label>
           </div>
 
           <div class="field" data-feature-group>

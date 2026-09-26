@@ -39,10 +39,11 @@ export function createInitialState() {
       showNumbers: true,
       showButtons: true,  // −, +1 y los rápidos; sin botones se usa tocar y mantener
       quickButtons: true, // +2, +3 y +4 (solo si showButtons)
-      showMano: true,
-      showHandNumber: true, // chip con el número de mano (con pica pica se ve siempre)
-      autoMano: true,     // pasar la mano sola después de anotar (si se muestra algo de la mano)
-      picaPica: true,     // de a 6 u 8: alternar manos redondas y de pica pica
+      trackHands: true,   // seguir las manos: número, quién es mano y pica pica.
+                          // Apagado, la app solo cuenta puntos.
+      showMano: true,     // badges de mano/mazo (si trackHands)
+      autoMano: true,     // pasar la mano sola después de anotar (si trackHands)
+      picaPica: true,     // de a 6 u 8: alternar manos redondas y de pica pica (si trackHands)
       vibrate: true,
       keepAwake: false,
     },
@@ -75,9 +76,20 @@ export function groupCount(target) {
   return target / POINTS_PER_GROUP;
 }
 
-// El pica pica se juega de a 6 u 8, si está activado.
+// Si la app sigue las manos. Si no, solo cuenta puntos: no hay mano, número, pase
+// automático ni pica pica.
+export function tracksHands(state) {
+  return state.options.trackHands;
+}
+
+// Si se muestran los badges de mano/mazo.
+export function showsMano(state) {
+  return tracksHands(state) && state.options.showMano;
+}
+
+// El pica pica se juega de a 6 u 8, si está activado y se siguen las manos.
 export function picaPicaEnabled(state) {
-  return state.options.picaPica && state.players >= 6;
+  return tracksHands(state) && state.options.picaPica && state.players >= 6;
 }
 
 // Duelos de un pica pica. De a 6: cada uno contra el de enfrente (3 duelos de uno contra
@@ -91,16 +103,6 @@ export function isPicaPicaHand(state) {
   return picaPicaEnabled(state) && state.hand.pica;
 }
 
-// El chip con el número de mano se ve si está activado, y siempre con pica pica.
-export function showsHandChip(state) {
-  return state.options.showHandNumber || picaPicaEnabled(state);
-}
-
-// Pasar la mano sola solo tiene sentido si se muestra algo de la mano (quién es, el
-// número o el pica pica). Si no, la app queda en "contar puntos y nada más".
-export function autoManoUseful(state) {
-  return state.options.showMano || showsHandChip(state);
-}
 
 // "En malas, faltan 12" · "Faltan 5" · "Ganó"
 export function standing(state, team) {
@@ -286,7 +288,7 @@ function inPicaPicaZone(scores) {
 // `pending` es null (nada pendiente) o { handStart } con los puntajes de antes del primer
 // punto de la mano. Devuelve { pending, restart }.
 export function autoManoAfter(pending, action, before, after) {
-  const enabled = after.options.autoMano && autoManoUseful(after);
+  const enabled = tracksHands(after) && after.options.autoMano;
   const cancels = ['passMano', 'newGame', 'setTarget', 'loadGame'].includes(action.type);
   if (!enabled || cancels) return { pending: null, restart: false };
 

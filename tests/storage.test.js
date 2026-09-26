@@ -82,6 +82,13 @@ test('mano actual: se guarda; si falta o viene rota arranca en la 1 con los punt
   assert.deepEqual(fromSaved({ version: 2, teams, hand: { number: 'x' } }).hand, fresh);
 });
 
+test('descarta opciones que ya no existen', () => {
+  const state = fromSaved({ version: 2, options: { showHandNumber: false, vibrate: false } });
+  assert.equal('showHandNumber' in state.options, false);
+  assert.equal(state.options.vibrate, false);
+  assert.equal(state.options.trackHands, true);
+});
+
 test('completa campos faltantes y corrige valores inválidos', () => {
   const state = fromSaved({ version: 2, target: 99, options: { quickButtons: false } });
   assert.equal(state.target, 30);
