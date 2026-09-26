@@ -87,15 +87,15 @@
   --muted: #C2A791;
 }
 
-/* ---- Noche: azul índigo con luna dorada ---- */
+/* ---- Noche: azul índigo con verde agua ---- */
 [data-palette="noche"] {
   --felt: #E4E6F1;
   --panel: #F6F7FC;
   --ink: #1A1D3A;
   --muted: #5E6283;
-  --accent: #F0C24B;
-  --accent-ink: #221A00;
-  --accent-shadow: #C69A24;
+  --accent: #5FCDB2;
+  --accent-ink: #06291F;
+  --accent-shadow: #3A9C84;
 }
 
 [data-mode="dark"][data-palette="noche"],
@@ -106,23 +106,23 @@
   --muted: #9A9FC0;
 }
 
-/* ---- Argento: celeste y blanco con el dorado del sol de mayo ---- */
+/* ---- Argento: celeste de la bandera sobre un blanco apagado ---- */
 [data-palette="argento"] {
-  --felt: #E4EFF8;
-  --panel: #FAFCFE;
-  --ink: #173652;
-  --muted: #5C7891;
-  --accent: #F6B40E;
-  --accent-ink: #3A2500;
-  --accent-shadow: #C98F06;
+  --felt: #DCE5EE;
+  --panel: #EBF1F6;
+  --ink: #16314D;
+  --muted: #5A7289;
+  --accent: #74B0E2;
+  --accent-ink: #0C2338;
+  --accent-shadow: #4E8CC2;
 }
 
 [data-mode="dark"][data-palette="argento"],
 [data-mode="dark"] [data-palette="argento"] {
-  --felt: #102A40;
-  --panel: #183A55;
-  --ink: #EEF5FB;
-  --muted: #A3C4DD;
+  --felt: #0F2236;
+  --panel: #17314B;
+  --ink: #EAF2F9;
+  --muted: #9DB8CF;
 }
 
 *, *::before, *::after {

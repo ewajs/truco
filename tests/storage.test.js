@@ -93,11 +93,11 @@ test('opciones: completa las que faltan y descarta las que sobran', () => {
   assert.deepEqual(loaded.teams, playedState().teams, 'la partida no se pierde');
 });
 
-test('opciones con valores fijos: tema y modo oscuro', () => {
-  const ok = fromSaved(savedWith({ options: { palette: 'argento', darkMode: false } }));
+test('opciones con valores fijos: tema y modo', () => {
+  const ok = fromSaved(savedWith({ options: { palette: 'argento', mode: 'dark' } }));
   assert.equal(ok.options.palette, 'argento');
-  assert.equal(ok.options.darkMode, false);
-  const bad = fromSaved(savedWith({ options: { palette: 'fucsia', darkMode: 'si' } }));
+  assert.equal(ok.options.mode, 'dark');
+  const bad = fromSaved(savedWith({ options: { palette: 'fucsia', mode: true } }));
   assert.equal(bad.options.palette, 'pano', 'tema desconocido: el de siempre');
-  assert.equal(bad.options.darkMode, 'auto', 'modo desconocido: seguir al celular');
+  assert.equal(bad.options.mode, 'auto', 'modo desconocido: seguir al celular');
 });
