@@ -4,7 +4,8 @@
 // una redonda dice "Mano 7"; en pica pica se pinta de rojo y muestra qué duelo se juega
 // ("Pica pica 2/3"). Tocarlo abre la corrección: número, tipo de mano y duelo.
 
-import { picaPicaEnabled, isPicaPicaHand, duelsPerPicaPica, tracksHands } from '../game.js';
+import { picaPicaEnabled, isPicaPicaHand, duelsPerPicaPica, tracksHands } from '../hands.js';
+import { createDialog } from './dialog.js';
 
 export function createHandChip({ dispatch }) {
   const chip = document.getElementById('hand-chip');
@@ -24,7 +25,7 @@ export function createHandChip({ dispatch }) {
     const pica = isPicaPicaHand(state);
     const { hand } = state;
     number.textContent = `Mano ${hand.number}`;
-    duel.textContent = pica ? `${hand.duels + 1}/${duelsPerPicaPica(state.players)}` : '';
+    duel.textContent = pica ? `${hand.duels + 1}/${duelsPerPicaPica(state.playerCount)}` : '';
     chip.classList.toggle('pica', pica);
     chip.setAttribute('aria-label', `${pica ? 'Pica pica, ' : ''}mano ${hand.number}. Tocá para corregir`);
 
@@ -41,7 +42,7 @@ export function createHandChip({ dispatch }) {
 
 // Popup de corrección. Trabaja sobre un borrador y recién "Listo" lo aplica.
 function createHandEditor({ dispatch }) {
-  const dialog = document.getElementById('hand-editor');
+  const dialog = createDialog(document.getElementById('hand-editor'));
   const numberOutput = document.getElementById('hand-editor-number');
   const minus = document.getElementById('hand-editor-minus');
   const picaSection = document.getElementById('hand-editor-pica');
@@ -56,7 +57,7 @@ function createHandEditor({ dispatch }) {
       number: state.hand.number,
       pica,
       duel: pica ? state.hand.duels + 1 : 1,
-      duels: duelsPerPicaPica(state.players),
+      duels: duelsPerPicaPica(state.playerCount),
     };
     picaSection.hidden = !picaPicaEnabled(state);
     duelSeg.replaceChildren(...Array.from({ length: draft.duels }, (_, i) => {
@@ -67,11 +68,7 @@ function createHandEditor({ dispatch }) {
       return button;
     }));
     update();
-    dialog.classList.add('open');
-  }
-
-  function close() {
-    dialog.classList.remove('open');
+    dialog.open({ focus: document.getElementById('hand-editor-save') });
   }
 
   function update() {
@@ -101,15 +98,9 @@ function createHandEditor({ dispatch }) {
 
   document.getElementById('hand-editor-save').addEventListener('click', () => {
     dispatch({ type: 'setHand', number: draft.number, pica: draft.pica, duel: draft.duel });
-    close();
+    dialog.close();
   });
-  document.getElementById('hand-editor-cancel').addEventListener('click', close);
-  dialog.addEventListener('click', event => {
-    if (event.target === dialog) close(); // tocar afuera de la tarjeta
-  });
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && dialog.classList.contains('open')) close();
-  });
+  document.getElementById('hand-editor-cancel').addEventListener('click', () => dialog.close());
 
   return { open };
 }

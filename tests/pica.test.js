@@ -1,12 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createInitialState, reduce, isPicaPicaHand } from '../site/js/game.js';
+import { createInitialState, reduce } from '../site/js/game.js';
+import { isPicaPicaHand } from '../site/js/hands.js';
 
-// Partida de a `players`. Cada paso es una acción; el helper `hand` anota puntos y pasa
-// la mano, como pasa en la mesa.
-function game(players = 6, target = 30) {
+// Partida de a `count` jugadores. Cada paso es una acción; el helper `hand` anota puntos
+// y pasa la mano, como pasa en la mesa.
+function game(count = 6, target = 30) {
   let state = createInitialState();
-  state = reduce(state, { type: 'setPlayers', players });
+  state = reduce(state, { type: 'setPlayerCount', count });
   return reduce(state, { type: 'setTarget', target });
 }
 
@@ -96,7 +97,7 @@ test('alterna redonda y pica pica mientras nadie llegue a 25', () => {
 
 test('llegar a 25 en una redonda: no hay más pica pica', () => {
   let state = game(6);
-  state = reduce(state, { type: 'loadGame', game: { target: 30, players: 6, teams: [{ name: 'A', score: 22, wins: 0 }, { name: 'B', score: 10, wins: 0 }] } });
+  state = reduce(state, { type: 'loadGame', game: { target: 30, playerCount: 6, teams: [{ name: 'A', score: 22, wins: 0 }, { name: 'B', score: 10, wins: 0 }] } });
   state = hand(state, 0, 3); // 25 en redonda
   assert.equal(isPicaPicaHand(state), false);
   state = hand(state, 1, 1);
@@ -105,7 +106,7 @@ test('llegar a 25 en una redonda: no hay más pica pica', () => {
 
 test('llegar a 25 durante un pica pica: termina el pica pica y no hay más', () => {
   let state = game(6);
-  state = reduce(state, { type: 'loadGame', game: { target: 30, players: 6, teams: [{ name: 'A', score: 20, wins: 0 }, { name: 'B', score: 10, wins: 0 }] } });
+  state = reduce(state, { type: 'loadGame', game: { target: 30, playerCount: 6, teams: [{ name: 'A', score: 20, wins: 0 }, { name: 'B', score: 10, wins: 0 }] } });
   state = hand(state, 1, 1); // redonda → pica
   assert.equal(isPicaPicaHand(state), true);
   state = hand(hand(hand(state, 0, 2), 0, 2), 0, 1); // 25 en el pica pica
@@ -182,4 +183,14 @@ test('la corrección ajusta valores fuera de rango', () => {
 test('corregir sin cambios no hace nada', () => {
   const state = game(6);
   assert.equal(reduce(state, setHand({ number: 1, pica: false, duel: 1 })), state);
+});
+
+test('cambiar de a 6 a de a 8 en el último duelo lo ajusta a los duelos que hay', () => {
+  let state = hand(game(6), 0, 5);       // pica pica de a 6
+  state = hand(hand(state, 1, 1), 1, 1); // duelo 3 de 3
+  assert.equal(state.hand.duels, 2);
+  state = reduce(state, { type: 'setPlayerCount', count: 8 });
+  assert.equal(state.hand.duels, 1, 'duelo 2 de 2');
+  state = hand(state, 0, 1);
+  assert.equal(isPicaPicaHand(state), false, 'termina el pica pica');
 });

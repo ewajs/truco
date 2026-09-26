@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createInitialState, reduce, winner, standing, playersLabel, HISTORY_LIMIT } from '../site/js/game.js';
+import { createInitialState, reduce, winner, standing, playerCountLabel, HISTORY_LIMIT } from '../site/js/game.js';
 
 // Aplica varias acciones seguidas y devuelve el estado final.
 function play(state, ...actions) {
@@ -159,18 +159,18 @@ test('cargar una partida ya ganada la deja ganada', () => {
 
 test('de a cuántos: 2, 4, 6 u 8, y cambiarlo no toca la partida', () => {
   const state = play(createInitialState(), add(0, 3), add(1, 2));
-  assert.equal(state.players, 4);
-  const next = reduce(state, { type: 'setPlayers', players: 8 });
-  assert.equal(next.players, 8);
+  assert.equal(state.playerCount, 4);
+  const next = reduce(state, { type: 'setPlayerCount', count: 8 });
+  assert.equal(next.playerCount, 8);
   assert.deepEqual(scores(next), [3, 2]);
   assert.deepEqual(next.history, state.history, 'se puede seguir deshaciendo');
-  assert.equal(reduce(next, { type: 'setPlayers', players: 8 }), next, 'mismo valor: sin cambios');
-  assert.equal(reduce(next, { type: 'setPlayers', players: 5 }), next, 'solo 2, 4, 6 u 8');
+  assert.equal(reduce(next, { type: 'setPlayerCount', count: 8 }), next, 'mismo valor: sin cambios');
+  assert.equal(reduce(next, { type: 'setPlayerCount', count: 5 }), next, 'solo 2, 4, 6 u 8');
 });
 
 test('de a cuántos, en palabras', () => {
-  assert.equal(playersLabel(2), 'Uno contra uno');
-  assert.equal(playersLabel(4), 'Dos contra dos');
-  assert.equal(playersLabel(6), 'Tres contra tres');
-  assert.equal(playersLabel(8), 'Cuatro contra cuatro');
+  assert.equal(playerCountLabel(2), 'Uno contra uno');
+  assert.equal(playerCountLabel(4), 'Dos contra dos');
+  assert.equal(playerCountLabel(6), 'Tres contra tres');
+  assert.equal(playerCountLabel(8), 'Cuatro contra cuatro');
 });

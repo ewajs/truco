@@ -1,12 +1,16 @@
 // Guardado de la partida en localStorage.
 //
-// La clave no cambia entre versiones: si cambia la forma del estado, se agrega una
-// migración en fromSaved() para que nadie pierda la partida que tenía guardada.
+// Todavía no migramos versiones viejas: si lo guardado es de otra versión o tiene algo
+// inválido, se descarta y se arranca de cero. Si cambia la forma del estado, subí VERSION.
+//
+// Las opciones son la excepción: se completan las que falten y se descartan las que ya no
+// existen, así agregar una opción nueva no borra la partida de nadie.
 
-import { createInitialState, newHand, TARGETS, PLAYERS } from './game.js';
+import { createInitialState, TARGETS, PLAYER_COUNTS, HISTORY_LIMIT } from './game.js';
+import { duelsPerPicaPica } from './hands.js';
 
 export const STORAGE_KEY = 'truco-anotador-v1';
-const VERSION = 2;
+const VERSION = 3;
 
 export function load(storage = globalThis.localStorage) {
   try {
@@ -26,57 +30,51 @@ export function save(state, storage = globalThis.localStorage) {
   }
 }
 
-// Convierte lo guardado (de cualquier versión) en un estado válido.
+// Convierte lo guardado en un estado válido, o en uno nuevo si no se puede usar.
 export function fromSaved(saved) {
-  const data = saved.version === VERSION ? saved : migrateFromV1(saved);
   const initial = createInitialState();
-  const teams = initial.teams.map((team, i) => ({ ...team, ...data.teams?.[i] }));
+  if (saved?.version !== VERSION || !isValidGame(saved)) return initial;
   return {
-    target: TARGETS.includes(data.target) ? data.target : initial.target,
-    players: PLAYERS.includes(data.players) ? data.players : initial.players,
-    teams,
-    history: Array.isArray(data.history) ? data.history : [],
-    mano: data.mano === 1 ? 1 : 0,
-    hand: validHand(data.hand) ?? newHand(teams.map(team => team.score)),
-    options: knownOptions(initial.options, data.options),
+    target: saved.target,
+    playerCount: saved.playerCount,
+    teams: saved.teams.map(({ name, score, wins }) => ({ name, score, wins })),
+    history: saved.history.map(({ team, delta }) => ({ team, delta })),
+    mano: saved.mano,
+    hand: { ...saved.hand, startScores: [...saved.hand.startScores] },
+    options: knownOptions(initial.options, saved.options),
   };
 }
 
-// Las opciones guardadas, completando las que falten y descartando las que ya no existen.
-function knownOptions(defaults, saved = {}) {
-  return Object.fromEntries(Object.entries(defaults).map(([key, value]) => [key, saved[key] ?? value]));
-}
+// Todo lo que no son opciones tiene que tener la forma y los rangos esperados.
+function isValidGame(data) {
+  const { target, playerCount, teams, history, mano, hand } = data;
+  if (!TARGETS.includes(target) || !PLAYER_COUNTS.includes(playerCount)) return false;
+  if (mano !== 0 && mano !== 1) return false;
 
-// La mano guardada, o null si falta o no tiene la forma esperada.
-function validHand(hand) {
-  const ok = hand
+  const points = value => Number.isInteger(value) && value >= 0 && value <= target;
+  const validTeam = team => typeof team?.name === 'string' && team.name.trim() !== ''
+    && points(team.score) && Number.isInteger(team.wins) && team.wins >= 0;
+  if (!Array.isArray(teams) || teams.length !== 2 || !teams.every(validTeam)) return false;
+
+  const validEntry = entry => (entry?.team === 0 || entry?.team === 1)
+    && Number.isInteger(entry.delta) && entry.delta !== 0;
+  if (!Array.isArray(history) || history.length > HISTORY_LIMIT || !history.every(validEntry)) {
+    return false;
+  }
+
+  return Boolean(hand)
     && Number.isInteger(hand.number) && hand.number >= 1
     && typeof hand.pica === 'boolean'
-    && Number.isInteger(hand.duels) && hand.duels >= 0
-    && Array.isArray(hand.startScores) && hand.startScores.length === 2;
-  return ok ? hand : null;
+    && Number.isInteger(hand.duels) && hand.duels >= 0 && hand.duels < duelsPerPicaPica(playerCount)
+    && Array.isArray(hand.startScores) && hand.startScores.length === 2
+    && hand.startScores.every(points);
 }
 
-// v1 (el prototipo): { target, names, scores, wins, history: [{ t, d }], opts }
-function migrateFromV1(v1) {
-  const opts = v1.opts ?? {};
-  return {
-    target: v1.target,
-    teams: [0, 1].map(i => withoutUndefined({
-      name: v1.names?.[i],
-      score: v1.scores?.[i],
-      wins: v1.wins?.[i],
-    })),
-    history: (v1.history ?? []).map(h => ({ team: h.t, delta: h.d })),
-    options: withoutUndefined({
-      showNumbers: opts.numbers,
-      quickButtons: opts.quick,
-      vibrate: opts.vibrate,
-      keepAwake: opts.awake,
-    }),
-  };
-}
-
-function withoutUndefined(obj) {
-  return Object.fromEntries(Object.entries(obj).filter(([, value]) => value !== undefined));
+// Las opciones guardadas, completando las que falten (con su valor por defecto) y
+// descartando las que ya no existen o no son booleanas.
+function knownOptions(defaults, saved) {
+  const source = saved && typeof saved === 'object' ? saved : {};
+  return Object.fromEntries(Object.entries(defaults).map(([key, value]) => (
+    [key, typeof source[key] === 'boolean' ? source[key] : value]
+  )));
 }

@@ -8,12 +8,12 @@
 // Se comparten los nombres, los puntos, las ganadas, a cuántos puntos y de a cuántos
 // jugadores. El historial y las opciones no.
 
-import { TARGETS, PLAYERS, cleanName } from './game.js';
+import { TARGETS, PLAYER_COUNTS, cleanName } from './game.js';
 
 const MAX_WINS = 999;
 
 export function gameToHash(state) {
-  const params = new URLSearchParams({ a: state.target, de: state.players });
+  const params = new URLSearchParams({ a: state.target, de: state.playerCount });
   state.teams.forEach((team, i) => {
     params.set(`equipo${i + 1}`, team.name);
     params.set(`puntos${i + 1}`, team.score);
@@ -22,8 +22,8 @@ export function gameToHash(state) {
   return `#${params}`;
 }
 
-// Devuelve { target, players, teams: [{ name, score, wins }] }, o null si el hash no trae
-// una partida válida (por ejemplo, un link común sin #). `players` falta en links viejos
+// Devuelve { target, playerCount, teams: [{ name, score, wins }] }, o null si el hash no
+// trae una partida válida (por ejemplo, un link común sin #). `playerCount` falta en links viejos
 // o si viene mal, y entonces se conserva el de quien lo abre.
 export function gameFromHash(hash) {
   const params = new URLSearchParams(hash.replace(/^#/, ''));
@@ -37,8 +37,8 @@ export function gameFromHash(hash) {
   }));
   if (teams.some(team => team.score === null || team.wins === null)) return null;
 
-  const players = Number(params.get('de'));
-  return PLAYERS.includes(players) ? { target, players, teams } : { target, teams };
+  const playerCount = Number(params.get('de'));
+  return PLAYER_COUNTS.includes(playerCount) ? { target, playerCount, teams } : { target, teams };
 }
 
 // "12" → 12. Devuelve null si no es un entero entre 0 y max.
