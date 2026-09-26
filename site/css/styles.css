@@ -237,12 +237,6 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   gap: 2px;
 }
 
-.bar-start {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
 .icon-btn {
   width: 44px;
   height: 44px;
@@ -1099,20 +1093,17 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 }
 
 /*
-  La mesa (js/view/table.js): los lugares van alrededor de un paño ovalado. Cada lugar es
-  un botón con el nombre y el equipo; la mano lleva la mano y el que da, el mazo.
+  La mesa (js/view/table.js), en Ajustes: los lugares van alrededor de un paño. Cada lugar
+  es un botón con el nombre y el turno; el fondo dice el equipo, la mano lleva la mano y
+  el que da, el mazo.
 */
-.table-card {
-  max-width: 380px;
-  max-height: calc(100dvh - 32px);
-  overflow-y: auto;
-}
-
 .mesa {
   --seat-w: 88px;
   position: relative;
+  width: 100%;
+  max-width: 360px;
   aspect-ratio: 1 / 1.1;
-  margin: 0 -8px 12px;
+  margin: 8px auto 0;
 }
 
 /* de a 8 hay menos lugar: la letra un poco más chica para que entre "Jugador 8" */
@@ -1162,7 +1153,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   white-space: nowrap;
 }
 
-.seat-team {
+.seat-turn {
   font-size: 11px;
   font-weight: 600;
   color: var(--muted);
@@ -1214,10 +1205,54 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   }
 }
 
+/* qué fondo es de qué equipo */
+.mesa-legend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 4px 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.mesa-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mesa-legend i {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  border: 2px solid var(--line);
+  background: var(--panel);
+}
+
+.mesa-legend i[data-team="1"] {
+  background: var(--felt);
+}
+
+/* la ayuda o el editor del lugar elegido, siempre del mismo alto */
+.seat-row {
+  min-height: 48px;
+  display: grid;
+  align-items: center;
+}
+
+.seat-row .help {
+  margin: 0;
+  text-align: center;
+}
+
+.seat-row .help[hidden] {
+  display: none;
+}
+
 .seat-editor {
   display: flex;
   gap: 8px;
-  margin-bottom: 14px;
 }
 
 .seat-editor[hidden] {

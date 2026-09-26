@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createInitialState, reduce } from '../site/js/game.js';
-import { dealerSeat, drawTable, seatedPlayers, MAX_PLAYERS } from '../site/js/table.js';
+import { dealerSeat, drawTable, seatTurn, seatedPlayers, MAX_PLAYERS } from '../site/js/table.js';
 import { fromSaved, save, STORAGE_KEY } from '../site/js/storage.js';
 
 const add = (team, points = 1) => ({ type: 'add', team, points });
@@ -117,4 +117,16 @@ test('una partida compartida trae su mesa', () => {
   assert.deepEqual(state.players.slice(0, 4), game.players);
   assert.equal(state.manoSeat, 1);
   assert.equal(state.mano, 1);
+});
+
+test('turnos: mano, segundo, tercero… y los dos últimos son pie (uno por equipo)', () => {
+  const turns = (count, manoSeat = 0) => {
+    const state = { ...reduce(createInitialState(), { type: 'setPlayerCount', count }), manoSeat };
+    return Array.from({ length: count }, (_, seat) => seatTurn(state, seat));
+  };
+  assert.deepEqual(turns(2), ['Mano', 'Pie']);
+  assert.deepEqual(turns(4), ['Mano', 'Segundo', 'Pie', 'Pie']);
+  assert.deepEqual(turns(6), ['Mano', 'Segundo', 'Tercero', 'Cuarto', 'Pie', 'Pie']);
+  assert.deepEqual(turns(8), ['Mano', 'Segundo', 'Tercero', 'Cuarto', 'Quinto', 'Sexto', 'Pie', 'Pie']);
+  assert.deepEqual(turns(4, 2), ['Pie', 'Pie', 'Mano', 'Segundo'], 'se cuenta desde la mano');
 });
