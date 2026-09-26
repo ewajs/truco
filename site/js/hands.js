@@ -84,6 +84,12 @@ export function setHand(state, { number, pica, duel }) {
   return same ? state : { ...state, hand };
 }
 
+// { type: 'restoreHand', mano, hand }: vuelve a quién era mano y a la mano de antes de
+// un pase (el "Deshacer" del aviso del pase automático). Los puntos no se tocan.
+export function restoreHand(state, { mano, hand }) {
+  return { ...state, mano, hand };
+}
+
 // Alguien llegó a 5 y nadie a 25.
 function inPicaPicaZone(scores) {
   const highest = Math.max(...scores);
@@ -120,6 +126,33 @@ export function autoManoAfter(pending, action, before, after) {
   }
 
   return { pending, restart: false };
+}
+
+// Cuándo aparece el aviso del pase: a mitad de la espera, y a lo sumo NOTICE_MAX_MS
+// después del último punto. Así no molesta mientras se sigue anotando y tampoco tarda en
+// avisar si la espera es larga.
+export const NOTICE_MAX_MS = 3000;
+
+export function noticeDelay(waitMs) {
+  return Math.min(waitMs / 2, NOTICE_MAX_MS);
+}
+
+// Qué dice el aviso según lo que hace el pase (`before` → `after`): pasar la mano, o
+// terminar un duelo del pica pica (ahí la mano no cambia hasta que se juegan todos).
+// `coming` se muestra durante la espera; `done`, después del pase.
+export function passNotice(before, after) {
+  if (after.mano === before.mano) {
+    const total = duelsPerPicaPica(before.playerCount);
+    return {
+      coming: `Fin del duelo ${before.hand.duels + 1}/${total}`,
+      done: `Pica pica: duelo ${after.hand.duels + 1}/${total}`,
+    };
+  }
+  const name = after.teams[after.mano].name;
+  return {
+    coming: `Mano para ${name}`,
+    done: isPicaPicaHand(after) ? `Es mano ${name} · Pica pica` : `Es mano ${name}`,
+  };
 }
 
 function scoreKey(state) {

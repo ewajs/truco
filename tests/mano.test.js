@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createInitialState, reduce } from '../site/js/game.js';
-import { autoManoAfter } from '../site/js/hands.js';
+import { autoManoAfter, noticeDelay, passNotice, NOTICE_MAX_MS } from '../site/js/hands.js';
 
 // Hace lo mismo que main.js, sin timer de verdad: aplica acciones y, con WAIT, simula
 // que pasó toda la espera sin que nadie toque nada.
@@ -147,4 +147,47 @@ test('con pica pica, las manos se siguen contando aunque no se muestre la mano',
   state = reduce(state, { type: 'setOption', option: 'showMano', value: false });
   const { state: after } = simulate([add(0, 2), WAIT], state);
   assert.equal(after.hand.number, 2);
+});
+
+test('deshacer un pase vuelve a la mano de antes, sin tocar los puntos', () => {
+  const { state: before } = simulate([add(0, 2)]);
+  const passed = reduce(before, passMano);
+  assert.notEqual(passed.mano, before.mano);
+  const restored = reduce(passed, { type: 'restoreHand', mano: before.mano, hand: before.hand });
+  assert.equal(restored.mano, before.mano);
+  assert.deepEqual(restored.hand, before.hand);
+  assert.deepEqual(restored.teams, passed.teams);
+  // y no arranca otra espera: el pase no vuelve a pasar solo
+  assert.equal(autoManoAfter(null, { type: 'restoreHand' }, passed, restored).pending, null);
+});
+
+// ---- Aviso del pase ----
+
+test('el aviso aparece a mitad de la espera, y a lo sumo a los 3 segundos', () => {
+  assert.equal(noticeDelay(3000), 1500);
+  assert.equal(noticeDelay(5000), 2500);
+  assert.equal(noticeDelay(8000), NOTICE_MAX_MS);
+  assert.equal(noticeDelay(12000), NOTICE_MAX_MS);
+});
+
+test('el aviso dice a quién pasa la mano', () => {
+  const { state: before } = simulate([add(0, 2)]);
+  const after = reduce(before, passMano);
+  assert.deepEqual(passNotice(before, after), { coming: 'Mano para Ellos', done: 'Es mano Ellos' });
+});
+
+test('el aviso avisa si la mano que viene es de pica pica', () => {
+  const six = reduce(createInitialState(), { type: 'setPlayerCount', count: 6 });
+  const { state: before } = simulate([add(0, 5)], six);
+  const after = reduce(before, passMano);
+  assert.equal(passNotice(before, after).done, 'Es mano Ellos · Pica pica');
+});
+
+test('en el pica pica, el aviso habla del duelo (la mano no cambia)', () => {
+  const six = reduce(createInitialState(), { type: 'setPlayerCount', count: 6 });
+  const { state: pica } = simulate([add(0, 5), WAIT], six); // mano 2: pica pica
+  const before = reduce(pica, add(1));
+  const after = reduce(before, passMano);
+  assert.equal(after.mano, before.mano);
+  assert.deepEqual(passNotice(before, after), { coming: 'Fin del duelo 1/3', done: 'Pica pica: duelo 2/3' });
 });

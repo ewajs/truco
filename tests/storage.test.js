@@ -101,3 +101,9 @@ test('opciones con valores fijos: tema y modo', () => {
   assert.equal(bad.options.palette, 'pano', 'tema desconocido: el de siempre');
   assert.equal(bad.options.mode, 'auto', 'modo desconocido: seguir al celular');
 });
+
+test('segundos del pase automático: solo los de la lista', () => {
+  assert.equal(fromSaved(savedWith({ options: { autoManoSeconds: 8 } })).options.autoManoSeconds, 8);
+  assert.equal(fromSaved(savedWith({ options: { autoManoSeconds: 7 } })).options.autoManoSeconds, 5);
+  assert.equal(fromSaved(savedWith({ options: { autoManoSeconds: '8' } })).options.autoManoSeconds, 5);
+});

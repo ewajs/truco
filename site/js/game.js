@@ -20,7 +20,7 @@
 //   { type: 'setHand', number, pica, duel }  corregir a mano la mano actual
 //   (las dos últimas están en hands.js)
 
-import { newHand, passMano, setHand, duelsPerPicaPica } from './hands.js';
+import { newHand, passMano, setHand, restoreHand, duelsPerPicaPica } from './hands.js';
 
 export const TARGETS = [15, 30];
 export const PLAYER_COUNTS = [2, 4, 6, 8]; // de a 8 no existe, pero se juega igual
@@ -34,6 +34,7 @@ export const PALETTES = ['pano', 'madera', 'noche', 'argento'];
 export const OPTION_CHOICES = {
   palette: PALETTES,
   mode: ['auto', 'light', 'dark'], // 'auto' sigue al celular
+  autoManoSeconds: [3, 5, 8, 12],
 };
 
 export function createInitialState() {
@@ -52,6 +53,8 @@ export function createInitialState() {
                           // Apagado, la app solo cuenta puntos.
       showMano: true,     // badges de mano/mazo (si trackHands)
       autoMano: true,     // pasar la mano sola después de anotar (si trackHands)
+      autoManoSeconds: 5, // cuánto esperar después del último punto para pasarla
+      autoManoNotice: true, // avisar antes del pase, con cancelar, ya y deshacer (si autoMano)
       picaPica: true,     // de a 6 u 8: alternar manos redondas y de pica pica (si trackHands)
       vibrate: true,
       keepAwake: false,
@@ -112,6 +115,7 @@ export function reduce(state, action) {
     case 'loadGame': return loadGame(state, action.game);
     case 'passMano': return passMano(state);
     case 'setHand': return setHand(state, action);
+    case 'restoreHand': return restoreHand(state, action);
     default: throw new Error(`Acción desconocida: ${action.type}`);
   }
 }

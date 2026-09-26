@@ -10,7 +10,7 @@
 // y avisan lo que hizo el usuario llamando a dispatch().
 
 import { reduce, winner } from './game.js';
-import { autoManoAfter, showsMano } from './hands.js';
+import { autoManoAfter, noticeDelay, showsMano } from './hands.js';
 import { load, save } from './storage.js';
 import { VIBRATION, vibrate, createWakeLock } from './device.js';
 import { createScoreboard } from './view/scoreboard.js';
@@ -22,9 +22,8 @@ import { setupInstallPrompt } from './view/install.js';
 import { createHelp } from './view/help.js';
 import { createHandChip } from './view/hand.js';
 import { createAppearance } from './view/appearance.js';
+import { createManoToast } from './view/mano-toast.js';
 import { gameFromHash } from './share.js';
-
-const AUTO_MANO_MS = 8000; // cuánto esperar después del último punto para pasar la mano
 
 let state = load();
 
@@ -33,33 +32,66 @@ function dispatch(action) {
   state = reduce(state, action);
   if (state === previous) return; // la acción no cambió nada
 
+  manoToast.hideDone(); // el "Deshacer" del último pase ya no corresponde
   save(state);
   giveFeedback(previous, state);
   render();
   scheduleManoPass(action, previous);
 }
 
-// Pase automático de la mano: qué hacer lo decide autoManoAfter() (hands.js); acá solo
-// se maneja el timer.
-let autoMano = null; // pase pendiente (ver autoManoAfter)
-let manoTimer = null;
+// Pase automático de la mano: qué hacer y cuándo avisar lo deciden autoManoAfter() y
+// noticeDelay() (hands.js); acá se manejan los timers y el aviso.
+let autoMano = null;   // pase pendiente (ver autoManoAfter)
+let manoTimer = null;  // cuándo pasa
+let toastTimer = null; // cuándo aparece el aviso
+let lastPass = null;   // { mano, hand } de antes del último pase automático, para deshacerlo
 
 function scheduleManoPass(action, previous) {
   const { pending, restart } = autoManoAfter(autoMano, action, previous, state);
   autoMano = pending;
-  if (!pending) clearTimeout(manoTimer);
+  if (!pending || restart) stopManoWait();
   if (!restart) return;
 
+  const wait = state.options.autoManoSeconds * 1000;
+  const deadline = Date.now() + wait;
+  toastTimer = setTimeout(() => {
+    if (!state.options.autoManoNotice || winner(state) !== null) return;
+    manoToast.countdown(state, reduce(state, { type: 'passMano' }), deadline);
+  }, noticeDelay(wait));
+  manoTimer = setTimeout(passManoNow, wait);
+}
+
+function stopManoWait() {
   clearTimeout(manoTimer);
-  manoTimer = setTimeout(() => {
-    autoMano = null;
-    if (winner(state) === null) dispatch({ type: 'passMano' });
-  }, AUTO_MANO_MS);
+  clearTimeout(toastTimer);
+  manoToast.hideCountdown();
+}
+
+// Se acabó la espera o tocaron "Ya".
+function passManoNow() {
+  autoMano = null;
+  stopManoWait();
+  if (winner(state) !== null) return;
+  const before = state;
+  dispatch({ type: 'passMano' });
+  lastPass = { mano: before.mano, hand: before.hand };
+  if (state.options.autoManoNotice) manoToast.done(before, state);
+}
+
+// "Cancelar": no pasa esta vez. El próximo punto arranca otra espera.
+function cancelManoPass() {
+  autoMano = null;
+  stopManoWait();
 }
 
 // ---- Vistas ----
 
 const appearance = createAppearance();
+const manoToast = createManoToast({
+  onNow: passManoNow,
+  onCancel: cancelManoPass,
+  onUndo: () => dispatch({ type: 'restoreHand', ...lastPass }),
+});
 const settings = createSettings({ dispatch });
 const winnerDialog = createWinnerDialog();
 const handChip = createHandChip({ dispatch });
