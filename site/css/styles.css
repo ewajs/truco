@@ -8,8 +8,11 @@
   así las muestras del selector de temas se pintan con los colores de su tema.
 
   Cada tema define solo estos colores: felt (fondo), panel (tarjetas), ink (texto),
-  muted (texto secundario), accent (botones), accent-ink (texto sobre accent) y
-  accent-shadow (borde inferior de los botones). El resto sale de ahí o es común.
+  muted (texto secundario), accent (botones), accent-ink (texto sobre accent),
+  accent-shadow (borde inferior de los botones), sun (quién es mano; mezclado con el
+  panel, el chip de la mano) y alert (pica pica, borrar y lo destructivo), cada uno con
+  su -ink. En oscuro cambian felt, panel, ink, muted y alert. El resto sale de ahí o es
+  común (los fósforos son siempre iguales).
 */
 
 :root {
@@ -23,8 +26,6 @@
   --stick-edge: #B48D52;
   --head: #B3312A;
   --head-hi: #E0604F;
-  --danger: #A8322B;
-  --on-strong: #fff;              /* texto sobre fondos fuertes (rojo, peligro) */
   --scrim: rgba(8,18,12,.62);     /* velo detrás de los diálogos */
   --scrim-soft: rgba(8,18,12,.5); /* velo detrás de la hoja de ajustes */
   --shadow: rgba(0,0,0,.18);      /* sombras de tarjetas y chips */
@@ -38,7 +39,7 @@
   --ui: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-/* ---- Paño: verde de mesa de juego (el de siempre) ---- */
+/* ---- Paño: verde de mesa de juego (el de siempre); mano celeste, alerta violeta ---- */
 :root,
 [data-palette="pano"] {
   --felt: #E3EBE0;
@@ -48,6 +49,10 @@
   --accent: #F2B42C;
   --accent-ink: #2B1D00;
   --accent-shadow: #C98E12;
+  --sun: #8FC1E3;
+  --sun-ink: #0E2436;
+  --alert: #7E4A99;
+  --alert-ink: #FFFFFF;
 }
 
 [data-mode="dark"],
@@ -56,6 +61,8 @@
   --panel: #1B3729;
   --ink: #F1EAD7;
   --muted: #97B1A1;
+  --alert: #C9A3E0;
+  --alert-ink: #2A1238;
 }
 
 /* Antes de que corra el JS: seguir al celular */
@@ -65,10 +72,12 @@
     --panel: #1B3729;
     --ink: #F1EAD7;
     --muted: #97B1A1;
+    --alert: #C9A3E0;
+    --alert-ink: #2A1238;
   }
 }
 
-/* ---- Madera: mesa de bodegón, cálida ---- */
+/* ---- Madera: mesa de bodegón, cálida; mano mostaza, alerta petróleo ---- */
 [data-palette="madera"] {
   --felt: #EDE3D6;
   --panel: #FAF5EE;
@@ -77,6 +86,10 @@
   --accent: #E0873B;
   --accent-ink: #2A1305;
   --accent-shadow: #B8692A;
+  --sun: #EBC860;
+  --sun-ink: #2A1D00;
+  --alert: #2F7482;
+  --alert-ink: #FFFFFF;
 }
 
 [data-mode="dark"][data-palette="madera"],
@@ -85,9 +98,11 @@
   --panel: #33241A;
   --ink: #F4E8DA;
   --muted: #C2A791;
+  --alert: #8CCFD9;
+  --alert-ink: #0B2A30;
 }
 
-/* ---- Noche: azul índigo con verde agua ---- */
+/* ---- Noche: azul índigo con verde agua; mano luna dorada, alerta magenta ---- */
 [data-palette="noche"] {
   --felt: #E4E6F1;
   --panel: #F6F7FC;
@@ -96,6 +111,10 @@
   --accent: #5FCDB2;
   --accent-ink: #06291F;
   --accent-shadow: #3A9C84;
+  --sun: #F0C24B;
+  --sun-ink: #221A00;
+  --alert: #B0417F;
+  --alert-ink: #FFFFFF;
 }
 
 [data-mode="dark"][data-palette="noche"],
@@ -104,9 +123,11 @@
   --panel: #1B2038;
   --ink: #E9EAF6;
   --muted: #9A9FC0;
+  --alert: #F29AC8;
+  --alert-ink: #3A0C26;
 }
 
-/* ---- Argento: celeste de la bandera sobre un blanco apagado ---- */
+/* ---- Argento: celeste de la bandera sobre un blanco apagado; mano sol de mayo ---- */
 [data-palette="argento"] {
   --felt: #DCE5EE;
   --panel: #EBF1F6;
@@ -115,6 +136,10 @@
   --accent: #74B0E2;
   --accent-ink: #0C2338;
   --accent-shadow: #4E8CC2;
+  --sun: #F6B40E;
+  --sun-ink: #3A2500;
+  --alert: #6A55B8;
+  --alert-ink: #FFFFFF;
 }
 
 [data-mode="dark"][data-palette="argento"],
@@ -123,6 +148,8 @@
   --panel: #17314B;
   --ink: #EAF2F9;
   --muted: #9DB8CF;
+  --alert: #B9ABF2;
+  --alert-ink: #1E1242;
 }
 
 *, *::before, *::after {
@@ -333,12 +360,12 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 }
 
 .mano.is-mano {
-  color: var(--accent-ink);
+  color: var(--sun-ink);
 }
 
 .mano.is-mano::before {
   border-color: transparent;
-  background: var(--stick);
+  background: var(--sun);
 }
 
 .mano .icon-mano,
@@ -397,7 +424,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   align-items: center;
   padding: 5px 11px;
   border-radius: 12px;
-  background: color-mix(in srgb, var(--stick) 40%, var(--panel));
+  background: color-mix(in srgb, var(--sun) 35%, var(--panel));
   color: var(--ink);
   font-size: 13px;
   font-weight: 700;
@@ -431,10 +458,10 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   stroke-linejoin: round;
 }
 
-/* pica pica: rojo cabeza de fósforo, para que se distinga del amarillo de los botones */
+/* pica pica: el color de alerta del tema, para que se distinga de una redonda */
 .hand-chip.pica {
-  background: var(--head);
-  color: var(--on-strong);
+  background: var(--alert);
+  color: var(--alert-ink);
 }
 
 .hand-chip.pica .hand-kind {
@@ -526,7 +553,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   border-radius: inherit;
   pointer-events: none;
   opacity: 0;
-  background: radial-gradient(circle at var(--px,50%) var(--py,50%),color-mix(in srgb, var(--head) 22%, transparent),transparent 70%);
+  background: radial-gradient(circle at var(--px,50%) var(--py,50%),color-mix(in srgb, var(--alert) 22%, transparent),transparent 70%);
   transform: scale(.6);
   transition: opacity .15s,transform .15s;
 }
@@ -538,7 +565,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 }
 
 .board.erasing {
-  background: color-mix(in srgb, var(--head) 10%, transparent);
+  background: color-mix(in srgb, var(--alert) 10%, transparent);
 }
 
 .board.erasing::after {
@@ -553,8 +580,8 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   transform: translateX(-50%);
   font-size: 12px;
   font-weight: 700;
-  color: var(--on-strong);
-  background: var(--danger);
+  color: var(--alert-ink);
+  background: var(--alert);
   padding: 4px 10px;
   border-radius: 999px;
   pointer-events: none;
@@ -1026,8 +1053,8 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   transform: translateX(-50%);
   font-size: 12px;
   font-weight: 700;
-  color: var(--on-strong);
-  background: var(--danger);
+  color: var(--alert-ink);
+  background: var(--alert);
   padding: 4px 10px;
   border-radius: 999px;
 }
@@ -1476,16 +1503,16 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   width: 100%;
   height: 52px;
   border-radius: 14px;
-  border: 1.5px solid var(--danger);
-  color: var(--danger);
+  border: 1.5px solid var(--alert);
+  color: var(--alert);
   font-weight: 700;
   font-size: 16px;
 }
 
 .btn-danger.armed, .btn-text.armed {
-  background: var(--danger);
-  color: var(--on-strong);
-  border-color: var(--danger);
+  background: var(--alert);
+  color: var(--alert-ink);
+  border-color: var(--alert);
 }
 
 .sr {
