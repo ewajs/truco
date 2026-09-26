@@ -54,6 +54,7 @@ export function createInitialState() {
       showMano: true,     // badges de mano/mazo (si trackHands)
       autoMano: true,     // pasar la mano sola después de anotar (si trackHands)
       autoManoSeconds: 5, // cuánto esperar después del último punto para pasarla
+      autoManoNotice: true, // avisar antes del pase, con cancelar, ya y deshacer (si autoMano)
       picaPica: true,     // de a 6 u 8: alternar manos redondas y de pica pica (si trackHands)
       vibrate: true,
       keepAwake: false,

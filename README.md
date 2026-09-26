@@ -11,7 +11,7 @@ Tocá la columna de un equipo para sumar, mantené apretado para borrar.
 - Se instala como app y anda sin conexión
 - Compartir el anotador o la partida actual por link
 - Muestra quién es mano y la pasa sola después de anotar (3 a 12 segundos), con un aviso
-  para adelantarla, cancelarla o deshacerla
+  (se puede apagar) para adelantarla, cancelarla o deshacerla
 - Sigue las manos: número (se corrige tocándolo) y, de a 6 u 8, pica pica entre los 5 y los 25. Se puede apagar para solo contar puntos
 - Se pueden ocultar los botones y usar solo tocar y mantener
 - Ayuda corta con lo básico

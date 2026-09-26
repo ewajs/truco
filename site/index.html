@@ -355,7 +355,7 @@
             <span class="field-label">Mano</span>
             <label class="toggle"><span>Seguir las manos<small>Número de mano (tocalo para corregirlo), quién es mano y pica pica. Apagado, solo se cuentan los puntos</small></span><input type="checkbox" data-option="trackHands"><i></i></label>
             <label class="toggle sub"><span>Mostrar quién es mano<small>Tocá la mano o el mazo para pasarla</small></span><input type="checkbox" data-option="showMano" data-requires="trackHands"><i></i></label>
-            <label class="toggle sub"><span>Pasar la mano sola<small>Después de anotar, con un aviso para adelantarla o cancelarla</small></span><input type="checkbox" data-option="autoMano" data-requires="trackHands"><i></i></label>
+            <label class="toggle sub"><span>Pasar la mano sola<small>Unos segundos después de anotar</small></span><input type="checkbox" data-option="autoMano" data-requires="trackHands"><i></i></label>
             <div class="sub-choice">
               <span id="auto-mano-wait">Esperar</span>
               <div class="seg" role="radiogroup" aria-labelledby="auto-mano-wait">
@@ -365,6 +365,7 @@
                 <button role="radio" data-choice="autoManoSeconds" data-value="12" data-requires="autoMano">12 s</button>
               </div>
             </div>
+            <label class="toggle sub"><span>Avisar antes de pasarla<small>Arriba, para adelantarla, cancelarla o deshacerla</small></span><input type="checkbox" data-option="autoManoNotice" data-requires="autoMano"><i></i></label>
           </div>
 
           <div class="field" data-feature-group>

@@ -59,7 +59,8 @@ function scheduleManoPass(action, previous) {
   const wait = state.options.autoManoSeconds * 1000;
   const deadline = Date.now() + wait;
   toastTimer = setTimeout(() => {
-    if (winner(state) === null) manoToast.countdown(state, reduce(state, { type: 'passMano' }), deadline);
+    if (!state.options.autoManoNotice || winner(state) !== null) return;
+    manoToast.countdown(state, reduce(state, { type: 'passMano' }), deadline);
   }, Math.min(wait / 2, QUIET_MAX_MS));
   manoTimer = setTimeout(passManoNow, wait);
 }
@@ -78,7 +79,7 @@ function passManoNow() {
   const before = state;
   dispatch({ type: 'passMano' });
   lastPass = { mano: before.mano, hand: before.hand };
-  manoToast.done(before, state);
+  if (state.options.autoManoNotice) manoToast.done(before, state);
 }
 
 // "Cancelar": no pasa esta vez. El próximo punto arranca otra espera.
