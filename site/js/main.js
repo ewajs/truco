@@ -9,7 +9,7 @@
 // `state` es la única fuente de verdad. Las vistas nunca lo modifican: solo lo dibujan
 // y avisan lo que hizo el usuario llamando a dispatch().
 
-import { reduce, winner } from './game.js';
+import { reduce, winner, autoManoAfter } from './game.js';
 import { load, save } from './storage.js';
 import { VIBRATION, vibrate, createWakeLock } from './device.js';
 import { createScoreboard } from './view/scoreboard.js';
@@ -33,21 +33,23 @@ function dispatch(action) {
   save(state);
   giveFeedback(previous, state);
   render();
-  scheduleManoPass(action);
+  scheduleManoPass(action, previous);
 }
 
-// Pasar la mano sola: cada cambio de puntos reinicia la espera, así se anotan tranquilos
-// el envido y el truco de la misma mano y la mano pasa recién cuando terminan.
+// Pase automático de la mano: qué hacer lo decide autoManoAfter() (game.js); acá solo
+// se maneja el timer.
+let autoMano = null; // pase pendiente (ver autoManoAfter)
 let manoTimer = null;
 
-function scheduleManoPass(action) {
-  if (action.type === 'passMano') clearTimeout(manoTimer); // la cambiaron a mano: no pisarla
-  if (!['add', 'subtract', 'undo'].includes(action.type)) return;
+function scheduleManoPass(action, previous) {
+  const { pending, restart } = autoManoAfter(autoMano, action, previous, state);
+  autoMano = pending;
+  if (!pending) clearTimeout(manoTimer);
+  if (!restart) return;
 
   clearTimeout(manoTimer);
-  const { showMano, autoMano } = state.options;
-  if (!showMano || !autoMano) return;
   manoTimer = setTimeout(() => {
+    autoMano = null;
     if (winner(state) === null) dispatch({ type: 'passMano' });
   }, AUTO_MANO_MS);
 }

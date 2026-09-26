@@ -125,3 +125,34 @@ test('malas y buenas', () => {
 test('una acción desconocida es un error', () => {
   assert.throws(() => reduce(createInitialState(), { type: 'nope' }), /desconocida/);
 });
+
+test('sumar 0 puntos no cambia nada', () => {
+  const state = createInitialState();
+  assert.equal(reduce(state, add(0, 0)), state);
+});
+
+test('gana el que llega, sea cual sea el equipo', () => {
+  const state = play(createInitialState(), { type: 'setTarget', target: 15 }, add(1, 4), add(1, 4), add(1, 4), add(1, 4));
+  assert.equal(winner(state), 1);
+  assert.deepEqual(scores(state), [0, 15]);
+  assert.deepEqual(state.teams.map(team => team.wins), [0, 1]);
+});
+
+test('deshacer una resta vuelve a poner el punto', () => {
+  const state = play(createInitialState(), add(0, 3), subtract(0), subtract(0), undo);
+  assert.deepEqual(scores(state), [2, 0]);
+});
+
+test('borrar las ganadas no toca los puntos', () => {
+  const won = play(createInitialState(), { type: 'setTarget', target: 15 }, add(0, 15), { type: 'newGame' }, add(1, 3));
+  const next = reduce(won, { type: 'clearWins' });
+  assert.deepEqual(scores(next), [0, 3]);
+  assert.deepEqual(next.teams.map(team => team.wins), [0, 0]);
+});
+
+test('cargar una partida ya ganada la deja ganada', () => {
+  const game = { target: 15, teams: [{ name: 'A', score: 15, wins: 1 }, { name: 'B', score: 9, wins: 0 }] };
+  const state = reduce(createInitialState(), { type: 'loadGame', game });
+  assert.equal(winner(state), 0);
+  assert.equal(reduce(state, add(1)), state, 'no se puede seguir sumando');
+});
