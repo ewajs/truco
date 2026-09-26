@@ -1228,17 +1228,43 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 }
 
 /* Aclaración que solo aparece cuando la opción está deshabilitada */
+/*
+  Opción deshabilitada: el título pasa a gris y el interruptor queda tenue, pero el texto
+  se sigue leyendo bien (en claro y en oscuro).
+*/
+.toggle:has(input:disabled) {
+  cursor: default;
+  color: var(--muted);
+}
+
+.toggle:has(input:disabled) i {
+  opacity: .35;
+}
+
+/* Aclaración debajo de una opción deshabilitada, con un botón para habilitarla */
 .requires-note {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin: 2px 0 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.requires-note[hidden] {
   display: none;
 }
 
-.toggle:has(input:disabled) .requires-note {
-  display: inline;
-}
-
-.toggle:has(input:disabled) {
-  opacity: .4;
-  cursor: default;
+.link {
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  padding: 6px 0; /* área de toque más alta sin mover el texto */
 }
 
 .toggle {
