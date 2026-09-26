@@ -17,13 +17,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
-      - run: npm install
-      - name: Tests unitarios
-        run: npm test
-      - name: Tests en el navegador
-        run: |
-          npx playwright install --with-deps chromium
-          npm run test:e2e
+      - run: npm test
 
   deploy:
     if: github.event_name != 'pull_request'

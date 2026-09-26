@@ -13,4 +13,7 @@ la estructura.
 - Cambios en la forma del estado: subir `VERSION` y migrar en `fromSaved()` (storage.js).
   No cambiar `STORAGE_KEY`.
 - Botones que disparan una acción del juego: `data-action` + su `case` en `actionFor()`.
-- Probar: `npm test` y `npm run test:e2e` (Playwright con Chromium). Local: `npm start`.
+- Probar: `npm test`. Local: `npm start`.
+- Agregar solo lo que la necesidad pida: nada de dependencias, herramientas, capas o
+  abstracciones "por si acaso". Preferir código simple y robusto. Hoy no hay tests en el
+  navegador (Playwright ni similares) ni dependencias de npm: no sumarlos sin que se pidan.

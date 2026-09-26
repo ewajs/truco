@@ -11,10 +11,10 @@ Tocá la columna de un equipo para sumar, mantené apretado para borrar.
 
 ## Correrlo local
 
-Es un sitio estático, sin build ni framework. Se necesita Node 22 o más nuevo.
+Es un sitio estático, sin build ni framework.
 
 ```sh
-npm start        # http://localhost:8000
+npm start        # http://localhost:8000 (usa python3)
 ```
 
 Hay que servirlo por HTTP porque usa módulos de JavaScript (abrir `index.html` con
@@ -23,11 +23,7 @@ doble click no anda).
 ## Tests
 
 ```sh
-npm test                           # reglas, guardado y dibujo (Node, sin navegador)
-
-npm install                        # la primera vez, para los tests en el navegador
-npx playwright install chromium    # ídem
-npm run test:e2e                   # abre el sitio en Chromium y lo usa
+npm test         # reglas, guardado y dibujo de fósforos (Node 22+, sin dependencias)
 ```
 
 ## Cómo está armado
@@ -48,8 +44,7 @@ site/                   lo que se publica en GitHub Pages, tal cual
       gestures.js       tocar para sumar, mantener para borrar
       settings.js       hoja de ajustes
       winner.js         cartel de ganador
-scripts/serve.js        servidor local (npm start y tests e2e)
-tests/                  tests unitarios (*.test.js) y en el navegador (e2e/)
+tests/                  tests de game.js, storage.js y view/matches.js
 ```
 
 El flujo es siempre el mismo:
@@ -77,7 +72,6 @@ evento ──▶ dispatch(action) ──▶ reduce(state, action) ──▶ nuev
    vista que llame a `dispatch()`. Dibujá lo nuevo en el `render(state)` de la vista.
 4. **Opción on/off**: alcanza con la clave en `options` y un
    `<input type="checkbox" data-option="nombre">` en ajustes.
-5. Si es algo que se toca, sumá un test en `tests/e2e/app.test.js`.
 
 ## Publicación
 
