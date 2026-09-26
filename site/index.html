@@ -25,6 +25,7 @@
   <svg width="0" height="0" style="position: absolute" aria-hidden="true">
     <symbol id="icon-mano" viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-6-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></symbol>
     <symbol id="icon-mazo" viewBox="0 0 24 24"><rect x="8" y="3" width="12" height="16" rx="2"/><path d="M5 7v12a2 2 0 0 0 2 2h9"/></symbol>
+    <symbol id="icon-pica" viewBox="0 0 24 24"><path d="M14.5 17.5 3 6V3h3l11.5 11.5M13 19l6-6M16 16l4 4M19 21l2-2M14.5 6.5 18 3h3v3l-3.5 3.5M5 14l4 4M7 17l-3 3M3 19l2 2"/></symbol>
   </svg>
 
   <div class="app">
@@ -49,7 +50,14 @@
       </div>
     </header>
 
-    <main class="teams" id="teams"></main>
+    <div class="table">
+      <main class="teams" id="teams"></main>
+      <!-- Número de mano y pica pica (js/view/hand.js). Solo de a 6 u 8 con pica pica. -->
+      <div class="hand-chip" id="hand-chip" aria-live="polite" hidden>
+        <span id="hand-number"></span>
+        <span class="hand-kind"><svg class="hand-icon"><use href="#icon-pica"/></svg>Pica pica <span id="hand-duel"></span></span>
+      </div>
+    </div>
   </div>
 
   <!-- Columna de un equipo. js/view/scoreboard.js la clona una vez por equipo. -->
@@ -229,6 +237,10 @@
               <button role="radio" data-action="setPlayers" data-players="8">8</button>
             </div>
             <p class="help" id="players-help"></p>
+          </div>
+
+          <div class="field" id="pica-field">
+            <label class="toggle"><span>Pica pica<small>Del 5 al 25 alterna una mano redonda y una de pica pica</small></span><input type="checkbox" data-option="picaPica"><i></i></label>
           </div>
 
           <div class="field">

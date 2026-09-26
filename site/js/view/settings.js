@@ -17,6 +17,7 @@ export function createSettings({ dispatch }) {
   const targetHelp = document.getElementById('target-help');
   const playersButtons = sheet.querySelectorAll('[data-action="setPlayers"]');
   const playersHelp = document.getElementById('players-help');
+  const picaField = document.getElementById('pica-field');
   const nameInputs = [0, 1].map(team => document.getElementById(`name-${team}`));
   const optionToggles = sheet.querySelectorAll('[data-option]');
   let current = null; // último estado renderizado
@@ -127,6 +128,7 @@ export function createSettings({ dispatch }) {
       button.setAttribute('aria-checked', String(Number(button.dataset.players) === state.players));
     });
     playersHelp.textContent = `${playersLabel(state.players)}.`;
+    picaField.hidden = state.players < 6; // el pica pica es solo de a 6 u 8
 
     nameInputs.forEach((input, team) => {
       // no pisar lo que se está escribiendo

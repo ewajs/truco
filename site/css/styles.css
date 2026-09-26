@@ -142,8 +142,14 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 }
 
 /* Equipos */
-.teams {
+.table {
+  position: relative;
   flex: 1;
+  min-height: 0;
+  display: grid;
+}
+
+.teams {
   min-height: 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -282,6 +288,67 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 
 .hide-nums .score, .hide-nums .left {
   display: none;
+}
+
+/*
+  Chip de la mano: centrado sobre la línea que divide los equipos, a la altura de los
+  puntajes (ahí sobra lugar). Discreto en una mano redonda; en pica pica toma el color de
+  acento, muestra el ícono y el duelo que se está jugando.
+*/
+.hand-chip {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--felt);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: background .3s, color .3s, border-color .3s;
+}
+
+.hand-chip[hidden] {
+  display: none;
+}
+
+.hand-kind {
+  display: none;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+}
+
+.hand-icon {
+  width: 12px;
+  height: 12px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hand-chip.pica {
+  border-color: transparent;
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.hand-chip.pica .hand-kind {
+  display: flex;
+}
+
+.hand-chip.pop {
+  animation: chip-pop .35s ease-out;
 }
 
 /* Tablero de fósforos */
@@ -1187,6 +1254,13 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   0% {
     opacity: 0;
     transform: scale(.8);
+  }
+}
+
+/* como bump, pero conservando el centrado del chip */
+@keyframes chip-pop {
+  40% {
+    transform: translateX(-50%) scale(1.12);
   }
 }
 

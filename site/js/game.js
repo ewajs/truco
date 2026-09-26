@@ -15,7 +15,7 @@
 //   { type: 'rename', team, name }
 //   { type: 'setOption', option, value }
 //   { type: 'loadGame', game }           cargar una partida compartida por link (ver share.js)
-//   { type: 'passMano' }                 la mano pasa al otro equipo
+//   { type: 'passMano' }                 terminó la mano (o un duelo del pica pica); ver passMano()
 
 export const TARGETS = [15, 30];
 export const PLAYERS = [2, 4, 6, 8]; // de a 8 no existe, pero se juega igual
@@ -23,6 +23,8 @@ export const POINTS_PER_GROUP = 5; // cada cuadrado de fósforos vale 5
 export const HISTORY_LIMIT = 300;
 export const DEFAULT_NAMES = ['Nosotros', 'Ellos'];
 export const MAX_NAME_LENGTH = 14;
+export const PICA_PICA_FROM = 5;  // el pica pica arranca cuando alguien llega a 5…
+export const PICA_PICA_UNTIL = 25; // …y se termina cuando alguien llega a 25
 
 export function createInitialState() {
   return {
@@ -31,16 +33,24 @@ export function createInitialState() {
     teams: DEFAULT_NAMES.map(name => ({ name, score: 0, wins: 0 })),
     history: [], // [{ team, delta }], para deshacer
     mano: 0, // equipo que es mano en esta ronda
+    hand: newHand([0, 0]), // la mano que se está jugando (ver passMano)
     options: {
       showNumbers: true,
       showButtons: true,  // −, +1 y los rápidos; sin botones se usa tocar y mantener
       quickButtons: true, // +2, +3 y +4 (solo si showButtons)
       showMano: true,
       autoMano: true,     // pasar la mano sola después de anotar (solo si showMano)
+      picaPica: true,     // de a 6 u 8: alternar manos redondas y de pica pica
       vibrate: true,
       keepAwake: false,
     },
   };
+}
+
+// Mano número `number`. `pica`: si es de pica pica; `duels`: duelos del pica pica ya
+// jugados; `startScores`: puntajes al empezar la mano o el último duelo.
+export function newHand(startScores, number = 1, pica = false) {
+  return { number, pica, duels: 0, startScores };
 }
 
 // ---- Consultas ----
@@ -61,6 +71,22 @@ export function hasBuenas(target) {
 
 export function groupCount(target) {
   return target / POINTS_PER_GROUP;
+}
+
+// El pica pica se juega de a 6 u 8, si está activado.
+export function picaPicaEnabled(state) {
+  return state.options.picaPica && state.players >= 6;
+}
+
+// Duelos de un pica pica. De a 6: cada uno contra el de enfrente (3 duelos de uno contra
+// uno). De a 8: dos partidas de dos contra dos.
+export function duelsPerPicaPica(players) {
+  return players === 8 ? 2 : 3;
+}
+
+// Si la mano actual se muestra como pica pica.
+export function isPicaPicaHand(state) {
+  return picaPicaEnabled(state) && state.hand.pica;
 }
 
 // "En malas, faltan 12" · "Faltan 5" · "Ganó"
@@ -92,7 +118,7 @@ export function reduce(state, action) {
     case 'rename': return rename(state, action.team, action.name);
     case 'setOption': return { ...state, options: { ...state.options, [action.option]: action.value } };
     case 'loadGame': return loadGame(state, action.game);
-    case 'passMano': return { ...state, mano: 1 - state.mano };
+    case 'passMano': return passMano(state);
     default: throw new Error(`Acción desconocida: ${action.type}`);
   }
 }
@@ -145,7 +171,7 @@ function pushHistory(state, entry) {
 }
 
 function newGame(state) {
-  return { ...updateTeams(state, () => ({ score: 0 })), history: [] };
+  return { ...updateTeams(state, () => ({ score: 0 })), history: [], hand: newHand([0, 0]) };
 }
 
 function setTarget(state, target) {
@@ -179,7 +205,39 @@ function loadGame(state, game) {
     players: game.players ?? state.players,
     teams: game.teams.map(team => ({ ...team })),
     history: [],
+    hand: newHand(game.teams.map(team => team.score)),
   };
+}
+
+// ---- Manos y pica pica ----
+//
+// Cada pase de mano (el automático o tocando el badge) marca que terminó una mano, salvo
+// que no haya habido puntos desde el pase anterior: en truco toda mano da puntos, así que
+// eso es alguien corrigiendo quién es mano. Entonces solo cambia la mano, sin contar.
+//
+// De a 6 u 8, entre los 5 y los 25 puntos se alterna una mano redonda y una de pica pica.
+// En el pica pica cada pase es un duelo terminado; la mano termina (y recién ahí pasa)
+// cuando se jugaron todos los duelos.
+function passMano(state) {
+  const scores = state.teams.map(team => team.score);
+  const played = scores.some((score, i) => score !== state.hand.startScores[i]);
+  if (!played) return { ...state, mano: 1 - state.mano };
+
+  if (isPicaPicaHand(state)) {
+    const duels = state.hand.duels + 1;
+    if (duels < duelsPerPicaPica(state.players)) {
+      return { ...state, hand: { ...state.hand, duels, startScores: scores } };
+    }
+  }
+
+  const nextIsPica = picaPicaEnabled(state) && !state.hand.pica && inPicaPicaZone(scores);
+  return { ...state, mano: 1 - state.mano, hand: newHand(scores, state.hand.number + 1, nextIsPica) };
+}
+
+// Alguien llegó a 5 y nadie a 25.
+function inPicaPicaZone(scores) {
+  const highest = Math.max(...scores);
+  return highest >= PICA_PICA_FROM && highest < PICA_PICA_UNTIL;
 }
 
 // ---- Pase automático de la mano ----
@@ -197,7 +255,8 @@ function loadGame(state, game) {
 // `pending` es null (nada pendiente) o { handStart } con los puntajes de antes del primer
 // punto de la mano. Devuelve { pending, restart }.
 export function autoManoAfter(pending, action, before, after) {
-  const enabled = after.options.showMano && after.options.autoMano;
+  // Con pica pica hace falta detectar el fin de cada mano aunque la mano no se muestre.
+  const enabled = after.options.autoMano && (after.options.showMano || picaPicaEnabled(after));
   const cancels = ['passMano', 'newGame', 'setTarget', 'loadGame'].includes(action.type);
   if (!enabled || cancels) return { pending: null, restart: false };
 
