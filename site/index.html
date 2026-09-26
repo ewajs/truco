@@ -68,12 +68,10 @@
       <main class="teams" id="teams"></main>
       <!-- Número de mano y pica pica (js/view/hand.js). Tocarlo abre la corrección. -->
       <button class="hand-chip" id="hand-chip" aria-live="polite" hidden>
-        <!-- "Mano 7", y en pica pica "Mano 7 ⚔ 2/3" en la misma línea -->
-        <span class="hand-title">
-          <span id="hand-number"></span>
-          <span class="hand-kind"><svg class="hand-icon"><use href="#icon-pica"/></svg><span id="hand-duel"></span></span>
-        </span>
-        <!-- Quién es mano y quién da (en el pica pica, los del duelo). Lo arma view/hand.js. -->
+        <!-- Lo de todos, centrado sobre la línea que divide los equipos: la mano y el duelo -->
+        <span class="hand-number" id="hand-number"></span>
+        <span class="hand-kind"><svg class="hand-icon"><use href="#icon-pica"/></svg>Pica pica <span id="hand-duel"></span></span>
+        <!-- Quién es mano y quién da, cada uno del lado de su equipo. Lo arma view/hand.js. -->
         <span class="hand-players" id="hand-players"></span>
       </button>
     </div>
@@ -92,9 +90,12 @@
           <span class="name-text" data-ref="name"></span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/></svg>
         </button>
-        <div class="wins" data-ref="wins"></div>
+        <!-- Cuánto falta y las ganadas, arriba del puntaje: abajo queda lugar para el chip -->
+        <div class="meta">
+          <span class="left" data-ref="standing"></span>
+          <span class="wins" data-ref="wins"></span>
+        </div>
         <div class="score" data-ref="score" aria-hidden="true"></div>
-        <div class="left" data-ref="standing"></div>
       </div>
       <div class="board" data-ref="board" role="button" tabindex="0">
         <div class="groups" data-ref="groups"></div>
@@ -263,6 +264,7 @@
       <div class="help-dots" id="help-dots"></div>
       <button class="btn-accent" id="help-next">Siguiente</button>
       <button class="btn-text" id="close-help">Cerrar</button>
+      <a class="help-manual" href="https://github.com/ewajs/truco#manual" target="_blank" rel="noopener">Manual completo</a>
     </div>
   </div>
 

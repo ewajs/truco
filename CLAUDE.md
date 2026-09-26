@@ -1,8 +1,8 @@
 # Truco
 
 Anotador de truco. Sitio estático en `site/` (HTML + CSS + ES modules, sin build ni
-framework), publicado en GitHub Pages por `.github/workflows/pages.yml`. Ver README para
-la estructura.
+framework), publicado en GitHub Pages por `.github/workflows/pages.yml`. El README es
+para quien lo usa (presentación y manual); lo de desarrollo está acá.
 
 - Texto de la UI en español rioplatense (voseo: "Tocá", "Mantené"). Los comentarios del
   código también van en español.
@@ -24,8 +24,67 @@ la estructura.
   todos los temas.
 - Probar: `npm test`. Local: `npm start`.
 - Agregar solo lo que la necesidad pida: nada de dependencias, herramientas, capas o
-  abstracciones "por si acaso". Preferir código simple y robusto. Hoy no hay tests en el
-  navegador (Playwright ni similares) ni dependencias de npm: no sumarlos sin que se pidan.
+  abstracciones "por si acaso". Preferir código simple y robusto. No hay tests en el
+  navegador y la única dependencia es Playwright, de desarrollo y solo para las capturas
+  (ver abajo): no sumar más sin que se pidan.
+
+## Cómo está armado
+
+```
+site/                   lo que se publica en GitHub Pages, tal cual
+  index.html            todo el markup (la columna de un equipo es un <template>)
+  css/styles.css
+  sw.js                 service worker: primero la red, sin conexión usa la última copia
+  manifest.webmanifest  datos para instalarla como app
+  js/
+    main.js             arranque: estado, dispatch(), timers del pase y conexión de las vistas
+    game.js             estado, puntaje y reduce(state, action)
+    hands.js            manos, pica pica, duelos y pase automático (lo usa reduce)
+    table.js            la mesa: lugares, equipos, turnos y tirar reyes (lo usa reduce)
+    storage.js          guardar/cargar en localStorage (valida; si algo no sirve, de cero)
+    share.js            partida ⇄ link (#a=30&de=4&equipo1=…&jugador1=…&mano=1)
+    device.js           vibración y wake lock
+    view/               una vista por archivo: dialog (abrir/cerrar, pila), scoreboard,
+                        matches (SVG de fósforos), layout, gestures, settings, winner,
+                        share, install, help, hand (chip y corrección), mano-toast,
+                        table (la mesa), appearance (tema y modo)
+tests/                  node:test: reglas, manos, pica pica, mesa, guardado, links,
+                        fósforos, tamaño del tablero e invariantes con acciones al azar
+scripts/capturas.mjs    capturas de referencia (ver abajo)
+docs/capturas/          capturas: de referencia (iphone/, samsung/) y de cada PR (prs/<n>/)
+```
+
+El flujo es siempre el mismo:
+
+```
+evento ──▶ dispatch(action) ──▶ reduce(state, action) ──▶ nuevo estado ──▶ guardar + render
+```
+
+- El estado es un objeto plano (`createInitialState()` en `game.js`), la única fuente de
+  verdad. `reduce()` es pura: devuelve un estado nuevo, o el mismo si no cambia nada.
+- Las vistas dibujan con `render(state)` y avisan con `dispatch()`.
+- En el HTML, los botones con `data-action` disparan una acción directo (`actionFor()` en
+  `main.js`); el resto tiene un `id` y lo maneja su vista.
+
+### Agregar una feature
+
+1. **Estado**: el campo en `createInitialState()`, su validación en `isValidGame()` y
+   subir `VERSION` (salvo opciones y mesa, ver arriba).
+2. **Regla**: un `case` en `reduce()` y su test. Si es de manos o pica pica, en
+   `hands.js`; si es de la mesa, en `table.js`. Sumar la acción a `randomAction()` en
+   `tests/invariants.test.js`.
+3. **UI**: un botón con `data-action` o un listener que llame a `dispatch()`, y dibujarlo
+   en el `render(state)` de la vista.
+4. **Opción**: on/off alcanza con la clave en `options` y un
+   `<input type="checkbox" data-option="nombre">`; con varios valores, sumarla a
+   `OPTION_CHOICES` y usar botones `data-choice` + `data-value`.
+
+### Publicación
+
+`pages.yml` corre `npm test` en cada PR (sin `npm install`: los tests no tienen
+dependencias) y en cada push a `main` publica `site/`. En el repo: **Settings → Pages →
+Source: GitHub Actions**, y en **Settings → Environments → github-pages** la rama `main`
+tiene que poder deployar.
 
 ## Pull requests
 
@@ -41,12 +100,25 @@ repetir el diff ni contar el proceso. Secciones:
   para validar. Van commiteadas en `docs/capturas/prs/<número>/` y se enlazan con su URL
   de raw.githubusercontent.com (con el hash del commit, así no se rompen).
 
-## Capturas de referencia
+## Capturas
 
-`docs/capturas/iphone/` (iPhone 15, 393×852) y `docs/capturas/samsung/` (Galaxy S24,
-360×780) muestran la intención del diseño: una partida normal a 30, de a 4 con nombres
-(Juan, Pedro, Ana, Sofi), en claro y en oscuro. Las usa el README. Si un cambio toca lo
-que se ve en ellas, se vuelven a sacar en el mismo PR: `tablero`, `tablero-oscuro`,
-`aviso` (el pase automático), `mesa` (Ajustes → Partida), `opciones` y `pica-pica` (de a
-6, tema Noche, oscuro). Los casos extremos (pantallas chicas, nombres largos, de a 8)
-son para validar y van solo en la carpeta del PR.
+`npm run capturas` saca las de referencia en `docs/capturas/iphone/` (iPhone 15, 393×852)
+y `docs/capturas/samsung/` (Galaxy S24, 360×780): muestran la intención del diseño, con
+una partida normal, no los casos extremos. Las usa el README. Las escenas están
+declaradas en `SCENES` (`scripts/capturas.mjs`); para sumar una, agregala ahí.
+
+```sh
+npm install                         # una vez: instala playwright (dependencia de desarrollo)
+npx playwright install chromium     # una vez, si no hay un Chromium de Playwright
+npm run capturas                    # todas
+npm run capturas -- mesa aviso      # algunas
+npm run capturas -- --out docs/capturas/prs/23 mesa   # para un PR
+```
+
+- Si un cambio toca lo que se ve en ellas, se vuelven a sacar en el mismo PR.
+- Los casos extremos (pantallas chicas, nombres largos, de a 8) son para validar y van
+  solo en la carpeta del PR.
+- En el entorno de Claude Code en la nube npm no llega al registro; Playwright y Chromium
+  ya están instalados: `mkdir -p node_modules && ln -sfn /opt/node22/lib/node_modules/playwright node_modules/playwright`.
+  Tampoco llega a Google Fonts, así que las capturas salen con las fuentes de reemplazo
+  salvo que se habiliten `fonts.googleapis.com` y `fonts.gstatic.com` en el entorno.
