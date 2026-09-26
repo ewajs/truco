@@ -11,6 +11,7 @@ Tocá la columna de un equipo para sumar, mantené apretado para borrar.
 - Se instala como app y anda sin conexión
 - Compartir el anotador o la partida actual por link
 - Muestra quién es mano y la pasa sola después de anotar
+- De a 6 u 8: pica pica entre los 5 y los 25 (alterna con manos redondas) y número de mano
 - Se pueden ocultar los botones y usar solo tocar y mantener
 - Ayuda corta con lo básico
 
@@ -55,6 +56,7 @@ site/                   lo que se publica en GitHub Pages, tal cual
       share.js          diálogo de compartir y aviso al abrir una partida compartida
       install.js        invitación a instalar la app
       help.js           ayuda (carrusel)
+      hand.js           chip con el número de mano y el pica pica
 tests/                  tests de las reglas (incluye el pase de mano), guardado, links y fósforos
 ```
 

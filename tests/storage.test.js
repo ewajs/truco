@@ -51,6 +51,7 @@ test('migra una partida guardada por el prototipo (v1)', () => {
     ],
     history: [{ team: 0, delta: 4 }, { team: 1, delta: 3 }, { team: 0, delta: 3 }],
     mano: 0,
+    hand: { number: 1, pica: false, duels: 0, startScores: [7, 3] },
     options: {
       ...createInitialState().options,
       showNumbers: false,
@@ -70,6 +71,15 @@ test('de a cuántos: se guarda y un valor inválido vuelve a 4', () => {
 test('mano: se guarda y un valor inválido vuelve al primer equipo', () => {
   assert.equal(fromSaved({ version: 2, mano: 1 }).mano, 1);
   assert.equal(fromSaved({ version: 2, mano: 7 }).mano, 0);
+});
+
+test('mano actual: se guarda; si falta o viene rota arranca en la 1 con los puntos de ahora', () => {
+  const hand = { number: 7, pica: true, duels: 1, startScores: [12, 9] };
+  assert.deepEqual(fromSaved({ version: 2, hand }).hand, hand);
+  const teams = [{ score: 12 }, { score: 9 }];
+  const fresh = { number: 1, pica: false, duels: 0, startScores: [12, 9] };
+  assert.deepEqual(fromSaved({ version: 2, teams }).hand, fresh);
+  assert.deepEqual(fromSaved({ version: 2, teams, hand: { number: 'x' } }).hand, fresh);
 });
 
 test('completa campos faltantes y corrige valores inválidos', () => {
