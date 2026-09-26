@@ -4,65 +4,85 @@ Anotador de truco con fósforos, pensado para el celular apoyado en la mesa.
 Tocá la columna de un equipo para sumar, mantené apretado para borrar.
 
 - Partidas a 15 o a 30 (malas y buenas)
-- Botones +2, +3 y +4 para anotar truco o envido de una
+- Botones +2, +3 y +4 para anotar un truco o un envido de una
 - Deshacer, contador de partidas ganadas y nombres editables
 - Vibración y opción de mantener la pantalla encendida
 - Todo se guarda en el navegador (`localStorage`)
 
 ## Correrlo local
 
-Es un sitio estático sin build. Como usa módulos de JavaScript, hay que servirlo
-por HTTP (abrir `index.html` con doble click no funciona):
+Es un sitio estático, sin build ni framework. Se necesita Node 22 o más nuevo.
 
 ```sh
-npm start          # python3 -m http.server 8000
-# abrir http://localhost:8000
+npm start        # http://localhost:8000
 ```
+
+Hay que servirlo por HTTP porque usa módulos de JavaScript (abrir `index.html` con
+doble click no anda).
 
 ## Tests
 
-Las reglas del juego (`js/game.js`, `js/state.js`) son funciones puras y se testean
-con el runner de Node, sin dependencias:
-
 ```sh
-npm test
+npm test                           # reglas, guardado y dibujo (Node, sin navegador)
+
+npm install                        # la primera vez, para los tests en el navegador
+npx playwright install chromium    # ídem
+npm run test:e2e                   # abre el sitio en Chromium y lo usa
 ```
 
-## Publicación en GitHub Pages
-
-El workflow `.github/workflows/pages.yml` corre los tests y publica el sitio en cada
-push a `main`. En los PRs solo corre los tests.
-
-Configuración inicial (una sola vez): en el repo, **Settings → Pages → Build and
-deployment → Source: GitHub Actions**.
-
-## Estructura
+## Cómo está armado
 
 ```
-index.html            Markup de la app (barra, cartel de ganador, hoja de ajustes)
-css/styles.css        Estilos y tema claro/oscuro
-js/main.js            Punto de entrada: arma `app` y conecta eventos con acciones
-js/state.js           Estado por defecto, carga/guardado y migraciones (normalize)
-js/game.js            Reglas: sumar, restar, deshacer, ganador, malas/buenas
-js/matches.js         Dibujo SVG de los fósforos
-js/layout.js          Tamaño de los cuadrados según el alto disponible
-js/platform.js        Vibración y wake lock
-js/ui/teams.js        Columnas de los equipos
-js/ui/settings.js     Hoja de ajustes
-js/ui/win.js          Cartel de ganador
-js/ui/gestures.js     Long press para borrar
-tests/                Tests de las reglas
+site/                   lo que se publica en GitHub Pages, tal cual
+  index.html            todo el markup (la columna de un equipo es un <template>)
+  css/styles.css
+  js/
+    main.js             arranque: estado, dispatch() y conexión de las vistas
+    game.js             reglas del juego: reduce(state, action) y consultas
+    storage.js          guardar/cargar en localStorage y migrar versiones viejas
+    device.js           vibración y wake lock
+    view/
+      scoreboard.js     columnas de los equipos
+      matches.js        SVG de los fósforos
+      layout.js         tamaño de los cuadrados según la pantalla
+      gestures.js       tocar para sumar, mantener para borrar
+      settings.js       hoja de ajustes
+      winner.js         cartel de ganador
+scripts/serve.js        servidor local (npm start y tests e2e)
+tests/                  tests unitarios (*.test.js) y en el navegador (e2e/)
 ```
 
-### Cómo agregar una feature
+El flujo es siempre el mismo:
 
-1. **Estado nuevo**: agregalo a `DEFAULT_STATE` en `js/state.js`. `normalize()` completa
-   los valores que falten en partidas guardadas, así que no hace falta cambiar la clave
-   de `localStorage`.
-2. **Regla nueva**: función pura en `js/game.js` que recibe el estado, lo modifica y
-   devuelve un resultado (o `null` si no hubo cambio). Agregá su test en `tests/`.
-3. **Acción**: sumala a `app.actions` en `js/main.js` (llama a la regla, vibra y hace
-   `app.commit()`, que guarda y re-renderiza).
-4. **UI**: los botones declaran `data-act="..."` (y `data-t` para el equipo); el
-   `switch` de `js/main.js` los despacha. Para una opción on/off alcanza con agregar
-   un `<input type="checkbox" data-opt="nombre">` en ajustes y la clave en `opts`.
+```
+evento ──▶ dispatch(action) ──▶ reduce(state, action) ──▶ nuevo estado ──▶ guardar + render
+```
+
+- **El estado** es un objeto plano (`createInitialState()` en `game.js`) y es la única
+  fuente de verdad.
+- **`reduce(state, action)`** es la única forma de cambiarlo. Es una función pura:
+  devuelve un estado nuevo, o el mismo si la acción no cambia nada. Por eso las reglas
+  se testean sin navegador.
+- **Las vistas** dibujan el estado con `render(state)` y avisan lo que hace el usuario
+  llamando a `dispatch()`. Nunca modifican el estado.
+- En el HTML, los botones con `data-action` disparan una acción directamente (ver
+  `actionFor()` en `main.js`); el resto tiene un `id` y lo maneja su vista.
+
+### Agregar una feature
+
+1. **Estado**: agregá el campo en `createInitialState()`. Si cambia la forma de algo que
+   ya existía, subí `VERSION` en `storage.js` y agregá la migración en `fromSaved()`.
+2. **Regla**: agregá un `case` en `reduce()` y su test en `tests/game.test.js`.
+3. **UI**: un botón con `data-action` (y su `case` en `actionFor()`), o un listener en la
+   vista que llame a `dispatch()`. Dibujá lo nuevo en el `render(state)` de la vista.
+4. **Opción on/off**: alcanza con la clave en `options` y un
+   `<input type="checkbox" data-option="nombre">` en ajustes.
+5. Si es algo que se toca, sumá un test en `tests/e2e/app.test.js`.
+
+## Publicación
+
+`.github/workflows/pages.yml` corre los tests en cada PR, y en cada push a `main`
+además publica la carpeta `site/` en GitHub Pages.
+
+Configuración del repo (una sola vez): **Settings → Pages → Source: GitHub Actions**, y
+en **Settings → Environments → github-pages** la rama `main` tiene que poder deployar.

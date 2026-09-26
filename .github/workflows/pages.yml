@@ -1,4 +1,4 @@
-name: Deploy a GitHub Pages
+name: Tests y deploy a GitHub Pages
 
 on:
   push:
@@ -8,43 +8,40 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
-      - run: npm test
-
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Armar el sitio
+      - run: npm install
+      - name: Tests unitarios
+        run: npm test
+      - name: Tests en el navegador
         run: |
-          mkdir _site
-          cp -r index.html manifest.webmanifest icon.svg .nojekyll css js _site/
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
+          npx playwright install --with-deps chromium
+          npm run test:e2e
 
   deploy:
     if: github.event_name != 'pull_request'
-    needs: build
+    needs: test
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/checkout@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: site
       - id: deployment
         uses: actions/deploy-pages@v4
