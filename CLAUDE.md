@@ -26,3 +26,17 @@ la estructura.
 - Agregar solo lo que la necesidad pida: nada de dependencias, herramientas, capas o
   abstracciones "por si acaso". Preferir código simple y robusto. Hoy no hay tests en el
   navegador (Playwright ni similares) ni dependencias de npm: no sumarlos sin que se pidan.
+
+## Pull requests
+
+Sucintos y al pie: el código lo mira quien revisa; el PR le dice qué mirar. Nada de
+repetir el diff ni contar el proceso. Secciones:
+
+- **Qué cambia**: 2 a 5 viñetas, contado desde el uso.
+- **Qué mirar**: dónde está lo importante o lo delicado (archivo y función) y las
+  decisiones discutibles.
+- **Probado**: qué se probó (tests nuevos; a mano en el navegador, en qué tamaños y
+  modos) y qué **no** (por ejemplo, un iPhone de verdad).
+- **Capturas**: solo si se tocó algo visible de forma significativa o se sacaron capturas
+  para validar. Se suben a la rama `screenshots` (no se mergea nunca), en `pr-<número>/`,
+  y se enlazan con su URL de raw.githubusercontent.com.
