@@ -1004,20 +1004,19 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   position: fixed;
   z-index: 16;
   top: calc(env(safe-area-inset-top, 0px) + 6px);
-  left: 8px;
-  right: 8px;
+  left: 12px;
+  right: 12px;
   max-width: 440px;
   margin: 0 auto;
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 4px 4px 4px 14px;
-  border-radius: 16px;
-  overflow: hidden;
+  gap: 10px;
+  min-height: 52px;
+  padding: 6px 4px 6px 12px;
+  border-radius: 18px;
   border: 1px solid var(--line);
   background: var(--panel);
-  box-shadow: 0 8px 24px var(--shadow);
+  box-shadow: 0 10px 30px var(--shadow);
   opacity: 0;
   transform: translateY(-16px);
   transition: opacity .25s ease-out, transform .3s cubic-bezier(.2,.8,.2,1);
@@ -1032,64 +1031,79 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   transform: none;
 }
 
-.toast-text {
-  flex: 1;
-  min-width: 0;
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-/* segundos que faltan, en un circulito a la izquierda */
 .toast-count {
   flex: none;
+  position: relative;
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
-  margin-left: -6px;
-  border-radius: 50%;
-  background: var(--sun);
-  color: var(--sun-ink);
+  width: 32px;
+  height: 32px;
+}
+
+.toast-count svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg); /* el anillo arranca arriba */
+  fill: none;
+  stroke-width: 3;
+}
+
+.toast-count circle:first-child {
+  stroke: var(--line);
+}
+
+.toast-count circle + circle {
+  stroke: var(--sun);
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+}
+
+.toast-count b {
   font-family: var(--display);
-  font-size: 16px;
+  font-weight: 400;
+  font-size: 15px;
 }
 
 .toast[data-mode="done"] .toast-count {
   display: none;
 }
 
-.toast-button {
-  flex: none;
-  height: 40px;
-  padding: 0 12px;
-  border-radius: 12px;
+.toast-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
   font-weight: 700;
+  line-height: 1.25;
+}
+
+/* Botones de texto, separados del mensaje por una línea */
+.toast-actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding-left: 2px;
+  border-left: 1px solid var(--line);
+}
+
+.toast-button {
+  height: 44px;
+  padding: 0 10px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--muted);
 }
 
+.toast-button.primary {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.toast-button:active {
+  background: var(--press);
+}
+
 .toast-button[hidden] {
-  display: none;
-}
-
-#mano-toast-now,
-#mano-toast-undo {
-  background: var(--accent);
-  color: var(--accent-ink);
-}
-
-/* Barra que se vacía hasta que pasa la mano */
-.toast-bar {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 3px;
-  background: var(--sun);
-  transform-origin: left;
-}
-
-.toast[data-mode="done"] .toast-bar {
   display: none;
 }
 

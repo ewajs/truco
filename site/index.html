@@ -159,12 +159,17 @@
 
   <!-- Aviso del pase automático de la mano (js/view/mano-toast.js) -->
   <div class="toast" id="mano-toast" role="status" hidden>
-    <span class="toast-count" id="mano-toast-count" aria-hidden="true"></span>
+    <!-- segundos que faltan, dentro de un anillo que se vacía -->
+    <span class="toast-count" aria-hidden="true">
+      <svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="16"></circle><circle cx="18" cy="18" r="16" pathLength="1" id="mano-toast-ring"></circle></svg>
+      <b id="mano-toast-count"></b>
+    </span>
     <span class="toast-text" id="mano-toast-text"></span>
-    <button class="toast-button" id="mano-toast-now">Ya</button>
-    <button class="toast-button" id="mano-toast-cancel">Cancelar</button>
-    <button class="toast-button" id="mano-toast-undo">Deshacer</button>
-    <i class="toast-bar" id="mano-toast-bar"></i>
+    <span class="toast-actions">
+      <button class="toast-button" id="mano-toast-cancel">Cancelar</button>
+      <button class="toast-button primary" id="mano-toast-now">Ya</button>
+      <button class="toast-button primary" id="mano-toast-undo">Deshacer</button>
+    </span>
   </div>
 
   <!-- Invitación a instalar la app (js/view/install.js) -->

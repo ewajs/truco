@@ -1,6 +1,6 @@
 // Aviso del pase automático de la mano. Va arriba, sobre el encabezado: lejos de los
 // tableros y los botones de sumar, que es donde está el dedo. Tiene dos formas:
-//   - countdown(): "3 Mano para Ellos" con "Ya" y "Cancelar", y una barra que se vacía
+//   - countdown(): "Mano para Ellos" con los segundos en un anillo que se vacía, "Cancelar" y "Ya"
 //   - done(): "Es mano Ellos" con "Deshacer", unos segundos
 // Solo muestra: cuándo aparece y qué hace cada botón lo decide main.js.
 
@@ -12,7 +12,7 @@ export function createManoToast({ onNow, onCancel, onUndo }) {
   const toast = document.getElementById('mano-toast');
   const text = document.getElementById('mano-toast-text');
   const count = document.getElementById('mano-toast-count');
-  const bar = document.getElementById('mano-toast-bar');
+  const ring = document.getElementById('mano-toast-ring');
   const nowButton = document.getElementById('mano-toast-now');
   const cancelButton = document.getElementById('mano-toast-cancel');
   const undoButton = document.getElementById('mano-toast-undo');
@@ -60,7 +60,7 @@ export function createManoToast({ onNow, onCancel, onUndo }) {
       };
       update();
       tick = setInterval(update, 200);
-      bar.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], {
+      ring.animate([{ strokeDashoffset: 0 }, { strokeDashoffset: 1 }], {
         duration: Math.max(0, deadline - Date.now()),
         easing: 'linear',
         fill: 'forwards',
