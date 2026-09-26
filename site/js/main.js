@@ -10,7 +10,7 @@
 // y avisan lo que hizo el usuario llamando a dispatch().
 
 import { reduce, winner } from './game.js';
-import { autoManoAfter, showsMano } from './hands.js';
+import { autoManoAfter, noticeDelay, showsMano } from './hands.js';
 import { load, save } from './storage.js';
 import { VIBRATION, vibrate, createWakeLock } from './device.js';
 import { createScoreboard } from './view/scoreboard.js';
@@ -39,12 +39,8 @@ function dispatch(action) {
   scheduleManoPass(action, previous);
 }
 
-// Pase automático de la mano: qué hacer lo decide autoManoAfter() (hands.js); acá se
-// manejan los timers y el aviso. El aviso aparece a mitad de la espera, y a lo sumo
-// QUIET_MAX_MS después del último punto: así no molesta mientras se sigue anotando y
-// tampoco tarda en avisar si la espera es larga.
-const QUIET_MAX_MS = 3000;
-
+// Pase automático de la mano: qué hacer y cuándo avisar lo deciden autoManoAfter() y
+// noticeDelay() (hands.js); acá se manejan los timers y el aviso.
 let autoMano = null;   // pase pendiente (ver autoManoAfter)
 let manoTimer = null;  // cuándo pasa
 let toastTimer = null; // cuándo aparece el aviso
@@ -61,7 +57,7 @@ function scheduleManoPass(action, previous) {
   toastTimer = setTimeout(() => {
     if (!state.options.autoManoNotice || winner(state) !== null) return;
     manoToast.countdown(state, reduce(state, { type: 'passMano' }), deadline);
-  }, Math.min(wait / 2, QUIET_MAX_MS));
+  }, noticeDelay(wait));
   manoTimer = setTimeout(passManoNow, wait);
 }
 

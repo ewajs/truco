@@ -4,7 +4,7 @@
 //   - done(): "Es mano Ellos" con deshacer, unos segundos
 // Solo muestra: cuándo aparece y qué hace cada botón lo decide main.js.
 
-import { duelsPerPicaPica, isPicaPicaHand } from '../hands.js';
+import { passNotice } from '../hands.js';
 
 const DONE_MS = 4000; // cuánto queda a la vista el "Es mano…"
 
@@ -50,7 +50,7 @@ export function createManoToast({ onNow, onCancel, onUndo }) {
     // `before` y `after`: el estado ahora y cómo va a quedar con el pase.
     // `deadline`: cuándo pasa (Date.now() de ese momento).
     countdown(before, after, deadline) {
-      show('countdown', describe(before, after).coming);
+      show('countdown', passNotice(before, after).coming);
       bar.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], {
         duration: Math.max(0, deadline - Date.now()),
         easing: 'linear',
@@ -59,7 +59,7 @@ export function createManoToast({ onNow, onCancel, onUndo }) {
     },
 
     done(before, after) {
-      show('done', describe(before, after).done);
+      show('done', passNotice(before, after).done);
       doneTimer = setTimeout(hide, DONE_MS);
     },
 
@@ -70,22 +70,5 @@ export function createManoToast({ onNow, onCancel, onUndo }) {
     hideDone() {
       if (mode === 'done') hide();
     },
-  };
-}
-
-// Qué dice el aviso según lo que hace el pase: pasar la mano, o terminar un duelo del
-// pica pica (ahí la mano no cambia hasta que se juegan todos).
-function describe(before, after) {
-  if (after.mano === before.mano) {
-    const total = duelsPerPicaPica(before.playerCount);
-    return {
-      coming: `Fin del duelo ${before.hand.duels + 1}/${total}`,
-      done: `Pica pica: duelo ${after.hand.duels + 1}/${total}`,
-    };
-  }
-  const name = after.teams[after.mano].name;
-  return {
-    coming: `Mano para ${name}`,
-    done: isPicaPicaHand(after) ? `Es mano ${name} · Pica pica` : `Es mano ${name}`,
   };
 }

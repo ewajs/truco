@@ -72,7 +72,12 @@ test(`invariantes con ${SEEDS} partidas de ${STEPS} acciones al azar`, () => {
     let state = createInitialState();
     for (let step = 0; step < STEPS; step++) {
       const action = randomAction(rand);
+      const before = state;
       state = reduce(state, action);
+      // a veces, "Deshacer" en el aviso justo después de un pase
+      if (action.type === 'passMano' && rand() < 0.3) {
+        state = reduce(state, { type: 'restoreHand', mano: before.mano, hand: before.hand });
+      }
       try {
         checkInvariants(state);
       } catch (error) {
