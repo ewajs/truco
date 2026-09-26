@@ -12,7 +12,7 @@ function memoryStorage(initial = {}) {
   };
 }
 
-// Una partida con de todo: puntos, historial, mano, pica pica y opciones cambiadas.
+// Una partida con de todo: puntos, historial, mano, Pica Pica y opciones cambiadas.
 function playedState() {
   let state = createInitialState();
   state = reduce(state, { type: 'setPlayerCount', count: 6 });

@@ -74,7 +74,7 @@ const SCENES = [
       await app.page.tap('[data-action="setPlayerCount"][data-count="6"]');
       await app.namePlayers(['Leo', 'Caro'], 4); // cierra Ajustes
       await app.add(1, 1);
-      await app.passMano(); // termina la mano: la que sigue es de pica pica
+      await app.passMano(); // termina la mano: la que sigue es de Pica Pica
     },
   },
 ];

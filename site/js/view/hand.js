@@ -1,10 +1,10 @@
-// Chip con el número de mano y si es de pica pica, y el popup para corregirlo.
+// Chip con el número de mano y si es de Pica Pica, y el popup para corregirlo.
 //
 // El chip se ve cuando la app sigue las manos ("Seguir las manos" en Opciones). Queda
 // sobre la línea que divide los equipos:
-//   - centrado, lo de todos: "Mano 7" y, en pica pica, "Pica pica 2/3" (y cambia de color);
+//   - centrado, lo de todos: "Mano 7" y, en Pica Pica, "Pica Pica 2/3" (y cambia de color);
 //   - abajo, quién es mano (con la mano) y quién da (con el mazo), cada uno del lado de su
-//     equipo. En una redonda y en un duelo de uno contra uno es una línea; en el pica pica
+//     equipo. En una redonda y en un duelo de uno contra uno es una línea; en el Pica Pica
 //     de a 8, los cuatro del duelo en dos líneas, en orden de la mesa.
 // Tocarlo abre la corrección: quién es mano, número, tipo de mano y duelo.
 
@@ -39,7 +39,7 @@ export function createHandChip({ dispatch }) {
     const deal = currentDeal(state);
     renderPlayers(players, state, deal);
     const who = `, es mano ${state.players[deal.mano]} y da ${state.players[deal.dealer]}`;
-    chip.setAttribute('aria-label', `${pica ? 'Pica pica, ' : ''}mano ${hand.number}${who}. Tocá para corregir`);
+    chip.setAttribute('aria-label', `${pica ? 'Pica Pica, ' : ''}mano ${hand.number}${who}. Tocá para corregir`);
 
     if (wasPica !== null && pica !== wasPica) {
       chip.classList.remove('pop');
@@ -114,7 +114,7 @@ function createHandEditor({ dispatch }) {
     kindButtons.forEach(button => {
       button.setAttribute('aria-checked', String((button.dataset.pica === 'true') === draft.pica));
     });
-    // se oculta sin sacarlo, así el popup no cambia de alto al elegir redonda o pica pica
+    // se oculta sin sacarlo, así el popup no cambia de alto al elegir redonda o Pica Pica
     duelsSection.classList.toggle('off', !draft.pica);
     duelSeg.querySelectorAll('[data-duel]').forEach(button => {
       button.setAttribute('aria-checked', String(Number(button.dataset.duel) === draft.duel));
@@ -141,7 +141,7 @@ function createHandEditor({ dispatch }) {
   });
 
   document.getElementById('hand-editor-save').addEventListener('click', () => {
-    // en el pica pica se elige la mano del duelo: la de la mano está unos lugares antes
+    // en el Pica Pica se elige la mano del duelo: la de la mano está unos lugares antes
     const offset = draft.pica ? duelOffset(players.length, draft.duel - 1) : 0;
     dispatch({ type: 'setManoSeat', seat: (draft.mano - offset + players.length * 4) % players.length });
     dispatch({ type: 'setHand', number: draft.number, pica: draft.pica, duel: draft.duel });

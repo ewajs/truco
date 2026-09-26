@@ -132,7 +132,7 @@ test('turnos: mano, segundo, tercero… y los dos últimos son pie (uno por equi
   assert.deepEqual(turns(4, 2), ['Pie', 'Pie', 'Mano', 'Segundo'], 'se cuenta desde la mano');
 });
 
-// Una mano de pica pica de a `count`, con la mano en `manoSeat`, en el duelo `duels`.
+// Una mano de Pica Pica de a `count`, con la mano en `manoSeat`, en el duelo `duels`.
 function picaHand(count, manoSeat, duels) {
   const state = reduce(createInitialState(), { type: 'setPlayerCount', count });
   return { ...state, manoSeat, mano: manoSeat % 2, hand: { ...state.hand, pica: true, duels } };
@@ -143,7 +143,7 @@ test('en una redonda juegan todos: mano y da el anterior', () => {
   assert.deepEqual(currentDeal(state), { mano: 2, dealer: 1, seats: [2, 3, 0, 1] });
 });
 
-test('pica pica de a 6: cada uno contra el de enfrente, empezando por la mano', () => {
+test('Pica Pica de a 6: cada uno contra el de enfrente, empezando por la mano', () => {
   assert.deepEqual([0, 1, 2].map(duel => currentDeal(picaHand(6, 1, duel))), [
     { mano: 1, dealer: 4, seats: [1, 4] },
     { mano: 2, dealer: 5, seats: [2, 5] },
@@ -151,7 +151,7 @@ test('pica pica de a 6: cada uno contra el de enfrente, empezando por la mano', 
   ]);
 });
 
-test('pica pica de a 8: dos grupos de a 4 desde la mano, dos de cada equipo', () => {
+test('Pica Pica de a 8: dos grupos de a 4 desde la mano, dos de cada equipo', () => {
   const [first, second] = [0, 1].map(duel => currentDeal(picaHand(8, 6, duel)));
   assert.deepEqual(first, { mano: 6, dealer: 1, seats: [6, 7, 0, 1] });
   assert.deepEqual(second, { mano: 2, dealer: 5, seats: [2, 3, 4, 5] });
@@ -163,9 +163,10 @@ test('pica pica de a 8: dos grupos de a 4 desde la mano, dos de cada equipo', ()
 test('los avisos nombran al jugador, aunque tenga el nombre por defecto', () => {
   const passed = state => reduce(reduce(state, add(0)), { type: 'passMano' });
   const unnamed = createInitialState();
-  assert.equal(passNotice(reduce(unnamed, add(0)), passed(unnamed)).done, 'Es mano Jugador 2');
+  assert.equal(passNotice(reduce(unnamed, add(0)), passed(unnamed)).done.detail,
+    'Jugador 2 es mano. Jugador 1 da.');
   const named = withPlayers(['Juan', 'Pedro', 'Ana', 'Sofi']);
-  assert.equal(passNotice(reduce(named, add(0)), passed(named)).coming, 'Mano para Pedro');
+  assert.equal(passNotice(reduce(named, add(0)), passed(named)).done.detail, 'Pedro es mano. Juan da.');
 });
 
 test('nombre corto: J3 si no lo cambiaron', () => {
