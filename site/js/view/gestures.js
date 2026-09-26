@@ -9,6 +9,7 @@ const REPEAT_MS = 500;  // ritmo de borrado continuo
 const MOVE_TOLERANCE_PX = 14;
 
 export function attachBoardGestures(board, { onTap, onErase, onEraseStart, canErase }) {
+  const eraseTag = board.querySelector('.erase-tag');
   let hold = null;           // { x, y, timer, interval, erasing }
   let ignoreNextClick = false; // el click que llega al soltar un long press no suma
 
@@ -44,6 +45,10 @@ export function attachBoardGestures(board, { onTap, onErase, onEraseStart, canEr
   function eraseOne() {
     if (!hold) return;
     onErase();
+    // el "Borrando" late con cada punto (reiniciar la animación)
+    eraseTag.classList.remove('bump');
+    void eraseTag.offsetWidth;
+    eraseTag.classList.add('bump');
     if (!canErase()) stopHold();
   }
 
