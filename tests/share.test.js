@@ -15,7 +15,7 @@ test('una partida sobrevive ida y vuelta por el link', () => {
   const state = playedGame();
   assert.deepEqual(gameFromHash(gameToHash(state)), {
     target: state.target,
-    players: state.players,
+    playerCount: state.playerCount,
     teams: state.teams,
   });
 });
@@ -57,17 +57,17 @@ test('recorta nombres demasiado largos', () => {
 });
 
 test('de a cuántos viaja en el link; si falta o viene mal, no se carga', () => {
-  assert.equal(gameFromHash('#a=15&de=6&puntos1=0&puntos2=0').players, 6);
-  assert.equal(gameFromHash('#a=15&puntos1=0&puntos2=0').players, undefined, 'links viejos');
-  assert.equal(gameFromHash('#a=15&de=5&puntos1=0&puntos2=0').players, undefined);
+  assert.equal(gameFromHash('#a=15&de=6&puntos1=0&puntos2=0').playerCount, 6);
+  assert.equal(gameFromHash('#a=15&puntos1=0&puntos2=0').playerCount, undefined, 'links viejos');
+  assert.equal(gameFromHash('#a=15&de=5&puntos1=0&puntos2=0').playerCount, undefined);
 });
 
 test('cargar un link viejo (sin de a cuántos) conserva el que había', () => {
-  const state = reduce(createInitialState(), { type: 'setPlayers', players: 8 });
+  const state = reduce(createInitialState(), { type: 'setPlayerCount', count: 8 });
   const next = reduce(state, { type: 'loadGame', game: gameFromHash('#a=15&puntos1=1&puntos2=2') });
-  assert.equal(next.players, 8);
+  assert.equal(next.playerCount, 8);
   const shared = reduce(state, { type: 'loadGame', game: gameFromHash('#a=15&de=2&puntos1=1&puntos2=2') });
-  assert.equal(shared.players, 2);
+  assert.equal(shared.playerCount, 2);
 });
 
 test('cargar una partida reemplaza la actual y conserva las opciones', () => {

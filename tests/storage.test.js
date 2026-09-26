@@ -12,9 +12,27 @@ function memoryStorage(initial = {}) {
   };
 }
 
+// Una partida con de todo: puntos, historial, mano, pica pica y opciones cambiadas.
+function playedState() {
+  let state = createInitialState();
+  state = reduce(state, { type: 'setPlayerCount', count: 6 });
+  state = reduce(state, { type: 'rename', team: 0, name: 'Primos' });
+  state = reduce(state, { type: 'add', team: 0, points: 5 });
+  state = reduce(state, { type: 'passMano' });
+  state = reduce(state, { type: 'add', team: 1, points: 2 });
+  return reduce(state, { type: 'setOption', option: 'vibrate', value: false });
+}
+
+// Lo que quedaría guardado para `state`, con `changes` aplicados encima.
+function savedWith(changes, state = playedState()) {
+  const storage = memoryStorage();
+  save(state, storage);
+  return { ...JSON.parse(storage.getItem(STORAGE_KEY)), ...changes };
+}
+
 test('guardar y cargar devuelve el mismo estado', () => {
   const storage = memoryStorage();
-  const state = reduce(createInitialState(), { type: 'add', team: 1, points: 3 });
+  const state = playedState();
   save(state, storage);
   assert.deepEqual(load(storage), state);
 });
@@ -22,6 +40,7 @@ test('guardar y cargar devuelve el mismo estado', () => {
 test('sin nada guardado, o con basura, arranca de cero', () => {
   assert.deepEqual(load(memoryStorage()), createInitialState());
   assert.deepEqual(load(memoryStorage({ [STORAGE_KEY]: '{roto' })), createInitialState());
+  assert.deepEqual(load(memoryStorage({ [STORAGE_KEY]: 'null' })), createInitialState());
 });
 
 test('sin localStorage disponible no se rompe', () => {
@@ -33,66 +52,43 @@ test('sin localStorage disponible no se rompe', () => {
   assert.doesNotThrow(() => save(createInitialState(), broken));
 });
 
-test('migra una partida guardada por el prototipo (v1)', () => {
-  const v1 = {
-    target: 15,
-    names: ['Primos', 'Tíos'],
-    scores: [7, 3],
-    wins: [2, 0],
-    history: [{ t: 0, d: 4 }, { t: 1, d: 3 }, { t: 0, d: 3 }],
-    opts: { numbers: false, quick: true, vibrate: false, awake: true },
-  };
-  assert.deepEqual(fromSaved(v1), {
-    target: 15,
-    players: 4,
-    teams: [
-      { name: 'Primos', score: 7, wins: 2 },
-      { name: 'Tíos', score: 3, wins: 0 },
-    ],
-    history: [{ team: 0, delta: 4 }, { team: 1, delta: 3 }, { team: 0, delta: 3 }],
-    mano: 0,
-    hand: { number: 1, pica: false, duels: 0, startScores: [7, 3] },
-    options: {
-      ...createInitialState().options,
-      showNumbers: false,
-      quickButtons: true,
-      vibrate: false,
-      keepAwake: true,
-    },
-  });
+test('lo guardado con otra versión se descarta (todavía no migramos)', () => {
+  assert.deepEqual(fromSaved(savedWith({ version: 2 })), createInitialState());
+  // el formato del prototipo
+  const v1 = { target: 15, names: ['A', 'B'], scores: [7, 3], wins: [2, 0], history: [], opts: {} };
+  assert.deepEqual(fromSaved(v1), createInitialState());
 });
 
-test('de a cuántos: se guarda y un valor inválido vuelve a 4', () => {
-  assert.equal(fromSaved({ version: 2, players: 6 }).players, 6);
-  assert.equal(fromSaved({ version: 2, players: 5 }).players, 4);
-  assert.equal(fromSaved({ version: 2 }).players, 4, 'partidas guardadas antes de existir');
+test('cualquier dato inválido descarta la partida entera', () => {
+  const state = playedState();
+  const broken = [
+    { target: 20 },
+    { playerCount: 5 },
+    { mano: 2 },
+    { teams: [state.teams[0]] },
+    { teams: [{ ...state.teams[0], score: 'abc' }, state.teams[1]] },
+    { teams: [{ ...state.teams[0], score: -1 }, state.teams[1]] },
+    { teams: [{ ...state.teams[0], score: 31 }, state.teams[1]] }, // más que el máximo
+    { teams: [{ ...state.teams[0], wins: 1.5 }, state.teams[1]] },
+    { teams: [{ ...state.teams[0], name: '  ' }, state.teams[1]] },
+    { history: 'x' },
+    { history: [{ team: 2, delta: 1 }] },
+    { history: [{ team: 0, delta: 0 }] },
+    { hand: null },
+    { hand: { ...state.hand, number: 0 } },
+    { hand: { ...state.hand, duels: 3 } }, // de a 6 hay 3 duelos: 0, 1 o 2 jugados
+    { hand: { ...state.hand, startScores: [1] } },
+  ];
+  for (const changes of broken) {
+    assert.deepEqual(fromSaved(savedWith(changes)), createInitialState(), JSON.stringify(changes));
+  }
 });
 
-test('mano: se guarda y un valor inválido vuelve al primer equipo', () => {
-  assert.equal(fromSaved({ version: 2, mano: 1 }).mano, 1);
-  assert.equal(fromSaved({ version: 2, mano: 7 }).mano, 0);
-});
-
-test('mano actual: se guarda; si falta o viene rota arranca en la 1 con los puntos de ahora', () => {
-  const hand = { number: 7, pica: true, duels: 1, startScores: [12, 9] };
-  assert.deepEqual(fromSaved({ version: 2, hand }).hand, hand);
-  const teams = [{ score: 12 }, { score: 9 }];
-  const fresh = { number: 1, pica: false, duels: 0, startScores: [12, 9] };
-  assert.deepEqual(fromSaved({ version: 2, teams }).hand, fresh);
-  assert.deepEqual(fromSaved({ version: 2, teams, hand: { number: 'x' } }).hand, fresh);
-});
-
-test('descarta opciones que ya no existen', () => {
-  const state = fromSaved({ version: 2, options: { showHandNumber: false, vibrate: false } });
-  assert.equal('showHandNumber' in state.options, false);
-  assert.equal(state.options.vibrate, false);
-  assert.equal(state.options.trackHands, true);
-});
-
-test('completa campos faltantes y corrige valores inválidos', () => {
-  const state = fromSaved({ version: 2, target: 99, options: { quickButtons: false } });
-  assert.equal(state.target, 30);
-  assert.equal(state.options.quickButtons, false);
-  assert.equal(state.options.showNumbers, true);
-  assert.deepEqual(state.teams, createInitialState().teams);
+test('opciones: completa las que faltan y descarta las que sobran', () => {
+  const loaded = fromSaved(savedWith({ options: { vibrate: false, showHandNumber: false, keepAwake: 'si' } }));
+  assert.equal(loaded.options.vibrate, false, 'se conserva');
+  assert.equal(loaded.options.trackHands, true, 'falta: valor por defecto');
+  assert.equal('showHandNumber' in loaded.options, false, 'ya no existe');
+  assert.equal(loaded.options.keepAwake, false, 'no es booleana: valor por defecto');
+  assert.deepEqual(loaded.teams, playedState().teams, 'la partida no se pierde');
 });

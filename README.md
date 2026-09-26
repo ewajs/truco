@@ -42,11 +42,13 @@ site/                   lo que se publica en GitHub Pages, tal cual
   manifest.webmanifest  datos para instalarla como app (nombre, íconos, colores)
   js/
     main.js             arranque: estado, dispatch() y conexión de las vistas
-    game.js             reglas del juego: reduce(state, action) y consultas
-    storage.js          guardar/cargar en localStorage y migrar versiones viejas
+    game.js             estado, puntaje y reduce(state, action)
+    hands.js            manos, pica pica y pase automático (lo usa reduce)
+    storage.js          guardar/cargar en localStorage (valida; si algo no sirve, de cero)
     share.js            partida ⇄ link (#a=30&de=4&equipo1=…&puntos1=…)
     device.js           vibración y wake lock
     view/
+      dialog.js         abrir/cerrar diálogos: Escape, tocar afuera, foco (una pila)
       scoreboard.js     columnas de los equipos
       matches.js        SVG de los fósforos
       layout.js         tamaño de los cuadrados según la pantalla
@@ -57,7 +59,8 @@ site/                   lo que se publica en GitHub Pages, tal cual
       install.js        invitación a instalar la app
       help.js           ayuda (carrusel)
       hand.js           chip con el número de mano y el pica pica
-tests/                  tests de las reglas (incluye el pase de mano), guardado, links y fósforos
+tests/                  reglas, manos y pica pica, guardado, links, fósforos, tamaño del
+                        tablero e invariantes con acciones al azar
 ```
 
 El flujo es siempre el mismo:
@@ -78,9 +81,12 @@ evento ──▶ dispatch(action) ──▶ reduce(state, action) ──▶ nuev
 
 ### Agregar una feature
 
-1. **Estado**: agregá el campo en `createInitialState()`. Si cambia la forma de algo que
-   ya existía, subí `VERSION` en `storage.js` y agregá la migración en `fromSaved()`.
-2. **Regla**: agregá un `case` en `reduce()` y su test en `tests/game.test.js`.
+1. **Estado**: agregá el campo en `createInitialState()` y su validación en
+   `isValidGame()` (storage.js), y subí `VERSION`. Todavía no migramos: lo guardado con
+   otra versión se descarta. Las opciones nuevas no necesitan nada de esto.
+2. **Regla**: agregá un `case` en `reduce()` y su test. Si es de manos o pica pica, va en
+   `hands.js`. El test de invariantes (`tests/invariants.test.js`) prueba miles de
+   acciones al azar: sumá la acción nueva a `randomAction()`.
 3. **UI**: un botón con `data-action` (y su `case` en `actionFor()`), o un listener en la
    vista que llame a `dispatch()`. Dibujá lo nuevo en el `render(state)` de la vista.
 4. **Opción on/off**: alcanza con la clave en `options` y un

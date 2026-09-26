@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createInitialState, reduce, autoManoAfter } from '../site/js/game.js';
+import { createInitialState, reduce } from '../site/js/game.js';
+import { autoManoAfter } from '../site/js/hands.js';
 
 // Hace lo mismo que main.js, sin timer de verdad: aplica acciones y, con WAIT, simula
 // que pasó toda la espera sin que nadie toque nada.
@@ -142,7 +143,7 @@ test('otras acciones no tocan la espera', () => {
 });
 
 test('con pica pica, las manos se siguen contando aunque no se muestre la mano', () => {
-  let state = reduce(createInitialState(), { type: 'setPlayers', players: 6 });
+  let state = reduce(createInitialState(), { type: 'setPlayerCount', count: 6 });
   state = reduce(state, { type: 'setOption', option: 'showMano', value: false });
   const { state: after } = simulate([add(0, 2), WAIT], state);
   assert.equal(after.hand.number, 2);

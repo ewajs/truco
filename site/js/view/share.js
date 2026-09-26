@@ -5,40 +5,30 @@
 // link al portapapeles.
 
 import { gameToHash } from '../share.js';
+import { createDialog } from './dialog.js';
 
 const APP_TITLE = 'Anotador de truco';
 
 export function createShareDialog() {
-  const dialog = document.getElementById('share');
+  const dialog = createDialog(document.getElementById('share'));
   const gameSummary = document.getElementById('share-game-summary');
   const status = document.getElementById('share-status');
   let current = null; // último estado renderizado
 
   function open() {
     status.textContent = '';
-    dialog.classList.add('open');
-    document.getElementById('share-app').focus({ preventScroll: true });
-  }
-
-  function close() {
-    dialog.classList.remove('open');
+    dialog.open();
   }
 
   async function shareLink(url, text) {
     const result = await share({ title: APP_TITLE, text, url });
-    if (result === 'shared') close();
+    if (result === 'shared') dialog.close();
     if (result === 'copied') status.textContent = 'Link copiado';
     if (result === 'failed') status.textContent = `No se pudo compartir. El link es: ${url}`;
   }
 
   document.getElementById('open-share').addEventListener('click', open);
-  document.getElementById('close-share').addEventListener('click', close);
-  dialog.addEventListener('click', event => {
-    if (event.target === dialog) close(); // tocar afuera de la tarjeta
-  });
-  document.addEventListener('keydown', event => {
-    if (event.key === 'Escape' && dialog.classList.contains('open')) close();
-  });
+  document.getElementById('close-share').addEventListener('click', () => dialog.close());
 
   document.getElementById('share-app').addEventListener('click', () => {
     shareLink(appUrl(), 'Anotador de truco con fósforos');
@@ -57,7 +47,8 @@ export function createShareDialog() {
 
 // Aviso al abrir un link con partida: se carga solo si la persona dice que sí.
 export function createSharedGameOffer({ onAccept }) {
-  const dialog = document.getElementById('shared-game');
+  // Escape o tocar afuera equivale a "No, gracias"
+  const dialog = createDialog(document.getElementById('shared-game'), { onDismiss: () => finish() });
   const summary = document.getElementById('shared-game-summary');
   let offered = null;
 
@@ -66,12 +57,11 @@ export function createSharedGameOffer({ onAccept }) {
     const replaces = state.teams.some(team => team.score > 0);
     summary.textContent = `${scoreLine(game)} · a ${game.target} puntos.`
       + (replaces ? ' Reemplaza la partida que tenés ahora.' : '');
-    dialog.classList.add('open');
-    document.getElementById('load-shared-game').focus({ preventScroll: true });
+    dialog.open({ focus: document.getElementById('load-shared-game') });
   }
 
   function finish() {
-    dialog.classList.remove('open');
+    dialog.close();
     offered = null;
     // sacar la partida de la URL para que no se vuelva a ofrecer al recargar
     history.replaceState(null, '', location.pathname + location.search);

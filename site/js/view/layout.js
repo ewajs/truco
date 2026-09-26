@@ -3,18 +3,15 @@
 
 import { groupCount, hasBuenas } from '../game.js';
 
-const MAX_SIZE = 72;
-const MIN_SIZE = 22;
+export const MAX_SIZE = 72;
+export const MIN_SIZE = 22;
+export const MIN_GAP = 14;
+export const DIVIDER_HEIGHT = 18;
 const GAP_RATIO = 0.42; // espacio ideal, en proporción al lado del cuadrado
-const MIN_GAP = 14;
-const DIVIDER_HEIGHT = 18;
 
-export function layoutBoard(board, target) {
-  const style = getComputedStyle(board);
-  const height = board.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
-  const width = board.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
-  if (height <= 0 || width <= 0) return;
-
+// Cuenta pura (se testea con Node): lado de cada cuadrado y espacio entre ellos para un
+// tablero de `width` × `height` px útiles.
+export function boardMetrics({ width, height, target }) {
   const groups = groupCount(target);
   const divider = hasBuenas(target) ? 1 : 0;
   const gaps = groups - 1 + divider; // el divisor suma un hueco más
@@ -26,7 +23,16 @@ export function layoutBoard(board, target) {
 
   // Si sobra alto, se reparte en los huecos sin agrandar los fósforos.
   const gap = Math.max(MIN_GAP, Math.min((available - size * groups) / Math.max(1, gaps), size * 0.7));
+  return { size, gap };
+}
 
+export function layoutBoard(board, target) {
+  const style = getComputedStyle(board);
+  const height = board.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom);
+  const width = board.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+  if (height <= 0 || width <= 0) return;
+
+  const { size, gap } = boardMetrics({ width, height, target });
   board.style.setProperty('--s', `${size.toFixed(1)}px`);
   board.style.setProperty('--g', `${gap.toFixed(1)}px`);
 }

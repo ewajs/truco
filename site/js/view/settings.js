@@ -3,8 +3,10 @@
 // Los botones de "Partida a" y "De a cuántos" usan data-action y los maneja main.js; el
 // resto se maneja acá.
 
-import { isFresh, hasBuenas, playersLabel, tracksHands } from '../game.js';
+import { isFresh, hasBuenas, playerCountLabel } from '../game.js';
+import { tracksHands } from '../hands.js';
 import { SUPPORTS } from '../device.js';
+import { createDialog } from './dialog.js';
 
 const SLIDE_MS = 320; // duración de la animación de apertura (ver .sheet en CSS)
 const CONFIRM_MS = 3000;
@@ -21,7 +23,7 @@ export function createSettings({ dispatch }) {
   const sheet = document.getElementById('settings');
   const targetButtons = sheet.querySelectorAll('[data-action="setTarget"]');
   const targetHelp = document.getElementById('target-help');
-  const playersButtons = sheet.querySelectorAll('[data-action="setPlayers"]');
+  const playerCountButtons = sheet.querySelectorAll('[data-action="setPlayerCount"]');
   const playersHelp = document.getElementById('players-help');
   const picaField = document.getElementById('pica-field');
   const nameInputs = [0, 1].map(team => document.getElementById(`name-${team}`));
@@ -58,8 +60,11 @@ export function createSettings({ dispatch }) {
 
   // Con `focusTeam` (tocaron el nombre de un equipo) abre en Partida con ese nombre listo
   // para editar; si no, en la última pestaña usada.
+  // Escape cierra la hoja como "Listo" (el fondo tiene su propio listener, abajo)
+  const dialog = createDialog(sheet, { onDismiss: () => close(), dismissOnBackdrop: false });
+
   function open(focusTeam) {
-    sheet.classList.add('open');
+    dialog.open({ focus: false });
     if (focusTeam === undefined) return;
     showTab('game');
     setTimeout(() => {
@@ -69,8 +74,7 @@ export function createSettings({ dispatch }) {
   }
 
   function close() {
-    document.activeElement?.blur();
-    sheet.classList.remove('open');
+    dialog.close();
     confirmReset.cancel();
     confirmClearWins.cancel();
   }
@@ -79,10 +83,6 @@ export function createSettings({ dispatch }) {
   document.getElementById('close-settings').addEventListener('click', close);
   document.getElementById('settings-backdrop').addEventListener('click', close);
   dragToClose(sheet.querySelector('.sheet'), document.getElementById('settings-drag'), close);
-  document.addEventListener('keydown', event => {
-    // con un diálogo abierto encima (ej. la ayuda), Escape cierra solo ese diálogo
-    if (event.key === 'Escape' && sheet.classList.contains('open') && !document.querySelector('.modal.open')) close();
-  });
 
   // ---- Nombres y opciones ----
 
@@ -138,11 +138,11 @@ export function createSettings({ dispatch }) {
       : 'Una sola vuelta de 15.';
     if (!isFresh(state)) targetHelp.textContent += ' Cambiarlo empieza una partida nueva.';
 
-    playersButtons.forEach(button => {
-      button.setAttribute('aria-checked', String(Number(button.dataset.players) === state.players));
+    playerCountButtons.forEach(button => {
+      button.setAttribute('aria-checked', String(Number(button.dataset.count) === state.playerCount));
     });
-    playersHelp.textContent = `${playersLabel(state.players)}.`;
-    picaField.hidden = state.players < 6; // el pica pica es solo de a 6 u 8
+    playersHelp.textContent = `${playerCountLabel(state.playerCount)}.`;
+    picaField.hidden = state.playerCount < 6; // el pica pica es solo de a 6 u 8
 
     nameInputs.forEach((input, team) => {
       // no pisar lo que se está escribiendo

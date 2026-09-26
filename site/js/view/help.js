@@ -2,9 +2,10 @@
 // con "Siguiente"; los puntitos muestran en qué página está y sirven para saltar.
 
 import { groupSVG } from './matches.js';
+import { createDialog } from './dialog.js';
 
 export function createHelp() {
-  const dialog = document.getElementById('help');
+  const dialog = createDialog(document.getElementById('help'));
   const track = document.getElementById('help-track');
   const slides = [...track.children];
   const dotsContainer = document.getElementById('help-dots');
@@ -38,31 +39,22 @@ export function createHelp() {
   }
 
   function open() {
-    dialog.classList.add('open');
     track.scrollTo({ left: 0 }); // siempre desde el principio
     update();
-    next.focus({ preventScroll: true });
-  }
-
-  function close() {
-    dialog.classList.remove('open');
+    dialog.open({ focus: next });
   }
 
   track.addEventListener('scroll', update, { passive: true });
   next.addEventListener('click', () => {
     const index = currentIndex();
-    if (index === slides.length - 1) close();
+    if (index === slides.length - 1) dialog.close();
     else goTo(index + 1);
   });
 
   document.getElementById('open-help').addEventListener('click', open);
-  document.getElementById('close-help').addEventListener('click', close);
-  dialog.addEventListener('click', event => {
-    if (event.target === dialog) close(); // tocar afuera de la tarjeta
-  });
+  document.getElementById('close-help').addEventListener('click', () => dialog.close());
   document.addEventListener('keydown', event => {
-    if (!dialog.classList.contains('open')) return;
-    if (event.key === 'Escape') close();
+    if (!dialog.isOpen()) return;
     if (event.key === 'ArrowRight') goTo(Math.min(currentIndex() + 1, slides.length - 1));
     if (event.key === 'ArrowLeft') goTo(Math.max(currentIndex() - 1, 0));
   });

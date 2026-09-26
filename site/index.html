@@ -107,7 +107,7 @@
         </defs>
         <path class="flame" d="M28 4C40 22 45 36 41 48c-3 9-23 9-26 0C11 36 18 24 28 4Z" fill="url(#flame-gradient)"/>
         <rect x="24" y="52" width="8" height="74" rx="2" class="stick"/>
-        <ellipse cx="28" cy="53" rx="8" ry="6.5" fill="#3B1E15"/>
+        <ellipse cx="28" cy="53" rx="8" ry="6.5" class="torch-head"/>
       </svg>
       <h2 id="winner-title"></h2>
       <p id="winner-summary"></p>
@@ -256,10 +256,10 @@
           <div class="field">
             <span class="field-label">De a cuántos</span>
             <div class="seg" role="radiogroup" aria-label="De a cuántos se juega">
-              <button role="radio" data-action="setPlayers" data-players="2">2</button>
-              <button role="radio" data-action="setPlayers" data-players="4">4</button>
-              <button role="radio" data-action="setPlayers" data-players="6">6</button>
-              <button role="radio" data-action="setPlayers" data-players="8">8</button>
+              <button role="radio" data-action="setPlayerCount" data-count="2">2</button>
+              <button role="radio" data-action="setPlayerCount" data-count="4">4</button>
+              <button role="radio" data-action="setPlayerCount" data-count="6">6</button>
+              <button role="radio" data-action="setPlayerCount" data-count="8">8</button>
             </div>
             <p class="help" id="players-help"></p>
           </div>

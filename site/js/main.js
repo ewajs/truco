@@ -9,7 +9,8 @@
 // `state` es la única fuente de verdad. Las vistas nunca lo modifican: solo lo dibujan
 // y avisan lo que hizo el usuario llamando a dispatch().
 
-import { reduce, winner, autoManoAfter, showsMano } from './game.js';
+import { reduce, winner } from './game.js';
+import { autoManoAfter, showsMano } from './hands.js';
 import { load, save } from './storage.js';
 import { VIBRATION, vibrate, createWakeLock } from './device.js';
 import { createScoreboard } from './view/scoreboard.js';
@@ -37,7 +38,7 @@ function dispatch(action) {
   scheduleManoPass(action, previous);
 }
 
-// Pase automático de la mano: qué hacer lo decide autoManoAfter() (game.js); acá solo
+// Pase automático de la mano: qué hacer lo decide autoManoAfter() (hands.js); acá solo
 // se maneja el timer.
 let autoMano = null; // pase pendiente (ver autoManoAfter)
 let manoTimer = null;
@@ -125,7 +126,7 @@ function actionFor(button) {
     case 'undo': return { type: 'undo' };
     case 'newGame': return { type: 'newGame' };
     case 'setTarget': return { type: 'setTarget', target: Number(button.dataset.target) };
-    case 'setPlayers': return { type: 'setPlayers', players: Number(button.dataset.players) };
+    case 'setPlayerCount': return { type: 'setPlayerCount', count: Number(button.dataset.count) };
     case 'passMano': return { type: 'passMano' };
     default: throw new Error(`data-action desconocida: ${button.dataset.action}`);
   }

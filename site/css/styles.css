@@ -18,6 +18,17 @@
   --accent: #F2B42C;
   --accent-ink: #2B1D00;
   --danger: #A8322B;
+  --accent-shadow: #C98E12;       /* borde inferior de los botones amarillos */
+  --on-strong: #fff;              /* texto sobre fondos fuertes (rojo, peligro) */
+  --scrim: rgba(8,18,12,.62);     /* velo detrás de los diálogos */
+  --scrim-soft: rgba(8,18,12,.5); /* velo detrás de la hoja de ajustes */
+  --shadow: rgba(0,0,0,.18);      /* sombras de tarjetas y chips */
+  --knob: #fff;                   /* perilla de los interruptores */
+  --spark: #FFC94A;               /* chispa al anotar */
+  --flare: #FF8B3D;               /* cabeza del fósforo al encenderse */
+  --flare-hot: #FFE59A;
+  --glint: #fff;                  /* brillo de la cabeza del fósforo */
+  --torch-head: #3B1E15;          /* fósforo quemado del cartel de ganador */
   --display: "Alfa Slab One", "Rockwell", "Roboto Slab", Georgia, serif;
   --ui: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
@@ -353,7 +364,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 /* pica pica: rojo cabeza de fósforo, para que se distinga del amarillo de los botones */
 .hand-chip.pica {
   background: var(--head);
-  color: #fff;
+  color: var(--on-strong);
 }
 
 .hand-chip.pica .hand-kind {
@@ -445,7 +456,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   border-radius: inherit;
   pointer-events: none;
   opacity: 0;
-  background: radial-gradient(circle at var(--px,50%) var(--py,50%),rgba(179,49,42,.22),rgba(179,49,42,0) 70%);
+  background: radial-gradient(circle at var(--px,50%) var(--py,50%),color-mix(in srgb, var(--head) 22%, transparent),transparent 70%);
   transform: scale(.6);
   transition: opacity .15s,transform .15s;
 }
@@ -457,7 +468,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 }
 
 .board.erasing {
-  background: rgba(179,49,42,.10);
+  background: color-mix(in srgb, var(--head) 10%, transparent);
 }
 
 .board.erasing::after {
@@ -472,7 +483,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   transform: translateX(-50%);
   font-size: 12px;
   font-weight: 700;
-  color: #fff;
+  color: var(--on-strong);
   background: var(--danger);
   padding: 4px 10px;
   border-radius: 999px;
@@ -510,6 +521,10 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   fill: var(--stick);
 }
 
+.torch-head {
+  fill: var(--torch-head);
+}
+
 .stick-edge {
   fill: var(--stick-edge);
   opacity: .55;
@@ -520,7 +535,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 }
 
 .glint {
-  fill: #fff;
+  fill: var(--glint);
   opacity: .28;
 }
 
@@ -538,7 +553,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 }
 
 .spark {
-  fill: #FFC94A;
+  fill: var(--spark);
   transform-box: fill-box;
   transform-origin: center;
   animation: spark .6s ease-out both;
@@ -621,12 +636,12 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   color: var(--accent-ink);
   font-family: var(--display);
   font-size: 28px;
-  box-shadow: 0 3px 0 #C98E12;
+  box-shadow: 0 3px 0 var(--accent-shadow);
 }
 
 .plus:active {
   transform: translateY(2px);
-  box-shadow: 0 1px 0 #C98E12;
+  box-shadow: 0 1px 0 var(--accent-shadow);
 }
 
 .quick {
@@ -663,7 +678,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(8,18,12,.62);
+  background: var(--scrim);
   opacity: 0;
   visibility: hidden;
   transition: opacity .25s,visibility 0s .25s;
@@ -728,12 +743,12 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   color: var(--accent-ink);
   font-weight: 700;
   font-size: 17px;
-  box-shadow: 0 3px 0 #C98E12;
+  box-shadow: 0 3px 0 var(--accent-shadow);
 }
 
 .btn-accent:active {
   transform: translateY(2px);
-  box-shadow: 0 1px 0 #C98E12;
+  box-shadow: 0 1px 0 var(--accent-shadow);
 }
 
 .btn-text {
@@ -810,7 +825,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   border-radius: 18px;
   border: 1px solid var(--line);
   background: var(--panel);
-  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  box-shadow: 0 8px 24px var(--shadow);
   opacity: 0;
   transform: translateX(32px);
   transition: opacity .4s ease-out, transform .4s cubic-bezier(.2,.8,.2,1);
@@ -941,7 +956,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   transform: translateX(-50%);
   font-size: 12px;
   font-weight: 700;
-  color: #fff;
+  color: var(--on-strong);
   background: var(--danger);
   padding: 4px 10px;
   border-radius: 999px;
@@ -999,7 +1014,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 .backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(8,18,12,.5);
+  background: var(--scrim-soft);
   opacity: 0;
   transition: opacity .3s;
 }
@@ -1182,7 +1197,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 .seg button[aria-checked="true"] {
   background: var(--panel);
   color: var(--ink);
-  box-shadow: 0 1px 3px rgba(0,0,0,.12);
+  box-shadow: 0 1px 3px var(--shadow);
 }
 
 .help {
@@ -1303,8 +1318,8 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0,0,0,.25);
+  background: var(--knob);
+  box-shadow: 0 1px 3px var(--shadow);
   transition: transform .2s;
 }
 
@@ -1336,7 +1351,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 
 .btn-danger.armed, .btn-text.armed {
   background: var(--danger);
-  color: #fff;
+  color: var(--on-strong);
   border-color: var(--danger);
 }
 
@@ -1382,10 +1397,10 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 
 @keyframes strike {
   0% {
-    fill: #FFE59A;
+    fill: var(--flare-hot);
   }
   30% {
-    fill: #FF8B3D;
+    fill: var(--flare);
   }
   100% {
     fill: var(--head);
