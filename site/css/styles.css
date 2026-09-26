@@ -927,7 +927,80 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
+}
+
+/*
+  Pestañas de ajustes. A propósito distintas del selector de "Partida a": acá es solo
+  texto con una línea fina debajo de la activa, que se desliza al cambiar.
+*/
+.tabs {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0 -20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tabs button {
+  height: 44px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--muted);
+  transition: color .2s;
+}
+
+.tabs button[aria-selected="true"] {
+  color: var(--ink);
+}
+
+.tab-indicator {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  transition: transform .3s cubic-bezier(.2,.8,.2,1);
+}
+
+.tab-indicator::after {
+  content: "";
+  width: 56px;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: var(--accent);
+}
+
+.tabs[data-active="options"] .tab-indicator {
+  transform: translateX(100%);
+}
+
+/* Los paneles se apilan en la misma celda: la hoja toma el alto del más alto */
+.tab-panels {
+  display: grid;
+}
+
+.tab-panel {
+  grid-area: 1 / 1;
+  transition: opacity .2s ease-out, transform .25s ease-out, visibility 0s;
+}
+
+/* El panel oculto se corre hacia su lado: Partida a la izquierda, Opciones a la derecha */
+.tab-panel[inert] {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-16px);
+  transition: opacity .15s, transform .15s, visibility 0s .15s;
+}
+
+#panel-options[inert] {
+  transform: translateX(16px);
+}
+
+.tab-panel > .field:first-of-type {
+  border-top: 0;
 }
 
 .sheet-head h2 {

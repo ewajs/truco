@@ -1,4 +1,5 @@
-// Hoja de ajustes: a cuántos se juega, nombres, opciones y reinicios.
+// Hoja de ajustes con dos pestañas: "Partida" (a cuántos se juega, nombres y reinicios)
+// y "Opciones" (cómo se ve y se comporta la app).
 // Los botones de "Partida a" usan data-action y los maneja main.js; el resto se maneja acá.
 
 import { isFresh, hasBuenas } from '../game.js';
@@ -17,11 +18,39 @@ export function createSettings({ dispatch }) {
   const optionToggles = sheet.querySelectorAll('[data-option]');
   let current = null; // último estado renderizado
 
+  // ---- Pestañas ----
+
+  const tabList = sheet.querySelector('[role="tablist"]');
+  const tabs = [...tabList.querySelectorAll('[role="tab"]')];
+
+  // Muestra la pestaña `name` ('game' u 'options'). Se recuerda mientras la app está abierta.
+  function showTab(name) {
+    tabList.dataset.active = name;
+    tabs.forEach(tab => {
+      const selected = tab.dataset.tab === name;
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+      document.getElementById(tab.getAttribute('aria-controls')).inert = !selected;
+    });
+  }
+
+  tabs.forEach(tab => tab.addEventListener('click', () => showTab(tab.dataset.tab)));
+  tabList.addEventListener('keydown', event => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    const next = tabs[(tabs.indexOf(document.activeElement) + 1) % tabs.length];
+    showTab(next.dataset.tab);
+    next.focus();
+  });
+  showTab('game');
+
   // ---- Abrir y cerrar ----
 
+  // Con `focusTeam` (tocaron el nombre de un equipo) abre en Partida con ese nombre listo
+  // para editar; si no, en la última pestaña usada.
   function open(focusTeam) {
     sheet.classList.add('open');
     if (focusTeam === undefined) return;
+    showTab('game');
     setTimeout(() => {
       nameInputs[focusTeam].focus();
       nameInputs[focusTeam].select();
