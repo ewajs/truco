@@ -1,10 +1,10 @@
 // Chip con el número de mano y si es de pica pica, y el popup para corregirlo.
 //
-// El chip se ve si "Mostrar número de mano" está activado, y siempre con pica pica. En
+// El chip se ve cuando la app sigue las manos ("Seguir las manos" en Opciones). En
 // una redonda dice "Mano 7"; en pica pica se pinta de rojo y muestra qué duelo se juega
 // ("Pica pica 2/3"). Tocarlo abre la corrección: número, tipo de mano y duelo.
 
-import { picaPicaEnabled, isPicaPicaHand, duelsPerPicaPica, showsHandChip } from '../game.js';
+import { picaPicaEnabled, isPicaPicaHand, duelsPerPicaPica, tracksHands } from '../game.js';
 
 export function createHandChip({ dispatch }) {
   const chip = document.getElementById('hand-chip');
@@ -18,7 +18,7 @@ export function createHandChip({ dispatch }) {
 
   function render(state) {
     current = state;
-    chip.hidden = !showsHandChip(state);
+    chip.hidden = !tracksHands(state);
     if (chip.hidden) return;
 
     const pica = isPicaPicaHand(state);

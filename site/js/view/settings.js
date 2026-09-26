@@ -3,7 +3,7 @@
 // Los botones de "Partida a" y "De a cuántos" usan data-action y los maneja main.js; el
 // resto se maneja acá.
 
-import { isFresh, hasBuenas, playersLabel, autoManoUseful } from '../game.js';
+import { isFresh, hasBuenas, playersLabel, tracksHands } from '../game.js';
 import { SUPPORTS } from '../device.js';
 
 const SLIDE_MS = 320; // duración de la animación de apertura (ver .sheet en CSS)
@@ -14,7 +14,7 @@ const DRAG_CLOSE_SPEED = 0.5;  // o soltarla rápido (px/ms), aunque sea un tir�
 // Condiciones de data-requires: la opción queda deshabilitada si devuelve false.
 const REQUIREMENTS = {
   showButtons: state => state.options.showButtons,
-  autoManoUseful,
+  trackHands: tracksHands,
 };
 
 export function createSettings({ dispatch }) {

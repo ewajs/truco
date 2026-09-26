@@ -38,8 +38,13 @@ export function fromSaved(saved) {
     history: Array.isArray(data.history) ? data.history : [],
     mano: data.mano === 1 ? 1 : 0,
     hand: validHand(data.hand) ?? newHand(teams.map(team => team.score)),
-    options: { ...initial.options, ...data.options },
+    options: knownOptions(initial.options, data.options),
   };
+}
+
+// Las opciones guardadas, completando las que falten y descartando las que ya no existen.
+function knownOptions(defaults, saved = {}) {
+  return Object.fromEntries(Object.entries(defaults).map(([key, value]) => [key, saved[key] ?? value]));
 }
 
 // La mano guardada, o null si falta o no tiene la forma esperada.

@@ -1227,6 +1227,15 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   padding-left: 14px;
 }
 
+/* Aclaración que solo aparece cuando la opción está deshabilitada */
+.requires-note {
+  display: none;
+}
+
+.toggle:has(input:disabled) .requires-note {
+  display: inline;
+}
+
 .toggle:has(input:disabled) {
   opacity: .4;
   cursor: default;
