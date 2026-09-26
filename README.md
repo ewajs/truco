@@ -16,8 +16,20 @@ Tocá la columna de un equipo para sumar, mantené apretado para borrar.
 - Se pueden ocultar los botones y usar solo tocar y mantener
 - Ayuda corta con lo básico
 - La mesa: quién se sienta dónde (los equipos se alternan), quién es mano y quién da;
-  se editan los nombres, se cambian de lugar o se tiran reyes
+  se editan los nombres, se cambian de lugar o se tiran reyes. El chip y los avisos dicen
+  quién es mano y quién da, también en cada duelo del pica pica
 - Cuatro temas (Paño, Madera, Noche y Argento), cada uno claro u oscuro; por defecto sigue al celular
+
+## Cómo se ve
+
+| | | | |
+|:-:|:-:|:-:|:-:|
+| <img src="docs/capturas/iphone/tablero.png" width="180" alt="Tablero"> | <img src="docs/capturas/iphone/aviso.png" width="180" alt="Aviso del pase de mano"> | <img src="docs/capturas/iphone/pica-pica.png" width="180" alt="Pica pica en tema Noche, oscuro"> | <img src="docs/capturas/iphone/mesa.png" width="180" alt="La mesa en Ajustes"> |
+| Tablero | Pase de mano | Pica pica (Noche) | La mesa |
+
+Más en [`docs/capturas/`](docs/capturas/) (iPhone 15 y Galaxy S24, claro y oscuro). Las
+fuentes de estas capturas son las de reemplazo (Georgia y la del sistema): en el
+entorno donde se sacaron no se llega a Google Fonts.
 
 ## Correrlo local
 

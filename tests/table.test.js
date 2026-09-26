@@ -1,8 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createInitialState, reduce } from '../site/js/game.js';
-import { dealerSeat, drawTable, seatTurn, seatedPlayers, MAX_PLAYERS } from '../site/js/table.js';
+import { dealerSeat, drawTable, seatTurn, seatedPlayers, shortPlayerName, MAX_PLAYERS } from '../site/js/table.js';
 import { fromSaved, save, STORAGE_KEY } from '../site/js/storage.js';
+import { currentDeal, passNotice } from '../site/js/hands.js';
 
 const add = (team, points = 1) => ({ type: 'add', team, points });
 
@@ -129,4 +130,45 @@ test('turnos: mano, segundo, tercero… y los dos últimos son pie (uno por equi
   assert.deepEqual(turns(6), ['Mano', 'Segundo', 'Tercero', 'Cuarto', 'Pie', 'Pie']);
   assert.deepEqual(turns(8), ['Mano', 'Segundo', 'Tercero', 'Cuarto', 'Quinto', 'Sexto', 'Pie', 'Pie']);
   assert.deepEqual(turns(4, 2), ['Pie', 'Pie', 'Mano', 'Segundo'], 'se cuenta desde la mano');
+});
+
+// Una mano de pica pica de a `count`, con la mano en `manoSeat`, en el duelo `duels`.
+function picaHand(count, manoSeat, duels) {
+  const state = reduce(createInitialState(), { type: 'setPlayerCount', count });
+  return { ...state, manoSeat, mano: manoSeat % 2, hand: { ...state.hand, pica: true, duels } };
+}
+
+test('en una redonda juegan todos: mano y da el anterior', () => {
+  const state = reduce(withPlayers(['Juan', 'Pedro', 'Ana', 'Sofi']), { type: 'setManoSeat', seat: 2 });
+  assert.deepEqual(currentDeal(state), { mano: 2, dealer: 1, seats: [2, 3, 0, 1] });
+});
+
+test('pica pica de a 6: cada uno contra el de enfrente, empezando por la mano', () => {
+  assert.deepEqual([0, 1, 2].map(duel => currentDeal(picaHand(6, 1, duel))), [
+    { mano: 1, dealer: 4, seats: [1, 4] },
+    { mano: 2, dealer: 5, seats: [2, 5] },
+    { mano: 3, dealer: 0, seats: [3, 0] },
+  ]);
+});
+
+test('pica pica de a 8: dos grupos de a 4 desde la mano, dos de cada equipo', () => {
+  const [first, second] = [0, 1].map(duel => currentDeal(picaHand(8, 6, duel)));
+  assert.deepEqual(first, { mano: 6, dealer: 1, seats: [6, 7, 0, 1] });
+  assert.deepEqual(second, { mano: 2, dealer: 5, seats: [2, 3, 4, 5] });
+  for (const { seats } of [first, second]) {
+    assert.deepEqual(seats.map(seat => seat % 2).sort(), [0, 0, 1, 1]);
+  }
+});
+
+test('los avisos nombran al jugador, aunque tenga el nombre por defecto', () => {
+  const passed = state => reduce(reduce(state, add(0)), { type: 'passMano' });
+  const unnamed = createInitialState();
+  assert.equal(passNotice(reduce(unnamed, add(0)), passed(unnamed)).done, 'Es mano Jugador 2');
+  const named = withPlayers(['Juan', 'Pedro', 'Ana', 'Sofi']);
+  assert.equal(passNotice(reduce(named, add(0)), passed(named)).coming, 'Mano para Pedro');
+});
+
+test('nombre corto: J3 si no lo cambiaron', () => {
+  const state = withPlayers(['Juan', 'Jugador 2']);
+  assert.deepEqual([0, 1, 2].map(seat => shortPlayerName(state, seat)), ['Juan', 'J2', 'J3']);
 });

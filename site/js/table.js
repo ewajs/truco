@@ -31,6 +31,13 @@ export function teamOfSeat(seat) {
   return seat % 2;
 }
 
+// El nombre corto para donde hay poco lugar (el chip de la mano): "J3" si no le
+// cambiaron el nombre por defecto.
+export function shortPlayerName(state, seat) {
+  const name = state.players[seat];
+  return name === defaultPlayerName(seat) ? `J${seat + 1}` : name;
+}
+
 // Los que están jugando, en orden: [{ seat, name, team }].
 export function seatedPlayers(state) {
   return state.players.slice(0, state.playerCount)

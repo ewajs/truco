@@ -28,7 +28,7 @@
 
 import { newHand, passMano, setHand, restoreHand, duelsPerPicaPica } from './hands.js';
 import {
-  defaultPlayers, fitManoSeat, renamePlayer, swapSeats, setManoSeat, setTable, teamOfSeat,
+  defaultPlayers, fitManoSeat, nextMano, renamePlayer, swapSeats, setManoSeat, setTable, teamOfSeat,
 } from './table.js';
 
 export const TARGETS = [15, 30];
@@ -182,8 +182,11 @@ function pushHistory(state, entry) {
   return { ...state, history: [...state.history, entry].slice(-HISTORY_LIMIT) };
 }
 
+// La mano sigue rotando: arranca el siguiente al que era mano (salvo que no se haya jugado
+// nada, por ejemplo al cambiar a cuántos puntos antes de empezar).
 function newGame(state) {
-  return { ...updateTeams(state, () => ({ score: 0 })), history: [], hand: newHand([0, 0]) };
+  const mano = isFresh(state) ? {} : nextMano(state);
+  return { ...updateTeams(state, () => ({ score: 0 })), history: [], hand: newHand([0, 0]), ...mano };
 }
 
 function setTarget(state, target) {
