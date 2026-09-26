@@ -1033,7 +1033,8 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 
 .seg {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: column; /* tantas columnas iguales como opciones */
+  grid-auto-columns: 1fr;
   background: var(--felt);
   border-radius: 14px;
   padding: 4px;

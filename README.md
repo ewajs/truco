@@ -3,7 +3,7 @@
 Anotador de truco con fósforos, pensado para el celular apoyado en la mesa.
 Tocá la columna de un equipo para sumar, mantené apretado para borrar.
 
-- Partidas a 15 o a 30 (malas y buenas)
+- Partidas a 15 o a 30 (malas y buenas), de a 2, 4, 6 u 8 jugadores
 - Botones +2, +3 y +4 para anotar un truco o un envido de una
 - Deshacer, contador de partidas ganadas y nombres editables
 - Vibración y opción de mantener la pantalla encendida
@@ -43,7 +43,7 @@ site/                   lo que se publica en GitHub Pages, tal cual
     main.js             arranque: estado, dispatch() y conexión de las vistas
     game.js             reglas del juego: reduce(state, action) y consultas
     storage.js          guardar/cargar en localStorage y migrar versiones viejas
-    share.js            partida ⇄ link (#a=30&equipo1=…&puntos1=…)
+    share.js            partida ⇄ link (#a=30&de=4&equipo1=…&puntos1=…)
     device.js           vibración y wake lock
     view/
       scoreboard.js     columnas de los equipos
