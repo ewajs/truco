@@ -434,13 +434,13 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 */
 .hand-chip {
   position: absolute;
-  top: 60px;
+  top: 42px; /* a la altura del puntaje, así hasta tres líneas no tapan el "faltan…" */
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 5px 11px;
+  padding: 4px 10px;
   border-radius: 12px;
   background: var(--sun);
   color: var(--sun-ink);
@@ -498,25 +498,28 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 /* quién es mano y quién da: más finito, con los íconos de mano y mazo */
 .hand-players {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.hand-line {
+  display: flex;
   align-items: center;
   gap: 3px;
-  margin-top: 1px;
-  font-size: 12px;
-  font-weight: 500;
 }
 
-.hand-players[hidden] {
-  display: none;
-}
-
-.hand-players span {
+.hand-line span {
   max-width: 56px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.hand-players span + .hand-icon {
+.hand-line span + .hand-icon,
+.hand-line span + span {
   margin-left: 6px;
 }
 

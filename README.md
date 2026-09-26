@@ -16,8 +16,8 @@ Tocá la columna de un equipo para sumar, mantené apretado para borrar.
 - Se pueden ocultar los botones y usar solo tocar y mantener
 - Ayuda corta con lo básico
 - La mesa: quién se sienta dónde (los equipos se alternan), quién es mano y quién da;
-  se editan los nombres, se cambian de lugar o se tiran reyes. Con nombres, el chip y los
-  avisos dicen quién es mano y quién da, también en cada duelo del pica pica
+  se editan los nombres, se cambian de lugar o se tiran reyes. El chip y los avisos dicen
+  quién es mano y quién da, también en cada duelo del pica pica
 - Cuatro temas (Paño, Madera, Noche y Argento), cada uno claro u oscuro; por defecto sigue al celular
 
 ## Correrlo local

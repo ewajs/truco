@@ -12,7 +12,7 @@
 // En el pica pica cada pase es un duelo terminado; la mano termina (y recién ahí pasa)
 // cuando se jugaron todos los duelos.
 
-import { nextMano, seatLabel } from './table.js';
+import { nextMano } from './table.js';
 
 export const PICA_PICA_FROM = 5;   // el pica pica arranca cuando alguien llega a 5…
 export const PICA_PICA_UNTIL = 25; // …y se termina cuando alguien llega a 25
@@ -169,18 +169,17 @@ export function noticeDelay(waitMs) {
 
 // Qué dice el aviso según lo que hace el pase (`before` → `after`): pasar la mano, o
 // terminar un duelo del pica pica (ahí la mano no cambia hasta que se juegan todos).
-// `coming` se muestra durante la espera; `done`, después del pase. Nombra al jugador, o
-// al equipo si nadie cargó nombres (ver seatLabel).
+// `coming` se muestra durante la espera; `done`, después del pase.
 export function passNotice(before, after) {
   if (after.manoSeat === before.manoSeat) {
     const total = duelsPerPicaPica(before.playerCount);
-    const next = seatLabel(after, currentDeal(after).mano);
+    const next = after.players[currentDeal(after).mano];
     return {
       coming: `Fin del duelo ${before.hand.duels + 1}/${total}`,
       done: `Duelo ${after.hand.duels + 1}/${total}: es mano ${next}`,
     };
   }
-  const name = seatLabel(after, after.manoSeat);
+  const name = after.players[after.manoSeat];
   return {
     coming: `Mano para ${name}`,
     done: isPicaPicaHand(after) ? `Es mano ${name} · Pica pica` : `Es mano ${name}`,

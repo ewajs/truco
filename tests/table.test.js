@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createInitialState, reduce } from '../site/js/game.js';
-import { dealerSeat, drawTable, seatTurn, seatedPlayers, MAX_PLAYERS } from '../site/js/table.js';
+import { dealerSeat, drawTable, seatTurn, seatedPlayers, shortPlayerName, MAX_PLAYERS } from '../site/js/table.js';
 import { fromSaved, save, STORAGE_KEY } from '../site/js/storage.js';
 import { currentDeal, passNotice } from '../site/js/hands.js';
 
@@ -160,10 +160,15 @@ test('pica pica de a 8: dos grupos de a 4 desde la mano, dos de cada equipo', ()
   }
 });
 
-test('los avisos nombran al jugador si hay nombres; si no, al equipo', () => {
+test('los avisos nombran al jugador, aunque tenga el nombre por defecto', () => {
   const passed = state => reduce(reduce(state, add(0)), { type: 'passMano' });
   const unnamed = createInitialState();
-  assert.equal(passNotice(reduce(unnamed, add(0)), passed(unnamed)).done, 'Es mano Ellos');
+  assert.equal(passNotice(reduce(unnamed, add(0)), passed(unnamed)).done, 'Es mano Jugador 2');
   const named = withPlayers(['Juan', 'Pedro', 'Ana', 'Sofi']);
   assert.equal(passNotice(reduce(named, add(0)), passed(named)).coming, 'Mano para Pedro');
+});
+
+test('nombre corto: J3 si no lo cambiaron', () => {
+  const state = withPlayers(['Juan', 'Jugador 2']);
+  assert.deepEqual([0, 1, 2].map(seat => shortPlayerName(state, seat)), ['Juan', 'J2', 'J3']);
 });

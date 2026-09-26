@@ -2,14 +2,15 @@
 //
 // El chip se ve cuando la app sigue las manos ("Seguir las manos" en Opciones). En
 // una redonda dice "Mano 7"; en pica pica cambia de color y muestra qué duelo se juega
-// ("Mano 7 ⚔ 2/3"). Si hay nombres, abajo dice quién es mano y quién da (en el pica
-// pica, los del duelo). Tocarlo abre la corrección: quién es mano, número, tipo de mano y
+// ("Mano 7 ⚔ 2/3"). Abajo, en orden de la mesa, quién es mano (el primero, con la mano)
+// y quién da (el último, con el mazo): en una redonda y en un duelo de uno contra uno en
+// una línea; en el pica pica de a 8, los cuatro del duelo en dos líneas. Tocarlo abre la corrección: quién es mano, número, tipo de mano y
 // duelo.
 
 import {
   picaPicaEnabled, isPicaPicaHand, duelsPerPicaPica, tracksHands, currentDeal, duelOffset,
 } from '../hands.js';
-import { hasPlayerNames } from '../table.js';
+import { shortPlayerName } from '../table.js';
 import { createDialog } from './dialog.js';
 
 export function createHandChip({ dispatch }) {
@@ -17,8 +18,6 @@ export function createHandChip({ dispatch }) {
   const number = document.getElementById('hand-number');
   const duel = document.getElementById('hand-duel');
   const players = document.getElementById('hand-players');
-  const manoName = document.getElementById('hand-mano');
-  const dealerName = document.getElementById('hand-dealer');
   const editor = createHandEditor({ dispatch });
   let current = null;
   let wasPica = null;
@@ -37,10 +36,8 @@ export function createHandChip({ dispatch }) {
     chip.classList.toggle('pica', pica);
 
     const deal = currentDeal(state);
-    players.hidden = !hasPlayerNames(state);
-    manoName.textContent = state.players[deal.mano];
-    dealerName.textContent = state.players[deal.dealer];
-    const who = players.hidden ? '' : `, es mano ${manoName.textContent} y da ${dealerName.textContent}`;
+    renderPlayers(players, state, deal);
+    const who = `, es mano ${state.players[deal.mano]} y da ${state.players[deal.dealer]}`;
     chip.setAttribute('aria-label', `${pica ? 'Pica pica, ' : ''}mano ${hand.number}${who}. Tocá para corregir`);
 
     if (wasPica !== null && pica !== wasPica) {
@@ -52,6 +49,26 @@ export function createHandChip({ dispatch }) {
   }
 
   return { render };
+}
+
+// Los que juegan, en orden de la mesa: el primero con la mano y el último con el mazo. En
+// una redonda solo la mano y el que da; en un duelo, todos los del duelo (de a 2 por línea).
+function renderPlayers(container, state, deal) {
+  const seats = isPicaPicaHand(state) ? deal.seats : [deal.mano, deal.dealer];
+  const lines = [];
+  for (let i = 0; i < seats.length; i += 2) {
+    const line = document.createElement('span');
+    line.className = 'hand-line';
+    seats.slice(i, i + 2).forEach(seat => {
+      const icon = seat === deal.mano ? 'icon-mano' : seat === deal.dealer ? 'icon-mazo' : null;
+      if (icon) line.insertAdjacentHTML('beforeend', `<svg class="hand-icon"><use href="#${icon}"/></svg>`);
+      const name = document.createElement('span');
+      name.textContent = shortPlayerName(state, seat);
+      line.append(name);
+    });
+    lines.push(line);
+  }
+  container.replaceChildren(...lines);
 }
 
 // Popup de corrección. Trabaja sobre un borrador y recién "Listo" lo aplica.
