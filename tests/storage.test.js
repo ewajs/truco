@@ -92,3 +92,12 @@ test('opciones: completa las que faltan y descarta las que sobran', () => {
   assert.equal(loaded.options.keepAwake, false, 'no es booleana: valor por defecto');
   assert.deepEqual(loaded.teams, playedState().teams, 'la partida no se pierde');
 });
+
+test('opciones con valores fijos: tema y modo oscuro', () => {
+  const ok = fromSaved(savedWith({ options: { palette: 'argento', darkMode: false } }));
+  assert.equal(ok.options.palette, 'argento');
+  assert.equal(ok.options.darkMode, false);
+  const bad = fromSaved(savedWith({ options: { palette: 'fucsia', darkMode: 'si' } }));
+  assert.equal(bad.options.palette, 'pano', 'tema desconocido: el de siempre');
+  assert.equal(bad.options.darkMode, 'auto', 'modo desconocido: seguir al celular');
+});

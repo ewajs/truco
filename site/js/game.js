@@ -28,6 +28,13 @@ export const POINTS_PER_GROUP = 5; // cada cuadrado de fósforos vale 5
 export const HISTORY_LIMIT = 300;
 export const DEFAULT_NAMES = ['Nosotros', 'Ellos'];
 export const MAX_NAME_LENGTH = 14;
+export const PALETTES = ['pano', 'madera', 'noche', 'argento'];
+
+// Opciones que no son de sí o no: los valores que aceptan (ver storage.js).
+export const OPTION_CHOICES = {
+  palette: PALETTES,
+  darkMode: ['auto', true, false], // 'auto' sigue al celular
+};
 
 export function createInitialState() {
   return {
@@ -48,6 +55,8 @@ export function createInitialState() {
       picaPica: true,     // de a 6 u 8: alternar manos redondas y de pica pica (si trackHands)
       vibrate: true,
       keepAwake: false,
+      palette: 'pano',    // tema de colores (PALETTES)
+      darkMode: 'auto',   // true, false o 'auto' (sigue al celular)
     },
   };
 }
