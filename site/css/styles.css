@@ -459,11 +459,16 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   display: none;
 }
 
+.hand-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .hand-kind {
   display: none;
   align-items: center;
-  gap: 4px;
-  font-size: 12px;
+  gap: 3px;
 }
 
 .hand-icon {
@@ -488,6 +493,37 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 
 .hand-chip.pop {
   animation: chip-pop .35s ease-out;
+}
+
+/* quién es mano y quién da: más finito, con los íconos de mano y mazo */
+.hand-players {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 1px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.hand-players[hidden] {
+  display: none;
+}
+
+.hand-players span {
+  max-width: 56px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hand-players span + .hand-icon {
+  margin-left: 6px;
+}
+
+.hand-players .hand-icon {
+  width: 12px;
+  height: 12px;
+  flex: none;
 }
 
 /* Corregir la mano: número con − y +, tipo de mano y duelo */
@@ -527,9 +563,39 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 }
 
 .hand-editor-pica,
-.hand-editor-duels {
+.hand-editor-duels,
+.hand-editor-mano {
   margin-bottom: 16px;
   text-align: left;
+}
+
+/* quién es mano: el nombre entre ‹ y ›, más chico que el número */
+.hand-editor-mano .stepper {
+  justify-content: space-between;
+  gap: 8px;
+  margin: 6px 0 0;
+}
+
+.hand-editor-mano .step {
+  width: 44px;
+  height: 44px;
+}
+
+.step-name {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-family: var(--ui);
+  font-weight: 700;
+  font-size: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* el duelo se oculta sin sacarlo: el popup no cambia de alto entre redonda y pica pica */
+.hand-editor-duels.off {
+  visibility: hidden;
 }
 
 .hand-editor-pica[hidden],

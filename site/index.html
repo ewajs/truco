@@ -68,8 +68,16 @@
       <main class="teams" id="teams"></main>
       <!-- Número de mano y pica pica (js/view/hand.js). Tocarlo abre la corrección. -->
       <button class="hand-chip" id="hand-chip" aria-live="polite" hidden>
-        <span id="hand-number"></span>
-        <span class="hand-kind"><svg class="hand-icon"><use href="#icon-pica"/></svg>Pica pica <span id="hand-duel"></span></span>
+        <!-- "Mano 7", y en pica pica "Mano 7 ⚔ 2/3" en la misma línea -->
+        <span class="hand-title">
+          <span id="hand-number"></span>
+          <span class="hand-kind"><svg class="hand-icon"><use href="#icon-pica"/></svg><span id="hand-duel"></span></span>
+        </span>
+        <!-- Quién es mano y quién da (en el pica pica, en el duelo actual). Solo si hay nombres. -->
+        <span class="hand-players" id="hand-players">
+          <svg class="hand-icon"><use href="#icon-mano"/></svg><span id="hand-mano"></span>
+          <svg class="hand-icon"><use href="#icon-mazo"/></svg><span id="hand-dealer"></span>
+        </span>
       </button>
     </div>
   </div>
@@ -190,11 +198,19 @@
   <div class="modal" id="hand-editor">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="hand-editor-title">
       <h2 id="hand-editor-title">Corregir la mano</h2>
-      <p>Por si el conteo automático se equivocó.</p>
+      <p>Por si el conteo automático se equivocó. Los lugares se cambian en Ajustes, en la mesa.</p>
       <div class="stepper">
         <button class="step" id="hand-editor-minus" aria-label="Una mano menos">−</button>
         <output class="step-value" id="hand-editor-number" aria-live="polite"></output>
         <button class="step" id="hand-editor-plus" aria-label="Una mano más">+</button>
+      </div>
+      <div class="hand-editor-mano">
+        <span class="field-label">Es mano</span>
+        <div class="stepper">
+          <button class="step" id="hand-editor-prev" aria-label="La mano al anterior">‹</button>
+          <output class="step-value step-name" id="hand-editor-mano" aria-live="polite"></output>
+          <button class="step" id="hand-editor-next" aria-label="La mano al siguiente">›</button>
+        </div>
       </div>
       <div class="hand-editor-pica" id="hand-editor-pica">
         <div class="seg" role="radiogroup" aria-label="Tipo de mano">

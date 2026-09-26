@@ -31,6 +31,18 @@ export function teamOfSeat(seat) {
   return seat % 2;
 }
 
+// Si les pusieron nombre a los jugadores (si no, todos se llaman "Jugador N" y no vale la
+// pena mostrarlos).
+export function hasPlayerNames(state) {
+  return state.players.slice(0, state.playerCount)
+    .some((name, seat) => name !== defaultPlayerName(seat));
+}
+
+// Cómo nombrar al lugar `seat` en un aviso: el jugador, o su equipo si nadie cargó nombres.
+export function seatLabel(state, seat) {
+  return hasPlayerNames(state) ? state.players[seat] : state.teams[teamOfSeat(seat)].name;
+}
+
 // Los que están jugando, en orden: [{ seat, name, team }].
 export function seatedPlayers(state) {
   return state.players.slice(0, state.playerCount)

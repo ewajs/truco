@@ -100,8 +100,16 @@ test('siguiendo las manos sin mostrar quién es mano, igual pasa y cuenta', () =
 });
 
 test('empezar otra partida cancela el pase pendiente', () => {
-  assert.equal(simulate([add(0), { type: 'newGame' }, WAIT]).state.mano, 0);
-  assert.equal(simulate([add(0), { type: 'setTarget', target: 15 }, WAIT]).state.mano, 0);
+  for (const restart of [{ type: 'newGame' }, { type: 'setTarget', target: 15 }]) {
+    const started = simulate([add(0), restart]);
+    assert.equal(started.pending, null);
+    assert.equal(simulate([add(0), restart, WAIT]).state.mano, started.state.mano, 'esperar no pasa nada');
+  }
+});
+
+test('la partida nueva arranca con el siguiente al que era mano', () => {
+  assert.equal(simulate([add(0), { type: 'newGame' }]).state.manoSeat, 1);
+  assert.equal(simulate([{ type: 'setTarget', target: 15 }]).state.manoSeat, 0, 'sin jugar nada, no rota');
 });
 
 // ---- autoManoAfter directo ----
@@ -189,5 +197,5 @@ test('en el pica pica, el aviso habla del duelo (la mano no cambia)', () => {
   const before = reduce(pica, add(1));
   const after = reduce(before, passMano);
   assert.equal(after.mano, before.mano);
-  assert.deepEqual(passNotice(before, after), { coming: 'Fin del duelo 1/3', done: 'Pica pica: duelo 2/3' });
+  assert.deepEqual(passNotice(before, after), { coming: 'Fin del duelo 1/3', done: 'Duelo 2/3: es mano Nosotros' });
 });

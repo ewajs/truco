@@ -1,16 +1,24 @@
 // Chip con el número de mano y si es de pica pica, y el popup para corregirlo.
 //
 // El chip se ve cuando la app sigue las manos ("Seguir las manos" en Opciones). En
-// una redonda dice "Mano 7"; en pica pica se pinta de rojo y muestra qué duelo se juega
-// ("Pica pica 2/3"). Tocarlo abre la corrección: número, tipo de mano y duelo.
+// una redonda dice "Mano 7"; en pica pica cambia de color y muestra qué duelo se juega
+// ("Mano 7 ⚔ 2/3"). Si hay nombres, abajo dice quién es mano y quién da (en el pica
+// pica, los del duelo). Tocarlo abre la corrección: quién es mano, número, tipo de mano y
+// duelo.
 
-import { picaPicaEnabled, isPicaPicaHand, duelsPerPicaPica, tracksHands } from '../hands.js';
+import {
+  picaPicaEnabled, isPicaPicaHand, duelsPerPicaPica, tracksHands, currentDeal, duelOffset,
+} from '../hands.js';
+import { hasPlayerNames } from '../table.js';
 import { createDialog } from './dialog.js';
 
 export function createHandChip({ dispatch }) {
   const chip = document.getElementById('hand-chip');
   const number = document.getElementById('hand-number');
   const duel = document.getElementById('hand-duel');
+  const players = document.getElementById('hand-players');
+  const manoName = document.getElementById('hand-mano');
+  const dealerName = document.getElementById('hand-dealer');
   const editor = createHandEditor({ dispatch });
   let current = null;
   let wasPica = null;
@@ -27,7 +35,13 @@ export function createHandChip({ dispatch }) {
     number.textContent = `Mano ${hand.number}`;
     duel.textContent = pica ? `${hand.duels + 1}/${duelsPerPicaPica(state.playerCount)}` : '';
     chip.classList.toggle('pica', pica);
-    chip.setAttribute('aria-label', `${pica ? 'Pica pica, ' : ''}mano ${hand.number}. Tocá para corregir`);
+
+    const deal = currentDeal(state);
+    players.hidden = !hasPlayerNames(state);
+    manoName.textContent = state.players[deal.mano];
+    dealerName.textContent = state.players[deal.dealer];
+    const who = players.hidden ? '' : `, es mano ${manoName.textContent} y da ${dealerName.textContent}`;
+    chip.setAttribute('aria-label', `${pica ? 'Pica pica, ' : ''}mano ${hand.number}${who}. Tocá para corregir`);
 
     if (wasPica !== null && pica !== wasPica) {
       chip.classList.remove('pop');
@@ -49,11 +63,15 @@ function createHandEditor({ dispatch }) {
   const kindButtons = picaSection.querySelectorAll('[data-pica]');
   const duelsSection = document.getElementById('hand-editor-duels');
   const duelSeg = document.getElementById('hand-editor-duel');
-  let draft = null; // { number, pica, duel, duels (cuántos hay) }
+  const manoOutput = document.getElementById('hand-editor-mano');
+  let players = [];  // los nombres de los que juegan, en orden
+  let draft = null; // { mano (lugar, el mismo que muestra el chip), number, pica, duel, duels }
 
   function open(state) {
     const pica = isPicaPicaHand(state);
+    players = state.players.slice(0, state.playerCount);
     draft = {
+      mano: currentDeal(state).mano,
       number: state.hand.number,
       pica,
       duel: pica ? state.hand.duels + 1 : 1,
@@ -72,17 +90,25 @@ function createHandEditor({ dispatch }) {
   }
 
   function update() {
+    manoOutput.textContent = players[draft.mano];
     numberOutput.textContent = draft.number;
     minus.disabled = draft.number <= 1;
     kindButtons.forEach(button => {
       button.setAttribute('aria-checked', String((button.dataset.pica === 'true') === draft.pica));
     });
-    duelsSection.hidden = !draft.pica;
+    // se oculta sin sacarlo, así el popup no cambia de alto al elegir redonda o pica pica
+    duelsSection.classList.toggle('off', !draft.pica);
     duelSeg.querySelectorAll('[data-duel]').forEach(button => {
       button.setAttribute('aria-checked', String(Number(button.dataset.duel) === draft.duel));
     });
   }
 
+  const moveMano = step => {
+    draft.mano = (draft.mano + step + players.length) % players.length;
+    update();
+  };
+  document.getElementById('hand-editor-prev').addEventListener('click', () => moveMano(-1));
+  document.getElementById('hand-editor-next').addEventListener('click', () => moveMano(1));
   minus.addEventListener('click', () => { draft.number = Math.max(1, draft.number - 1); update(); });
   document.getElementById('hand-editor-plus').addEventListener('click', () => { draft.number += 1; update(); });
   kindButtons.forEach(button => button.addEventListener('click', () => {
@@ -97,6 +123,9 @@ function createHandEditor({ dispatch }) {
   });
 
   document.getElementById('hand-editor-save').addEventListener('click', () => {
+    // en el pica pica se elige la mano del duelo: la de la mano está unos lugares antes
+    const offset = draft.pica ? duelOffset(players.length, draft.duel - 1) : 0;
+    dispatch({ type: 'setManoSeat', seat: (draft.mano - offset + players.length * 4) % players.length });
     dispatch({ type: 'setHand', number: draft.number, pica: draft.pica, duel: draft.duel });
     dialog.close();
   });
