@@ -68,13 +68,30 @@ const SCENES = [
     dark: true,
     async run(app) {
       await playedGame(app);
-      await app.openSettings('#tab-options');
-      await app.page.tap('[data-choice="palette"][data-value="noche"]');
+      await app.choosePalette('noche');
       await app.page.tap('#tab-game');
       await app.page.tap('[data-action="setPlayerCount"][data-count="6"]');
       await app.namePlayers(['Leo', 'Caro'], 4); // cierra Ajustes
       await app.add(1, 1);
       await app.passMano(); // termina la mano: la que sigue es de Pica Pica
+    },
+  },
+  // los otros temas (el de por defecto es Argento, el de todas las demás)
+  {
+    name: 'tema-pano',
+    async run(app) {
+      await playedGame(app);
+      await app.choosePalette('pano');
+      await app.closeSettings();
+    },
+  },
+  {
+    name: 'tema-madera', // en oscuro
+    dark: true,
+    async run(app) {
+      await playedGame(app);
+      await app.choosePalette('madera');
+      await app.closeSettings();
     },
   },
 ];
@@ -92,6 +109,11 @@ function createApp(page) {
         await app.wait(450);
       }
       if (tab) await page.tap(tab);
+    },
+    // Elige el tema en Ajustes → Opciones y deja Ajustes abierto.
+    async choosePalette(palette) {
+      await app.openSettings('#tab-options');
+      await page.tap(`[data-choice="palette"][data-value="${palette}"]`);
     },
     async closeSettings() {
       await page.tap('#close-settings');

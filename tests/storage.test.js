@@ -94,11 +94,11 @@ test('opciones: completa las que faltan y descarta las que sobran', () => {
 });
 
 test('opciones con valores fijos: tema y modo', () => {
-  const ok = fromSaved(savedWith({ options: { palette: 'argento', mode: 'dark' } }));
-  assert.equal(ok.options.palette, 'argento');
+  const ok = fromSaved(savedWith({ options: { palette: 'madera', mode: 'dark' } }));
+  assert.equal(ok.options.palette, 'madera');
   assert.equal(ok.options.mode, 'dark');
   const bad = fromSaved(savedWith({ options: { palette: 'fucsia', mode: true } }));
-  assert.equal(bad.options.palette, 'pano', 'tema desconocido: el de siempre');
+  assert.equal(bad.options.palette, 'argento', 'tema desconocido: el de por defecto');
   assert.equal(bad.options.mode, 'auto', 'modo desconocido: seguir al celular');
 });
 

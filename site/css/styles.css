@@ -2,7 +2,7 @@
   Anotador de truco. Colores y fuentes en variables.
 
   Temas: cada uno define sus colores en claro y en oscuro. El tema va en
-  data-palette="pano|madera|noche|argento" y el modo en data-mode="light|dark", los dos
+  data-palette="argento|pano|madera|noche" y el modo en data-mode="light|dark", los dos
   sobre <html> (los pone js/view/appearance.js; antes de que cargue, un script chico en
   index.html). Los selectores sirven también para cualquier elemento con data-palette:
   así las muestras del selector de temas se pintan con los colores de su tema.
@@ -41,8 +41,54 @@
   --ui: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-/* ---- Paño: verde de mesa de juego (el de siempre); mano celeste, Pica Pica violeta ---- */
+/* ---- Argento: celeste de la bandera sobre un blanco apagado; mano sol de mayo, Pica Pica violeta (el de por defecto) ---- */
 :root,
+[data-palette="argento"] {
+  --felt: #DCE5EE;
+  --panel: #EBF1F6;
+  --ink: #16314D;
+  --muted: #5A7289;
+  --accent: #74B0E2;
+  --accent-ink: #0C2338;
+  --accent-shadow: #4E8CC2;
+  --sun: #F6B40E;
+  --sun-ink: #3A2500;
+  --pica: #6A55B8;
+  --pica-ink: #FFFFFF;
+}
+
+[data-mode="dark"],
+[data-mode="dark"][data-palette="argento"],
+[data-mode="dark"] [data-palette="argento"] {
+  --felt: #0F2236;
+  --panel: #17314B;
+  --ink: #EAF2F9;
+  --muted: #9DB8CF;
+  --pica: #B9ABF2;
+  --pica-ink: #1E1242;
+}
+
+/* Rojo más claro en oscuro, para que se lea también como texto sobre el panel */
+[data-mode="dark"] {
+  --danger: #F2958B;
+  --danger-ink: #3D0A06;
+}
+
+/* Antes de que corra el JS: seguir al celular */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode]) {
+    --danger: #F2958B;
+    --danger-ink: #3D0A06;
+    --felt: #0F2236;
+    --panel: #17314B;
+    --ink: #EAF2F9;
+    --muted: #9DB8CF;
+    --pica: #B9ABF2;
+    --pica-ink: #1E1242;
+  }
+}
+
+/* ---- Paño: verde de mesa de juego; mano celeste, Pica Pica violeta ---- */
 [data-palette="pano"] {
   --felt: #E3EBE0;
   --panel: #F4F7F1;
@@ -57,7 +103,7 @@
   --pica-ink: #FFFFFF;
 }
 
-[data-mode="dark"],
+[data-mode="dark"][data-palette="pano"],
 [data-mode="dark"] [data-palette="pano"] {
   --felt: #132A1F;
   --panel: #1B3729;
@@ -65,26 +111,6 @@
   --muted: #97B1A1;
   --pica: #C9A3E0;
   --pica-ink: #2A1238;
-}
-
-/* Rojo más claro en oscuro, para que se lea también como texto sobre el panel */
-[data-mode="dark"] {
-  --danger: #F2958B;
-  --danger-ink: #3D0A06;
-}
-
-/* Antes de que corra el JS: seguir al celular */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-mode]) {
-    --danger: #F2958B;
-    --danger-ink: #3D0A06;
-    --felt: #132A1F;
-    --panel: #1B3729;
-    --ink: #F1EAD7;
-    --muted: #97B1A1;
-    --pica: #C9A3E0;
-    --pica-ink: #2A1238;
-  }
 }
 
 /* ---- Madera: mesa de bodegón, cálida; mano mostaza, Pica Pica petróleo ---- */
@@ -135,31 +161,6 @@
   --muted: #9A9FC0;
   --pica: #F29AC8;
   --pica-ink: #3A0C26;
-}
-
-/* ---- Argento: celeste de la bandera sobre un blanco apagado; mano sol de mayo, Pica Pica violeta ---- */
-[data-palette="argento"] {
-  --felt: #DCE5EE;
-  --panel: #EBF1F6;
-  --ink: #16314D;
-  --muted: #5A7289;
-  --accent: #74B0E2;
-  --accent-ink: #0C2338;
-  --accent-shadow: #4E8CC2;
-  --sun: #F6B40E;
-  --sun-ink: #3A2500;
-  --pica: #6A55B8;
-  --pica-ink: #FFFFFF;
-}
-
-[data-mode="dark"][data-palette="argento"],
-[data-mode="dark"] [data-palette="argento"] {
-  --felt: #0F2236;
-  --panel: #17314B;
-  --ink: #EAF2F9;
-  --muted: #9DB8CF;
-  --pica: #B9ABF2;
-  --pica-ink: #1E1242;
 }
 
 *, *::before, *::after {
@@ -882,6 +883,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   inset: 0;
   z-index: 30;
   display: grid;
+  grid-template-columns: minmax(0, 1fr); /* la tarjeta nunca más ancha que la pantalla */
   place-items: center;
   padding: 24px;
   background: var(--scrim);
@@ -1439,12 +1441,20 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   margin-bottom: 12px;
 }
 
+/*
+  Dibujos de la ayuda: todos del mismo alto y centrados, así el título queda siempre en
+  el mismo lugar. Cada uno tiene una animación corta que corre cuando entra su página
+  (.play, ver js/view/help.js). Lo que se ve sin animación es el estado final: con
+  movimiento reducido quedan quietos y se entienden igual.
+*/
 .help-art {
   position: relative;
-  height: 110px;
-  display: grid;
-  place-items: center;
-  margin-bottom: 12px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  margin-bottom: 18px;
   color: var(--ink);
 }
 
@@ -1453,36 +1463,338 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   height: 88px;
 }
 
-.help-art .divider {
+/* sumar: los fósforos caen de a uno */
+.play.help-slide .help-add .m {
+  animation: drop .32s cubic-bezier(.2,.9,.3,1.2) backwards;
+}
+
+.play.help-slide .help-add .head {
+  animation: strike .9s ease-out backwards;
+}
+
+.help-add .grp > g:nth-of-type(1) > .m,
+.help-add .grp > g:nth-of-type(1) .head {
+  animation-delay: .15s;
+}
+
+.help-add .grp > g:nth-of-type(2) > .m,
+.help-add .grp > g:nth-of-type(2) .head {
+  animation-delay: .35s;
+}
+
+.help-add .grp > g:nth-of-type(3) > .m,
+.help-add .grp > g:nth-of-type(3) .head {
+  animation-delay: .55s;
+}
+
+.help-add .grp > g:nth-of-type(4) > .m,
+.help-add .grp > g:nth-of-type(4) .head {
+  animation-delay: .75s;
+}
+
+.help-add .grp > g:nth-of-type(5) > .m,
+.help-add .grp > g:nth-of-type(5) .head {
+  animation-delay: .95s;
+}
+
+/* borrar: el último fósforo se va mientras late el cartel */
+.help-erase .grp > g:nth-of-type(4) > .m {
+  opacity: 0;
+}
+
+.play.help-slide .help-erase .grp > g:nth-of-type(4) > .m {
+  animation: help-erase .9s ease-in backwards;
+}
+
+.play.help-slide .help-erase .help-tag {
+  animation: erase-bump .3s .5s ease-out;
+}
+
+@keyframes help-erase {
+  0%, 55% { opacity: 1; }
+}
+
+/* malas y buenas: la línea se abre desde el medio */
+.help-buenas .divider {
   width: 70%;
 }
 
-.help-art .mano {
+.help-buenas .divider::before {
+  transform-origin: right;
+}
+
+.help-buenas .divider::after {
+  transform-origin: left;
+}
+
+.play.help-slide .help-buenas .divider::before,
+.play.help-slide .help-buenas .divider::after {
+  animation: help-grow .6s .2s cubic-bezier(.2,.8,.2,1) backwards;
+}
+
+@keyframes help-grow {
+  0% { scale: 0 1; }
+}
+
+/* mano y mazo: el círculo de la mano pasa de un equipo al otro */
+.help-badge,
+.help-sun {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.help-badge {
   position: relative;
-  width: 64px;
-  height: 64px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  color: var(--muted);
 }
 
-.help-art .mano svg {
-  display: block;
-  width: 26px;
-  height: 26px;
+.help-badge.on {
+  border-color: transparent;
+  color: var(--sun-ink);
 }
 
-.help-icons {
+.help-badge svg {
+  grid-area: 1 / 1;
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.help-badge .first {
+  opacity: 0;
+}
+
+/* detrás del primer círculo (el par mide 48 + 28 + 48) */
+.help-sun {
+  position: absolute;
+  top: calc(50% - 24px);
+  left: calc(50% - 62px);
+  background: var(--sun);
+}
+
+.play.help-slide .help-sun {
+  animation: help-pass .7s .5s cubic-bezier(.5,0,.2,1) backwards;
+}
+
+.play.help-slide .help-badge .first {
+  animation: help-shown .3s .7s backwards;
+}
+
+.play.help-slide .help-badge .last {
+  animation: help-hidden .3s .7s backwards;
+}
+
+.play.help-slide .help-badge.on {
+  animation: help-muted .3s .7s backwards;
+}
+
+.play.help-slide .help-badge:not(.on) {
+  animation: help-sun-ink .3s .7s backwards;
+}
+
+@keyframes help-pass {
+  0% { transform: translateX(76px); }
+}
+
+@keyframes help-shown {
+  0% { opacity: 1; }
+}
+
+@keyframes help-hidden {
+  0% { opacity: 0; }
+}
+
+@keyframes help-muted {
+  0% { color: var(--muted); }
+}
+
+@keyframes help-sun-ink {
+  0% { color: var(--sun-ink); }
+}
+
+/* Pica Pica: el chip de una redonda cambia al del Pica Pica */
+.help-chip {
+  display: grid;
+  justify-items: center;
+  padding: 7px 16px 8px;
+  border-radius: 14px;
+  background: var(--pica);
+  color: var(--pica-ink);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.help-chip-kind {
   display: flex;
-  justify-content: center;
-  gap: 28px;
+  align-items: center;
+  gap: 4px;
+  max-height: 22px;
+  overflow: hidden;
+  font-size: 15px;
 }
 
+.help-chip-kind svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.play.help-slide .help-chip {
+  animation: help-to-pica .6s .5s ease-out backwards;
+}
+
+.play.help-slide .help-chip-kind {
+  animation: help-kind-in .4s .7s ease-out backwards;
+}
+
+/* el color cambia rápido (sin pasar por la mezcla de los dos) y el chip late */
+@keyframes help-to-pica {
+  0%, 40% { background: var(--sun); color: var(--sun-ink); }
+  55% { background: var(--pica); color: var(--pica-ink); transform: scale(1.1); }
+}
+
+@keyframes help-kind-in {
+  0% { max-height: 0; opacity: 0; }
+}
+
+/* la mesa: tirar reyes, la mano da la vuelta y queda en un lugar */
+.help-table {
+  position: relative;
+  width: 116px;
+  height: 116px;
+}
+
+.help-table::before {
+  content: "";
+  position: absolute;
+  inset: 28px;
+  border-radius: 50%;
+  border: 2px dashed var(--line);
+}
+
+.help-seat {
+  position: absolute;
+  top: calc(50% + var(--y) * 42px - 16px);
+  left: calc(50% + var(--x) * 42px - 16px);
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.help-seat.on {
+  border-color: transparent;
+  background: var(--sun);
+  color: var(--sun-ink);
+}
+
+.play.help-slide .help-seat:nth-child(1) { animation: help-flash .2s .2s, help-flash .2s .84s; }
+.play.help-slide .help-seat:nth-child(2) { animation: help-flash .2s .34s, help-flash .2s 1.08s; }
+.play.help-slide .help-seat:nth-child(3) { animation: help-flash .2s .5s; }
+.play.help-slide .help-seat:nth-child(4) { animation: help-land .3s 1.36s backwards, help-flash .2s .66s; }
+
+@keyframes help-flash {
+  50% { background: var(--sun); color: var(--sun-ink); border-color: transparent; }
+}
+
+@keyframes help-land {
+  0% { background: var(--panel); color: var(--muted); border-color: var(--line); scale: 1.2; }
+}
+
+/* deshacer y compartir: la flecha vuelve para atrás; la de compartir sube */
 .help-icons svg {
   width: 44px;
   height: 44px;
+  overflow: visible;
+}
+
+.play.help-slide .help-undo {
+  animation: help-undo .6s .3s ease-in-out;
+}
+
+.play.help-slide .help-share-arrow {
+  animation: help-lift .6s .6s ease-in-out;
+}
+
+@keyframes help-undo {
+  45% { rotate: -35deg; }
+}
+
+@keyframes help-lift {
+  45% { translate: 0 -4px; }
+}
+
+/* a tu gusto: los temas aparecen de a uno */
+.help-palettes {
+  gap: 10px;
+}
+
+/* el padding de .swatch es en %, del ancho del contenedor: acá, fijo */
+.help-palettes .swatch {
+  flex: 0 1 58px;
+  padding-bottom: 10px;
+}
+
+.play.help-slide .help-palettes .swatch {
+  animation: help-pop-in .35s cubic-bezier(.2,.9,.3,1.3) backwards;
+}
+
+.play.help-slide .help-palettes .swatch:nth-child(1) { animation-delay: .15s; }
+.play.help-slide .help-palettes .swatch:nth-child(2) { animation-delay: .27s; }
+.play.help-slide .help-palettes .swatch:nth-child(3) { animation-delay: .39s; }
+.play.help-slide .help-palettes .swatch:nth-child(4) { animation-delay: .51s; }
+
+@keyframes help-pop-in {
+  0% { opacity: 0; scale: .6; }
+}
+
+/* instalar: siempre ocupa el mismo lugar, haya botón o solo el texto */
+.help-install {
+  min-height: 64px;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.help-install .install-button {
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.help-install .install-button[hidden] {
+  display: none;
+}
+
+.help-install small {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
 }
 
 .help-tag {
   position: absolute;
-  top: 0;
+  top: 2px;
   left: 50%;
   transform: translateX(-50%);
   font-size: 12px;
@@ -1491,6 +1803,43 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   background: var(--danger);
   padding: 4px 10px;
   border-radius: 999px;
+}
+
+/* pantallas bajas: dibujos más chicos para que la ayuda entre entera */
+@media (max-height: 640px) {
+  .modal {
+    padding-block: 12px;
+  }
+  .help-art {
+    height: 96px;
+    margin-bottom: 12px;
+  }
+  .help-art .grp {
+    width: 72px;
+    height: 72px;
+  }
+  .help-table {
+    scale: .85;
+  }
+  .modal .help-slide h2 {
+    font-size: 23px;
+  }
+  .help-install {
+    min-height: 56px;
+    margin-bottom: 6px;
+  }
+}
+
+/* camino a una pantalla: "(Ajustes) › Partida › La mesa" */
+.nav-path {
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.nav-icon {
+  width: 1.1em;
+  height: 1.1em;
+  vertical-align: -.2em;
 }
 
 .help-manual {

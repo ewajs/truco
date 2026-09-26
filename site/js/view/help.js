@@ -1,5 +1,7 @@
 // Ayuda: carrusel corto con lo básico. Se desliza con el dedo (scroll-snap del CSS) o
 // con "Siguiente"; los puntitos muestran en qué página está y sirven para saltar.
+// La página que entra recibe .play, que arranca la animación de su dibujo (styles.css).
+// Todas las páginas miden lo que la más alta, así el carrusel no cambia de alto.
 
 import { groupSVG } from './matches.js';
 import { createDialog } from './dialog.js';
@@ -10,6 +12,7 @@ export function createHelp() {
   const slides = [...track.children];
   const dotsContainer = document.getElementById('help-dots');
   const next = document.getElementById('help-next');
+  let playing = -1; // la página que tiene .play
 
   // Dibujos de fósforos: <div data-matches="3"> → un cuadrado con 3 fósforos
   track.querySelectorAll('[data-matches]').forEach(art => {
@@ -36,10 +39,20 @@ export function createHelp() {
     const index = currentIndex();
     dots.forEach((dot, i) => dot.setAttribute('aria-current', String(i === index)));
     next.textContent = index === slides.length - 1 ? 'Listo' : 'Siguiente';
+    if (index !== playing) play(index);
+  }
+
+  function play(index) {
+    slides[playing]?.classList.remove('play');
+    playing = index;
+    void slides[index].offsetWidth; // para que la animación arranque de nuevo al volver
+    slides[index].classList.add('play');
   }
 
   function open() {
     track.scrollTo({ left: 0 }); // siempre desde el principio
+    playing = -1;
+    slides.forEach(slide => slide.classList.remove('play'));
     update();
     dialog.open({ focus: next });
   }
