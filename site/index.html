@@ -52,11 +52,11 @@
 
     <div class="table">
       <main class="teams" id="teams"></main>
-      <!-- Número de mano y pica pica (js/view/hand.js). Solo de a 6 u 8 con pica pica. -->
-      <div class="hand-chip" id="hand-chip" aria-live="polite" hidden>
+      <!-- Número de mano y pica pica (js/view/hand.js). Tocarlo abre la corrección. -->
+      <button class="hand-chip" id="hand-chip" aria-live="polite" hidden>
         <span id="hand-number"></span>
         <span class="hand-kind"><svg class="hand-icon"><use href="#icon-pica"/></svg>Pica pica <span id="hand-duel"></span></span>
-      </div>
+      </button>
     </div>
   </div>
 
@@ -154,6 +154,31 @@
     <button class="icon-btn install-close" id="install-close" aria-label="No mostrar más">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
     </button>
+  </div>
+
+  <!-- Corregir la mano actual (js/view/hand.js) -->
+  <div class="modal" id="hand-editor">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="hand-editor-title">
+      <h2 id="hand-editor-title">Corregir la mano</h2>
+      <p>Por si el conteo automático se equivocó.</p>
+      <div class="stepper">
+        <button class="step" id="hand-editor-minus" aria-label="Una mano menos">−</button>
+        <output class="step-value" id="hand-editor-number" aria-live="polite"></output>
+        <button class="step" id="hand-editor-plus" aria-label="Una mano más">+</button>
+      </div>
+      <div class="hand-editor-pica" id="hand-editor-pica">
+        <div class="seg" role="radiogroup" aria-label="Tipo de mano">
+          <button role="radio" data-pica="false">Redonda</button>
+          <button role="radio" data-pica="true">Pica pica</button>
+        </div>
+        <div class="hand-editor-duels" id="hand-editor-duels">
+          <span class="field-label">Duelo</span>
+          <div class="seg" role="radiogroup" aria-label="Duelo" id="hand-editor-duel"></div>
+        </div>
+      </div>
+      <button class="btn-accent" id="hand-editor-save">Listo</button>
+      <button class="btn-text" id="hand-editor-cancel">Cancelar</button>
+    </div>
   </div>
 
   <!-- Ayuda (js/view/help.js): carrusel que se desliza con el dedo o con "Siguiente" -->
@@ -259,7 +284,8 @@
 
         <section class="tab-panel" role="tabpanel" id="panel-options" aria-labelledby="tab-options">
           <!--
-            data-requires: la opción solo se puede cambiar si la otra está activada.
+            data-requires: la opción solo se puede cambiar si se cumple esa condición (ver
+            REQUIREMENTS en js/view/settings.js).
             data-feature: la opción se oculta si el navegador no lo soporta (ver device.js).
           -->
           <div class="field">
@@ -272,7 +298,8 @@
           <div class="field">
             <span class="field-label">Mano</span>
             <label class="toggle"><span>Mostrar quién es mano<small>Tocá la mano o el mazo para pasarla</small></span><input type="checkbox" data-option="showMano"><i></i></label>
-            <label class="toggle sub"><span>Pasar la mano sola<small>Unos segundos después de anotar</small></span><input type="checkbox" data-option="autoMano" data-requires="showMano"><i></i></label>
+            <label class="toggle"><span>Mostrar número de mano<small>Con pica pica se muestra siempre. Tocalo para corregirlo</small></span><input type="checkbox" data-option="showHandNumber"><i></i></label>
+            <label class="toggle"><span>Pasar la mano sola<small>Unos segundos después de anotar</small></span><input type="checkbox" data-option="autoMano" data-requires="autoManoUseful"><i></i></label>
           </div>
 
           <div class="field" data-feature-group>

@@ -137,3 +137,43 @@ test('corregir la mano en un pica pica no cuenta un duelo', () => {
   assert.equal(state.hand.duels, 0);
   assert.equal(isPicaPicaHand(state), true);
 });
+
+// ---- Corregir la mano a mano (setHand) ----
+
+const setHand = fields => ({ type: 'setHand', ...fields });
+
+test('corregir el número de mano en una redonda', () => {
+  const state = hand(hand(game(4), 0, 1), 1, 1); // mano 3
+  const next = reduce(state, setHand({ number: 7, pica: false, duel: 1 }));
+  assert.equal(next.hand.number, 7);
+  assert.deepEqual(next.teams, state.teams, 'no toca los puntos');
+  assert.equal(next.mano, state.mano, 'ni quién es mano');
+  assert.deepEqual(next.hand.startScores, state.hand.startScores, 'el próximo pase cuenta bien');
+});
+
+test('corregir el tipo y el duelo del pica pica', () => {
+  const state = hand(game(6), 0, 3); // mano 2, redonda (3-0)
+  const next = reduce(state, setHand({ number: 2, pica: true, duel: 2 }));
+  assert.equal(isPicaPicaHand(next), true);
+  assert.equal(next.hand.duels, 1, 'duelo 2 = 1 duelo ya jugado');
+  // desde ahí sigue normal: falta un duelo más de los 3
+  let after = hand(next, 1, 1);
+  assert.equal(after.hand.duels, 2);
+  after = hand(after, 1, 1);
+  assert.equal(isPicaPicaHand(after), false);
+  assert.equal(after.hand.number, 3);
+});
+
+test('la corrección ajusta valores fuera de rango', () => {
+  const state = game(6);
+  assert.equal(reduce(state, setHand({ number: 0, pica: false })).hand.number, 1);
+  assert.equal(reduce(state, setHand({ number: 4, pica: true, duel: 9 })).hand.duels, 2, 'de a 6, hasta el duelo 3');
+  const four = reduce(game(4), setHand({ number: 4, pica: true, duel: 2 }));
+  assert.equal(four.hand.pica, false, 'de a 4 no hay pica pica');
+  assert.equal(four.hand.duels, 0);
+});
+
+test('corregir sin cambios no hace nada', () => {
+  const state = game(6);
+  assert.equal(reduce(state, setHand({ number: 1, pica: false, duel: 1 })), state);
+});

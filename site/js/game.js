@@ -16,6 +16,7 @@
 //   { type: 'setOption', option, value }
 //   { type: 'loadGame', game }           cargar una partida compartida por link (ver share.js)
 //   { type: 'passMano' }                 terminó la mano (o un duelo del pica pica); ver passMano()
+//   { type: 'setHand', number, pica, duel }  corregir a mano la mano actual (ver setHand)
 
 export const TARGETS = [15, 30];
 export const PLAYERS = [2, 4, 6, 8]; // de a 8 no existe, pero se juega igual
@@ -39,7 +40,8 @@ export function createInitialState() {
       showButtons: true,  // −, +1 y los rápidos; sin botones se usa tocar y mantener
       quickButtons: true, // +2, +3 y +4 (solo si showButtons)
       showMano: true,
-      autoMano: true,     // pasar la mano sola después de anotar (solo si showMano)
+      showHandNumber: true, // chip con el número de mano (con pica pica se ve siempre)
+      autoMano: true,     // pasar la mano sola después de anotar (si se muestra algo de la mano)
       picaPica: true,     // de a 6 u 8: alternar manos redondas y de pica pica
       vibrate: true,
       keepAwake: false,
@@ -89,6 +91,17 @@ export function isPicaPicaHand(state) {
   return picaPicaEnabled(state) && state.hand.pica;
 }
 
+// El chip con el número de mano se ve si está activado, y siempre con pica pica.
+export function showsHandChip(state) {
+  return state.options.showHandNumber || picaPicaEnabled(state);
+}
+
+// Pasar la mano sola solo tiene sentido si se muestra algo de la mano (quién es, el
+// número o el pica pica). Si no, la app queda en "contar puntos y nada más".
+export function autoManoUseful(state) {
+  return state.options.showMano || showsHandChip(state);
+}
+
 // "En malas, faltan 12" · "Faltan 5" · "Ganó"
 export function standing(state, team) {
   const { target } = state;
@@ -119,6 +132,7 @@ export function reduce(state, action) {
     case 'setOption': return { ...state, options: { ...state.options, [action.option]: action.value } };
     case 'loadGame': return loadGame(state, action.game);
     case 'passMano': return passMano(state);
+    case 'setHand': return setHand(state, action);
     default: throw new Error(`Acción desconocida: ${action.type}`);
   }
 }
@@ -234,6 +248,23 @@ function passMano(state) {
   return { ...state, mano: 1 - state.mano, hand: newHand(scores, state.hand.number + 1, nextIsPica) };
 }
 
+// Corrección a mano de la mano actual, por si el conteo automático pifió: número, si es
+// pica pica y en qué duelo va (desde 1). Reemplaza la mano actual sin tocar los puntos
+// ni quién es mano. Los valores fuera de rango se ajustan al más cercano.
+function setHand(state, { number, pica, duel }) {
+  const isPica = Boolean(pica) && picaPicaEnabled(state);
+  const maxDuel = isPica ? duelsPerPicaPica(state.players) : 1;
+  const hand = {
+    ...state.hand,
+    number: Math.max(1, Math.round(number) || 1),
+    pica: isPica,
+    duels: isPica ? Math.min(maxDuel, Math.max(1, Math.round(duel) || 1)) - 1 : 0,
+  };
+  const same = hand.number === state.hand.number && hand.pica === state.hand.pica
+    && hand.duels === state.hand.duels;
+  return same ? state : { ...state, hand };
+}
+
 // Alguien llegó a 5 y nadie a 25.
 function inPicaPicaZone(scores) {
   const highest = Math.max(...scores);
@@ -255,8 +286,7 @@ function inPicaPicaZone(scores) {
 // `pending` es null (nada pendiente) o { handStart } con los puntajes de antes del primer
 // punto de la mano. Devuelve { pending, restart }.
 export function autoManoAfter(pending, action, before, after) {
-  // Con pica pica hace falta detectar el fin de cada mano aunque la mano no se muestre.
-  const enabled = after.options.autoMano && (after.options.showMano || picaPicaEnabled(after));
+  const enabled = after.options.autoMano && autoManoUseful(after);
   const cancels = ['passMano', 'newGame', 'setTarget', 'loadGame'].includes(action.type);
   if (!enabled || cancels) return { pending: null, restart: false };
 

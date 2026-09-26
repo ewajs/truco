@@ -3,13 +3,19 @@
 // Los botones de "Partida a" y "De a cuántos" usan data-action y los maneja main.js; el
 // resto se maneja acá.
 
-import { isFresh, hasBuenas, playersLabel } from '../game.js';
+import { isFresh, hasBuenas, playersLabel, autoManoUseful } from '../game.js';
 import { SUPPORTS } from '../device.js';
 
 const SLIDE_MS = 320; // duración de la animación de apertura (ver .sheet en CSS)
 const CONFIRM_MS = 3000;
 const DRAG_CLOSE_PX = 80;      // arrastrar la cabecera más que esto cierra la hoja
 const DRAG_CLOSE_SPEED = 0.5;  // o soltarla rápido (px/ms), aunque sea un tirón corto
+
+// Condiciones de data-requires: la opción queda deshabilitada si devuelve false.
+const REQUIREMENTS = {
+  showButtons: state => state.options.showButtons,
+  autoManoUseful,
+};
 
 export function createSettings({ dispatch }) {
   const sheet = document.getElementById('settings');
@@ -138,7 +144,7 @@ export function createSettings({ dispatch }) {
     optionToggles.forEach(toggle => {
       toggle.checked = Boolean(state.options[toggle.dataset.option]);
       const { requires } = toggle.dataset;
-      toggle.disabled = Boolean(requires) && !state.options[requires];
+      toggle.disabled = Boolean(requires) && !REQUIREMENTS[requires](state);
     });
   }
 
