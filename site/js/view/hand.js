@@ -1,16 +1,17 @@
 // Chip con el número de mano y si es de pica pica, y el popup para corregirlo.
 //
-// El chip se ve cuando la app sigue las manos ("Seguir las manos" en Opciones). En
-// una redonda dice "Mano 7"; en pica pica cambia de color y muestra qué duelo se juega
-// ("Mano 7 ⚔ 2/3"). Abajo, en orden de la mesa, quién es mano (el primero, con la mano)
-// y quién da (el último, con el mazo): en una redonda y en un duelo de uno contra uno en
-// una línea; en el pica pica de a 8, los cuatro del duelo en dos líneas. Tocarlo abre la corrección: quién es mano, número, tipo de mano y
-// duelo.
+// El chip se ve cuando la app sigue las manos ("Seguir las manos" en Opciones). Queda
+// sobre la línea que divide los equipos:
+//   - centrado, lo de todos: "Mano 7" y, en pica pica, "Pica pica 2/3" (y cambia de color);
+//   - abajo, quién es mano (con la mano) y quién da (con el mazo), cada uno del lado de su
+//     equipo. En una redonda y en un duelo de uno contra uno es una línea; en el pica pica
+//     de a 8, los cuatro del duelo en dos líneas, en orden de la mesa.
+// Tocarlo abre la corrección: quién es mano, número, tipo de mano y duelo.
 
 import {
   picaPicaEnabled, isPicaPicaHand, duelsPerPicaPica, tracksHands, currentDeal, duelOffset,
 } from '../hands.js';
-import { shortPlayerName } from '../table.js';
+import { shortPlayerName, teamOfSeat } from '../table.js';
 import { createDialog } from './dialog.js';
 
 export function createHandChip({ dispatch }) {
@@ -51,24 +52,24 @@ export function createHandChip({ dispatch }) {
   return { render };
 }
 
-// Los que juegan, en orden de la mesa: el primero con la mano y el último con el mazo. En
-// una redonda solo la mano y el que da; en un duelo, todos los del duelo (de a 2 por línea).
+// Los que juegan, de a dos por línea en orden de la mesa: el primero con la mano y el
+// último con el mazo. En una redonda solo la mano y el que da; en un duelo, todos los del
+// duelo. Dos lugares seguidos son siempre de equipos distintos, así que cada línea tiene
+// uno de cada lado: la grilla del chip (dos columnas) los pone del lado de su equipo.
 function renderPlayers(container, state, deal) {
   const seats = isPicaPicaHand(state) ? deal.seats : [deal.mano, deal.dealer];
-  const lines = [];
-  for (let i = 0; i < seats.length; i += 2) {
-    const line = document.createElement('span');
-    line.className = 'hand-line';
-    seats.slice(i, i + 2).forEach(seat => {
-      const icon = seat === deal.mano ? 'icon-mano' : seat === deal.dealer ? 'icon-mazo' : null;
-      if (icon) line.insertAdjacentHTML('beforeend', `<svg class="hand-icon"><use href="#${icon}"/></svg>`);
-      const name = document.createElement('span');
-      name.textContent = shortPlayerName(state, seat);
-      line.append(name);
-    });
-    lines.push(line);
-  }
-  container.replaceChildren(...lines);
+  const cells = seats.map(seat => {
+    const cell = document.createElement('span');
+    cell.className = 'hand-player';
+    cell.dataset.team = teamOfSeat(seat);
+    const icon = seat === deal.mano ? 'icon-mano' : seat === deal.dealer ? 'icon-mazo' : null;
+    if (icon) cell.insertAdjacentHTML('beforeend', `<svg class="hand-icon"><use href="#${icon}"/></svg>`);
+    const name = document.createElement('span');
+    name.textContent = shortPlayerName(state, seat);
+    cell.append(name);
+    return cell;
+  });
+  container.replaceChildren(...cells);
 }
 
 // Popup de corrección. Trabaja sobre un borrador y recién "Listo" lo aplica.

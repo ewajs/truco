@@ -291,7 +291,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   text-align: center;
   flex: none;
   padding-top: 2px;
-  min-height: 88px; /* alcanza para el badge aunque se oculten los números */
+  min-height: 102px; /* alcanza para el badge aunque se oculten los números */
 }
 
 .name {
@@ -322,12 +322,22 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   opacity: .45;
 }
 
-.wins {
+/* "En malas, faltan 12 · 2 ganadas", arriba del puntaje */
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 5px;
+  min-height: 17px;
+  margin-top: -2px;
   font-size: 12px;
   font-weight: 600;
+  line-height: 1.4;
   color: var(--muted);
-  min-height: 15px;
-  margin-top: -2px;
+}
+
+.left:not(:empty) + .wins:not(:empty)::before {
+  content: "· ";
 }
 
 /*
@@ -339,7 +349,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 */
 .mano {
   position: absolute;
-  top: 32px;
+  top: 46px;
   left: -12px;
   width: 56px;
   height: 56px;
@@ -415,14 +425,6 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   animation: bump .28s ease-out;
 }
 
-.left {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted);
-  margin-top: 4px;
-  min-height: 17px;
-}
-
 .hide-nums .score, .hide-nums .left {
   display: none;
 }
@@ -434,13 +436,16 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 */
 .hand-chip {
   position: absolute;
-  top: 42px; /* a la altura del puntaje, así hasta tres líneas no tapan el "faltan…" */
+  top: 54px; /* a la altura del puntaje */
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 4px 10px;
+  /* Dos columnas iguales: el centro del chip cae sobre la línea que divide los equipos.
+     Lo de todos ocupa las dos; cada jugador va en la de su equipo. */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: dense; /* el de la izquierda puede venir segundo y queda en la misma línea */
+  column-gap: 14px;
+  padding: 4px 10px 5px;
   border-radius: 12px;
   background: var(--sun);
   color: var(--sun-ink);
@@ -459,16 +464,17 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   display: none;
 }
 
-.hand-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.hand-number,
+.hand-kind {
+  grid-column: 1 / -1;
+  justify-self: center;
 }
 
 .hand-kind {
   display: none;
   align-items: center;
   gap: 3px;
+  font-size: 12px;
 }
 
 .hand-icon {
@@ -495,35 +501,38 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   animation: chip-pop .35s ease-out;
 }
 
-/* quién es mano y quién da: más finito, con los íconos de mano y mazo */
+/* quién es mano y quién da: más finito, cada uno del lado de su equipo */
 .hand-players {
+  display: contents;
+}
+
+.hand-player {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  gap: 3px;
+  margin-top: 1px;
   font-size: 11px;
   font-weight: 500;
   line-height: 1.2;
 }
 
-.hand-line {
-  display: flex;
-  align-items: center;
-  gap: 3px;
+.hand-player[data-team="0"] {
+  grid-column: 1;
+  justify-self: end;
 }
 
-.hand-line span {
+.hand-player[data-team="1"] {
+  grid-column: 2;
+  justify-self: start;
+}
+
+.hand-player span {
   max-width: 56px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.hand-line span + .hand-icon,
-.hand-line span + span {
-  margin-left: 6px;
-}
-
-.hand-players .hand-icon {
+.hand-player .hand-icon {
   width: 12px;
   height: 12px;
   flex: none;
@@ -1467,6 +1476,17 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   background: var(--danger);
   padding: 4px 10px;
   border-radius: 999px;
+}
+
+.help-manual {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
 }
 
 .help-dots {

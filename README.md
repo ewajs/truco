@@ -1,122 +1,124 @@
 # Anotador de truco
 
-Anotador de truco con fósforos, pensado para el celular apoyado en la mesa.
-Tocá la columna de un equipo para sumar, mantené apretado para borrar.
+Los fósforos de siempre, en el celular apoyado en la mesa. Tocás la columna de tu equipo
+para sumar, mantenés para borrar, y el anotador se encarga del resto: malas y buenas,
+quién es mano, el pica pica y quién gana.
 
-- Partidas a 15 o a 30 (malas y buenas), de a 2, 4, 6 u 8 jugadores
-- Botones +2, +3 y +4 para anotar un truco o un envido de una
-- Deshacer, contador de partidas ganadas y nombres editables
-- Vibración y opción de mantener la pantalla encendida
-- Todo se guarda en el navegador (`localStorage`)
-- Se instala como app y anda sin conexión
-- Compartir el anotador o la partida actual por link
-- Muestra quién es mano y la pasa sola después de anotar (3 a 12 segundos), con un aviso
-  (se puede apagar) para adelantarla, cancelarla o deshacerla
-- Sigue las manos: número (se corrige tocándolo) y, de a 6 u 8, pica pica entre los 5 y los 25. Se puede apagar para solo contar puntos
-- Se pueden ocultar los botones y usar solo tocar y mantener
-- Ayuda corta con lo básico
-- La mesa: quién se sienta dónde (los equipos se alternan), quién es mano y quién da;
-  se editan los nombres, se cambian de lugar o se tiran reyes. El chip y los avisos dicen
-  quién es mano y quién da, también en cada duelo del pica pica
-- Cuatro temas (Paño, Madera, Noche y Argento), cada uno claro u oscuro; por defecto sigue al celular
-
-## Cómo se ve
+**[Abrir el anotador](https://ewajs.github.io/truco/)** · [Manual](#manual)
 
 | | | | |
 |:-:|:-:|:-:|:-:|
-| <img src="docs/capturas/iphone/tablero.png" width="180" alt="Tablero"> | <img src="docs/capturas/iphone/aviso.png" width="180" alt="Aviso del pase de mano"> | <img src="docs/capturas/iphone/pica-pica.png" width="180" alt="Pica pica en tema Noche, oscuro"> | <img src="docs/capturas/iphone/mesa.png" width="180" alt="La mesa en Ajustes"> |
-| Tablero | Pase de mano | Pica pica (Noche) | La mesa |
+| <img src="docs/capturas/iphone/tablero.png" width="180" alt="Tablero con una partida en buenas"> | <img src="docs/capturas/iphone/aviso.png" width="180" alt="Aviso del pase de mano"> | <img src="docs/capturas/iphone/pica-pica.png" width="180" alt="Pica pica de a 6, tema Noche en oscuro"> | <img src="docs/capturas/iphone/mesa.png" width="180" alt="La mesa en Ajustes"> |
+| Una partida en buenas | La mano pasa sola | Pica pica de a 6 | La mesa |
 
-Más en [`docs/capturas/`](docs/capturas/) (iPhone 15 y Galaxy S24, claro y oscuro). Las
-fuentes de estas capturas son las de reemplazo (Georgia y la del sistema): en el
-entorno donde se sacaron no se llega a Google Fonts.
+- **Rápido**: un toque, un punto. +2, +3 y +4 para el envido o el truco de una vez.
+- **Sigue la mano**: quién es mano y quién da, la pasa solo después de anotar, y de a 6 u
+  8 lleva el pica pica.
+- **La mesa**: los jugadores en sus lugares, los equipos cruzados y tirar reyes.
+- **Tuyo**: cuatro temas, claro u oscuro, y lo que no uses se apaga.
+- **Anda siempre**: se instala como app, funciona sin conexión y guarda la partida sola.
 
-## Correrlo local
+## Manual
 
-Es un sitio estático, sin build ni framework.
+1. [Empezar](#empezar)
+2. [Anotar](#anotar)
+3. [Malas y buenas](#malas-y-buenas)
+4. [La mano](#la-mano)
+5. [Pica pica](#pica-pica)
+6. [La mesa](#la-mesa)
+7. [Compartir](#compartir)
+8. [Opciones](#opciones)
+9. [Tus datos](#tus-datos)
 
-```sh
-npm start        # http://localhost:8000 (usa python3)
-```
+### Empezar
 
-Hay que servirlo por HTTP porque usa módulos de JavaScript (abrir `index.html` con
-doble click no anda).
+Abrí [ewajs.github.io/truco](https://ewajs.github.io/truco/) en el celular. Para tenerlo
+como app, con el ícono en la pantalla de inicio y sin la barra del navegador:
 
-## Tests
+- **Android (Chrome)**: tocá **Instalar** en el aviso que aparece, o en el menú del
+  navegador, **Instalar app**.
+- **iPhone (Safari)**: **Compartir → Agregar a inicio**.
 
-```sh
-npm test         # reglas, guardado y dibujo de fósforos (Node 22+, sin dependencias)
-```
+En **Ajustes → Partida** elegís a cuántos puntos (15 o 30) y de a cuántos se juega (2, 4, 6
+u 8). Los nombres de los equipos se cambian ahí o tocándolos en el tablero.
 
-## Cómo está armado
+### Anotar
 
-```
-site/                   lo que se publica en GitHub Pages, tal cual
-  index.html            todo el markup (la columna de un equipo es un <template>)
-  css/styles.css
-  sw.js                 service worker: primero la red, sin conexión usa la última copia
-  manifest.webmanifest  datos para instalarla como app (nombre, íconos, colores)
-  js/
-    main.js             arranque: estado, dispatch() y conexión de las vistas
-    game.js             estado, puntaje y reduce(state, action)
-    hands.js            manos, pica pica y pase automático (lo usa reduce)
-    table.js            la mesa: lugares, equipos, mano y tirar reyes (lo usa reduce)
-    storage.js          guardar/cargar en localStorage (valida; si algo no sirve, de cero)
-    share.js            partida ⇄ link (#a=30&de=4&equipo1=…&puntos1=…)
-    device.js           vibración y wake lock
-    view/
-      dialog.js         abrir/cerrar diálogos: Escape, tocar afuera, foco (una pila)
-      scoreboard.js     columnas de los equipos
-      matches.js        SVG de los fósforos
-      layout.js         tamaño de los cuadrados según la pantalla
-      gestures.js       tocar para sumar, mantener para borrar
-      settings.js       hoja de ajustes
-      winner.js         cartel de ganador
-      share.js          diálogo de compartir y aviso al abrir una partida compartida
-      install.js        invitación a instalar la app
-      help.js           ayuda (carrusel)
-      hand.js           chip con el número de mano y el pica pica
-      mano-toast.js     aviso del pase automático (cuenta regresiva y deshacer)
-      table.js          la mesa: lugares, nombres y quién es mano
-      appearance.js     tema y modo oscuro (data-palette y data-mode en <html>)
-tests/                  reglas, manos y pica pica, guardado, links, fósforos, tamaño del
-                        tablero e invariantes con acciones al azar
-```
+- **Tocá la columna** de un equipo para sumar un punto. Cada cuadrado de fósforos son 5.
+- **Mantené apretado** para borrar; si seguís apretando, sigue borrando.
+- **+1, −, +2, +3 y +4**: los botones de abajo, para anotar varios de una.
+- **Deshacer** (arriba) vuelve atrás el último cambio de puntos.
 
-El flujo es siempre el mismo:
+Al llegar a los puntos aparece el ganador; se suma a sus partidas ganadas y se puede
+arrancar otra.
 
-```
-evento ──▶ dispatch(action) ──▶ reduce(state, action) ──▶ nuevo estado ──▶ guardar + render
-```
+### Malas y buenas
 
-- **El estado** es un objeto plano (`createInitialState()` en `game.js`) y es la única
-  fuente de verdad.
-- **`reduce(state, action)`** es la única forma de cambiarlo. Es una función pura:
-  devuelve un estado nuevo, o el mismo si la acción no cambia nada. Por eso las reglas
-  se testean sin navegador.
-- **Las vistas** dibujan el estado con `render(state)` y avisan lo que hace el usuario
-  llamando a `dispatch()`. Nunca modifican el estado.
-- En el HTML, los botones con `data-action` disparan una acción directamente (ver
-  `actionFor()` en `main.js`); el resto tiene un `id` y lo maneja su vista.
+A 30 se juega en malas (los primeros 15) y buenas (los otros 15). La línea **Buenas**
+separa las dos mitades y arriba del puntaje dice en cuál está cada equipo y cuánto le
+falta. A 15 es una sola vuelta.
 
-### Agregar una feature
+### La mano
 
-1. **Estado**: agregá el campo en `createInitialState()` y su validación en
-   `isValidGame()` (storage.js), y subí `VERSION`. Todavía no migramos: lo guardado con
-   otra versión se descarta. Las opciones nuevas no necesitan nada de esto (tampoco la
-   mesa: se completa sola si falta, ver `knownTable()`).
-2. **Regla**: agregá un `case` en `reduce()` y su test. Si es de manos o pica pica, va en
-   `hands.js`. El test de invariantes (`tests/invariants.test.js`) prueba miles de
-   acciones al azar: sumá la acción nueva a `randomAction()`.
-3. **UI**: un botón con `data-action` (y su `case` en `actionFor()`), o un listener en la
-   vista que llame a `dispatch()`. Dibujá lo nuevo en el `render(state)` de la vista.
-4. **Opción on/off**: alcanza con la clave en `options` y un
-   `<input type="checkbox" data-option="nombre">` en ajustes.
+- El círculo al lado del puntaje muestra qué equipo es **mano**; el otro tiene el
+  **mazo**. Tocalo para pasar la mano a mano.
+- El **chip del medio** dice qué mano se juega ("Mano 7"), quién es mano y quién da, cada
+  uno del lado de su equipo. Tocalo para corregir cualquier cosa: quién es mano, el número
+  de mano o si es de pica pica.
+- **La mano pasa sola** unos segundos después del último punto (3, 5, 8 o 12, se elige
+  en Opciones). Antes de pasar aparece un aviso arriba para **pasarla ya** o
+  **cancelar**; después, uno para **deshacer**.
+- Borrar o deshacer puntos nunca pasa la mano: se entiende que fue un toque de más.
 
-## Publicación
+### Pica pica
 
-`.github/workflows/pages.yml` corre los tests en cada PR, y en cada push a `main`
-además publica la carpeta `site/` en GitHub Pages.
+De a 6 u 8, desde que alguien llega a 5 y hasta que alguien llega a 25, se alterna una
+mano redonda y una de pica pica. El chip se pinta de otro color y dice qué duelo se juega:
 
-Configuración del repo (una sola vez): **Settings → Pages → Source: GitHub Actions**, y
-en **Settings → Environments → github-pages** la rama `main` tiene que poder deployar.
+- **De a 6**: tres duelos, cada uno contra el de enfrente. Arranca el de la mano y siguen
+  en orden, así que siempre te toca el mismo rival.
+- **De a 8**: dos duelos de dos contra dos, con los primeros cuatro desde la mano y los
+  otros cuatro. Las parejas rotan.
+
+Cada pase de mano cierra un duelo; cuando se jugaron todos, la mano pasa como siempre. El
+pica pica se puede apagar en **Ajustes → Partida**.
+
+### La mesa
+
+En **Ajustes → Partida → La mesa** están los jugadores sentados alrededor, en el orden en
+que se juega. Los equipos se cruzan, así cada uno tiene un rival a cada lado y el
+compañero enfrente. Cada lugar dice su turno: **Mano**, **Segundo**, **Tercero**… y
+**Pie**, el último de cada equipo en jugar (el mazo lo tiene el último pie).
+
+- Tocá un lugar para cambiarle el nombre o **hacerlo mano**.
+- Tocá dos lugares para **cambiarlos de lugar** (y quizá de equipo).
+- **Tirar reyes** sortea los lugares y la mano.
+
+Todo se puede cambiar en medio de la partida: los puntos no se tocan.
+
+### Compartir
+
+El botón de compartir (arriba) manda el link del anotador o **la partida como está**:
+puntos, ganadas, nombres y la mesa. Quien abre el link elige si la carga.
+
+### Opciones
+
+En **Ajustes → Opciones**:
+
+- **Tema** (Paño, Madera, Noche o Argento) y **modo** (Auto, que sigue al celular, Claro u Oscuro).
+- **Pantalla**: mostrar los números y los botones. Sin botones se anota solo tocando y
+  manteniendo.
+- **Mano**: seguir las manos (apagado, el anotador solo cuenta puntos), mostrar quién es
+  mano, pasarla sola y cuánto esperar, y el aviso antes de pasarla.
+- **Celular**: vibrar al anotar y mantener la pantalla encendida, si el celular lo
+  permite.
+
+### Tus datos
+
+La partida y las opciones se guardan en el celular, en el navegador. No hay cuentas ni
+servidor: nada sale del teléfono salvo que compartas un link.
+
+---
+
+¿Querés colaborar o ver cómo está hecho? Es un sitio estático, sin build: `npm start` lo
+levanta y `npm test` corre los tests. Los detalles están en [CLAUDE.md](CLAUDE.md).
