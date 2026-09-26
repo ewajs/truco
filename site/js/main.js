@@ -33,23 +33,44 @@ function dispatch(action) {
   save(state);
   giveFeedback(previous, state);
   render();
-  scheduleManoPass(action);
+  scheduleManoPass(action, previous);
 }
 
-// Pasar la mano sola: cada cambio de puntos reinicia la espera, así se anotan tranquilos
-// el envido y el truco de la misma mano y la mano pasa recién cuando terminan.
+// Pasar la mano sola: cada punto sumado reinicia la espera, así se anotan tranquilos el
+// envido y el truco de la misma mano y la mano pasa recién cuando terminan.
+// Restar o deshacer son correcciones: demoran el pase pendiente pero nunca arrancan uno
+// nuevo (si la mano ya pasó, corregir un tap de más no la vuelve a pasar). Y si se
+// deshace todo lo anotado en esta mano, el pase se cancela.
 let manoTimer = null;
+let scoresBeforeHand = null; // puntajes antes del primer punto de esta mano
 
-function scheduleManoPass(action) {
-  if (action.type === 'passMano') clearTimeout(manoTimer); // la cambiaron a mano: no pisarla
-  if (!['add', 'subtract', 'undo'].includes(action.type)) return;
+function scheduleManoPass(action, previous) {
+  const isAdd = action.type === 'add';
+  const isCorrection = action.type === 'subtract' || action.type === 'undo';
+
+  if (action.type === 'passMano') return cancelManoPass(); // la cambiaron a mano: no pisarla
+  if (!isAdd && !isCorrection) return;
+  if (!state.options.showMano || !state.options.autoMano) return cancelManoPass();
+
+  const pending = manoTimer !== null;
+  if (isCorrection && !pending) return;
+  if (isAdd && !pending) scoresBeforeHand = scoresOf(previous);
+  if (isCorrection && scoresOf(state) === scoresBeforeHand) return cancelManoPass();
 
   clearTimeout(manoTimer);
-  const { showMano, autoMano } = state.options;
-  if (!showMano || !autoMano) return;
   manoTimer = setTimeout(() => {
+    manoTimer = null;
     if (winner(state) === null) dispatch({ type: 'passMano' });
   }, AUTO_MANO_MS);
+}
+
+function cancelManoPass() {
+  clearTimeout(manoTimer);
+  manoTimer = null;
+}
+
+function scoresOf(someState) {
+  return someState.teams.map(team => team.score).join('-');
 }
 
 // ---- Vistas ----
