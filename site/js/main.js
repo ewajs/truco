@@ -59,7 +59,7 @@ function scheduleManoPass(action, previous) {
 
 const settings = createSettings({ dispatch });
 const winnerDialog = createWinnerDialog();
-const handChip = createHandChip();
+const handChip = createHandChip({ dispatch });
 const shareDialog = createShareDialog();
 const sharedGameOffer = createSharedGameOffer({
   onAccept: game => dispatch({ type: 'loadGame', game }),

@@ -81,9 +81,16 @@ test('con la opción apagada no pasa, aunque se apague con un pase pendiente', (
   assert.equal(simulate([add(0), off, WAIT]).state.mano, 0);
 });
 
-test('sin mostrar la mano tampoco pasa sola', () => {
-  const hidden = { type: 'setOption', option: 'showMano', value: false };
-  assert.equal(simulate([hidden, add(0), WAIT]).state.mano, 0);
+test('sin mostrar nada de la mano (ni quién es ni el número) no pasa sola', () => {
+  const hideMano = { type: 'setOption', option: 'showMano', value: false };
+  const hideNumber = { type: 'setOption', option: 'showHandNumber', value: false };
+  assert.equal(simulate([hideMano, hideNumber, add(0), WAIT]).state.mano, 0);
+  assert.equal(simulate([hideMano, hideNumber, add(0), WAIT]).state.hand.number, 1, 'ni cuenta');
+});
+
+test('mostrando solo el número de mano, pasa sola y cuenta', () => {
+  const hideMano = { type: 'setOption', option: 'showMano', value: false };
+  assert.equal(simulate([hideMano, add(0), WAIT]).state.hand.number, 2);
 });
 
 test('empezar otra partida cancela el pase pendiente', () => {
