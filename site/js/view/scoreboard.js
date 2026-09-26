@@ -42,8 +42,7 @@ export function createScoreboard(container, { onNameClick }) {
       column.name.textContent = name;
       column.nameButton.setAttribute('aria-label', `Cambiar nombre de ${name}`);
       column.wins.textContent = wins === 0 ? '' : wins === 1 ? '1 ganada' : `${wins} ganadas`;
-      column.mano.hidden = state.mano !== team;
-      column.mano.setAttribute('aria-label', `${name} es mano. Tocá para pasarla`);
+      renderManoBadge(column.mano, name, state.mano === team);
       column.score.textContent = score;
       column.standing.textContent = standing(state, team);
       if (score !== previous) restartAnimation(column.score, 'bump');
@@ -62,6 +61,15 @@ export function createScoreboard(container, { onNameClick }) {
   }
 
   return { render, boards: columns.map(column => column.board) };
+}
+
+// El badge siempre está: mano para el equipo que es mano, mazo para el otro.
+function renderManoBadge(badge, teamName, isMano) {
+  if (badge.classList.contains('is-mano') !== isMano) restartAnimation(badge, 'swap');
+  badge.classList.toggle('is-mano', isMano);
+  badge.setAttribute('aria-label', isMano
+    ? `${teamName} es mano. Tocá para pasar la mano`
+    : `${teamName} tiene el mazo. Tocá para pasarle la mano`);
 }
 
 function restartAnimation(element, className) {

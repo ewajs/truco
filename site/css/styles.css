@@ -162,6 +162,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 }
 
 .team-head {
+  position: relative;
   text-align: center;
   flex: none;
   padding-top: 2px;
@@ -195,36 +196,66 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   opacity: .45;
 }
 
-.meta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-height: 18px;
-  margin-top: -2px;
-}
-
 .wins {
   font-size: 12px;
   font-weight: 600;
   color: var(--muted);
+  min-height: 15px;
+  margin-top: -2px;
 }
 
-/* Cartel de mano: chico, y aparece con un fundido cuando pasa de un equipo al otro */
+/*
+  Badge de mano/mazo: fijo a un costado del puntaje (donde sobra lugar), del lado de
+  afuera de cada columna, así no mueve nada al pasar la mano. El equipo que es mano
+  muestra la mano; el otro, el mazo.
+*/
 .mano {
-  height: 18px;
-  padding: 0 8px;
-  border-radius: 999px;
+  position: absolute;
+  top: 44px;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.team + .team .mano {
+  left: auto;
+  right: 0;
+}
+
+.mano svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mano.is-mano {
+  border-color: transparent;
   background: var(--stick);
   color: var(--accent-ink);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .02em;
-  line-height: 18px;
+}
+
+.mano .icon-mano,
+.mano.is-mano .icon-mazo {
+  display: none;
+}
+
+.mano.is-mano .icon-mano {
+  display: block;
+}
+
+.mano.swap svg {
   animation: mano-in .35s ease-out;
 }
 
-.mano[hidden],
 .hide-mano .mano {
   display: none;
 }
@@ -750,10 +781,15 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 }
 
 .help-art .mano {
-  height: 26px;
-  padding: 0 14px;
-  font-size: 15px;
-  line-height: 26px;
+  position: static;
+  width: 52px;
+  height: 52px;
+}
+
+.help-art .mano svg {
+  display: block;
+  width: 28px;
+  height: 28px;
 }
 
 .help-icons {

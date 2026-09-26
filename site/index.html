@@ -21,6 +21,12 @@
     (ver actionFor() en js/main.js). El resto de los botones tiene un id y lo maneja
     su vista.
   -->
+  <!-- Íconos que se repiten: <svg><use href="#icon-mano"/></svg> -->
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="icon-mano" viewBox="0 0 24 24"><path d="M18 11V6a2 2 0 0 0-4 0"/><path d="M14 10V4a2 2 0 0 0-4 0v2"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-6-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></symbol>
+    <symbol id="icon-mazo" viewBox="0 0 24 24"><rect x="8" y="3" width="12" height="16" rx="2"/><path d="M5 7v12a2 2 0 0 0 2 2h9"/></symbol>
+  </svg>
+
   <div class="app">
     <header class="bar">
       <div class="brand">
@@ -33,6 +39,9 @@
         </button>
         <button class="icon-btn" id="open-share" aria-label="Compartir">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>
+        </button>
+        <button class="icon-btn" id="open-help" aria-label="Cómo se usa">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M9.3 9a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.4-2.7 4"/><path d="M12 17.5h.01"/></svg>
         </button>
         <button class="icon-btn" id="open-settings" aria-label="Ajustes">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>
@@ -47,14 +56,16 @@
   <template id="team-template">
     <section class="team">
       <div class="team-head">
+        <!-- Siempre está: muestra la mano o el mazo (el que reparte). Tocarlo pasa la mano. -->
+        <button class="mano" data-ref="mano" data-action="passMano">
+          <svg class="icon-mano"><use href="#icon-mano"/></svg>
+          <svg class="icon-mazo"><use href="#icon-mazo"/></svg>
+        </button>
         <button class="name" data-ref="nameButton">
           <span class="name-text" data-ref="name"></span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/></svg>
         </button>
-        <div class="meta">
-          <span class="wins" data-ref="wins"></span>
-          <button class="mano" data-ref="mano" data-action="passMano">Mano</button>
-        </div>
+        <div class="wins" data-ref="wins"></div>
         <div class="score" data-ref="score" aria-hidden="true"></div>
         <div class="left" data-ref="standing"></div>
       </div>
@@ -157,9 +168,12 @@
           <p>A 30 los primeros 15 son las malas y los otros 15, las buenas.</p>
         </section>
         <section class="help-slide">
-          <div class="help-art"><span class="mano">Mano</span></div>
-          <h2>Quién es mano</h2>
-          <p>La mano pasa sola unos segundos después de anotar. Tocá el cartel para cambiarla.</p>
+          <div class="help-art help-icons">
+            <span class="mano is-mano"><svg class="icon-mano"><use href="#icon-mano"/></svg></span>
+            <span class="mano"><svg class="icon-mazo"><use href="#icon-mazo"/></svg></span>
+          </div>
+          <h2>Mano y mazo</h2>
+          <p>La mano pasa sola unos segundos después de anotar. Tocá la mano o el mazo para cambiarla.</p>
         </section>
         <section class="help-slide">
           <div class="help-art help-icons">
@@ -213,13 +227,13 @@
       <div class="field">
         <span class="field-label">Pantalla</span>
         <label class="toggle"><span>Mostrar números</span><input type="checkbox" data-option="showNumbers"><i></i></label>
-        <label class="toggle"><span>Mostrar botones<small>Sin botones: tocá la columna para sumar y mantené para borrar</small></span><input type="checkbox" data-option="showButtons"><i></i></label>
+        <label class="toggle"><span>Mostrar botones<small>Tocá para sumar y mantené para borrar</small></span><input type="checkbox" data-option="showButtons"><i></i></label>
         <label class="toggle sub"><span>Botones +2, +3 y +4<small>Para anotar un truco o un envido de una</small></span><input type="checkbox" data-option="quickButtons" data-requires="showButtons"><i></i></label>
       </div>
 
       <div class="field">
         <span class="field-label">Mano</span>
-        <label class="toggle"><span>Mostrar quién es mano<small>Tocá el cartel para pasarla</small></span><input type="checkbox" data-option="showMano"><i></i></label>
+        <label class="toggle"><span>Mostrar quién es mano<small>Tocá la mano o el mazo para pasarla</small></span><input type="checkbox" data-option="showMano"><i></i></label>
         <label class="toggle sub"><span>Pasar la mano sola<small>Unos segundos después de anotar</small></span><input type="checkbox" data-option="autoMano" data-requires="showMano"><i></i></label>
       </div>
 
@@ -227,13 +241,6 @@
         <span class="field-label">Celular</span>
         <label class="toggle" data-feature="vibrate"><span>Vibrar al anotar</span><input type="checkbox" data-option="vibrate"><i></i></label>
         <label class="toggle" data-feature="keepAwake"><span>Mantener la pantalla encendida<small>Útil con el celu apoyado en la mesa</small></span><input type="checkbox" data-option="keepAwake"><i></i></label>
-      </div>
-
-      <div class="field">
-        <button class="option" id="open-help">
-          <strong>Cómo se usa</strong>
-          <small>Lo básico en un minuto</small>
-        </button>
       </div>
 
       <div class="field">
