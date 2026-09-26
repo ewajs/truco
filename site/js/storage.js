@@ -3,11 +3,12 @@
 // Todavía no migramos versiones viejas: si lo guardado es de otra versión o tiene algo
 // inválido, se descarta y se arranca de cero. Si cambia la forma del estado, subí VERSION.
 //
-// Las opciones son la excepción: se completan las que falten y se descartan las que ya no
-// existen, así agregar una opción nueva no borra la partida de nadie.
+// Las opciones y la mesa son la excepción: se completan si faltan y se descartan si no
+// sirven, así agregarlas no borró la partida de nadie.
 
 import { createInitialState, TARGETS, PLAYER_COUNTS, HISTORY_LIMIT, OPTION_CHOICES } from './game.js';
 import { duelsPerPicaPica } from './hands.js';
+import { cleanPlayerName, teamOfSeat } from './table.js';
 
 export const STORAGE_KEY = 'truco-anotador-v1';
 const VERSION = 3;
@@ -42,7 +43,21 @@ export function fromSaved(saved) {
     mano: saved.mano,
     hand: { ...saved.hand, startScores: [...saved.hand.startScores] },
     options: knownOptions(initial.options, saved.options),
+    ...knownTable(initial, saved),
   };
+}
+
+// La mesa guardada: los nombres que sirvan (el resto, por defecto) y el lugar de la mano
+// si es de la mesa y del equipo que es mano; si no, el primer lugar de ese equipo.
+function knownTable(initial, saved) {
+  const source = Array.isArray(saved.players) ? saved.players : [];
+  const players = initial.players.map((name, seat) => (
+    typeof source[seat] === 'string' ? cleanPlayerName(source[seat], seat) : name
+  ));
+  const { manoSeat } = saved;
+  const valid = Number.isInteger(manoSeat) && manoSeat >= 0 && manoSeat < saved.playerCount
+    && teamOfSeat(manoSeat) === saved.mano;
+  return { players, manoSeat: valid ? manoSeat : saved.mano };
 }
 
 // Todo lo que no son opciones tiene que tener la forma y los rangos esperados.

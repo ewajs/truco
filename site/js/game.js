@@ -18,9 +18,18 @@
 //   { type: 'loadGame', game }           cargar una partida compartida por link (ver share.js)
 //   { type: 'passMano' }                 terminó la mano (o un duelo del pica pica)
 //   { type: 'setHand', number, pica, duel }  corregir a mano la mano actual
-//   (las dos últimas están en hands.js)
+//   { type: 'restoreHand', mano, manoSeat, hand }  deshacer un pase de mano
+//   (las tres últimas están en hands.js)
+//   { type: 'renamePlayer', seat, name }  la mesa: nombres, lugares y quién es mano
+//   { type: 'swapSeats', a, b }
+//   { type: 'setManoSeat', seat }
+//   { type: 'setTable', players, manoSeat }
+//   (las de la mesa están en table.js)
 
 import { newHand, passMano, setHand, restoreHand, duelsPerPicaPica } from './hands.js';
+import {
+  defaultPlayers, fitManoSeat, renamePlayer, swapSeats, setManoSeat, setTable, teamOfSeat,
+} from './table.js';
 
 export const TARGETS = [15, 30];
 export const PLAYER_COUNTS = [2, 4, 6, 8]; // de a 8 no existe, pero se juega igual
@@ -43,7 +52,9 @@ export function createInitialState() {
     playerCount: 4, // de a cuántos se juega (el pica pica es de a 6 u 8)
     teams: DEFAULT_NAMES.map(name => ({ name, score: 0, wins: 0 })),
     history: [], // [{ team, delta }], para deshacer
-    mano: 0, // equipo que es mano en esta ronda
+    mano: 0, // equipo que es mano en esta ronda (el de manoSeat)
+    players: defaultPlayers(), // la mesa, en orden de juego (ver table.js)
+    manoSeat: 0, // lugar de la mesa que es mano
     hand: newHand([0, 0]), // la mano que se está jugando (ver passMano)
     options: {
       showNumbers: true,
@@ -116,6 +127,10 @@ export function reduce(state, action) {
     case 'passMano': return passMano(state);
     case 'setHand': return setHand(state, action);
     case 'restoreHand': return restoreHand(state, action);
+    case 'renamePlayer': return renamePlayer(state, action);
+    case 'swapSeats': return swapSeats(state, action);
+    case 'setManoSeat': return setManoSeat(state, action);
+    case 'setTable': return setTable(state, action);
     default: throw new Error(`Acción desconocida: ${action.type}`);
   }
 }
@@ -182,7 +197,7 @@ function setPlayerCount(state, count) {
   if (!PLAYER_COUNTS.includes(count) || count === state.playerCount) return state;
   const lastDuel = duelsPerPicaPica(count) - 1;
   const hand = state.hand.duels > lastDuel ? { ...state.hand, duels: lastDuel } : state.hand;
-  return { ...state, playerCount: count, hand };
+  return { ...state, playerCount: count, hand, manoSeat: fitManoSeat(state.manoSeat, count) };
 }
 
 // "Dos contra dos"
@@ -197,15 +212,24 @@ function rename(state, team, name) {
   return updateTeam(state, team, () => ({ name: clean }));
 }
 
-// `game` ya viene validado por share.js: { target, playerCount?, teams: [{ name, score, wins }] }.
-// Las opciones se conservan; el historial arranca de cero. Links viejos no traen playerCount.
+// `game` ya viene validado por share.js: { target, playerCount?, teams: [{ name, score, wins }],
+// players?, manoSeat? }. Las opciones se conservan; el historial arranca de cero. Links
+// viejos no traen playerCount ni la mesa.
 function loadGame(state, game) {
+  const playerCount = game.playerCount ?? state.playerCount;
+  const players = game.players
+    ? state.players.map((old, seat) => game.players[seat] ?? old)
+    : state.players;
+  const manoSeat = game.manoSeat ?? fitManoSeat(state.manoSeat, playerCount);
   return {
     ...state,
     target: game.target,
-    playerCount: game.playerCount ?? state.playerCount,
+    playerCount,
     teams: game.teams.map(team => ({ ...team })),
     history: [],
     hand: newHand(game.teams.map(team => team.score)),
+    players,
+    manoSeat,
+    mano: teamOfSeat(manoSeat),
   };
 }

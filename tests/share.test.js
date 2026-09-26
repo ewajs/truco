@@ -8,6 +8,8 @@ function playedGame() {
   state = reduce(state, { type: 'rename', team: 0, name: 'Los Primos & Cía' });
   state = reduce(state, { type: 'add', team: 0, points: 4 });
   state = reduce(state, { type: 'add', team: 1, points: 3 });
+  state = reduce(state, { type: 'renamePlayer', seat: 2, name: 'Juan & Cía, el de al lado' });
+  state = reduce(state, { type: 'setManoSeat', seat: 3 });
   return state;
 }
 
@@ -17,13 +19,16 @@ test('una partida sobrevive ida y vuelta por el link', () => {
     target: state.target,
     playerCount: state.playerCount,
     teams: state.teams,
+    players: state.players.slice(0, state.playerCount),
+    manoSeat: state.manoSeat,
   });
 });
 
 test('el link es legible', () => {
   assert.equal(
     gameToHash(createInitialState()),
-    '#a=30&de=4&equipo1=Nosotros&puntos1=0&ganadas1=0&equipo2=Ellos&puntos2=0&ganadas2=0',
+    '#a=30&de=4&equipo1=Nosotros&puntos1=0&ganadas1=0&equipo2=Ellos&puntos2=0&ganadas2=0'
+      + '&jugador1=Jugador+1&jugador2=Jugador+2&jugador3=Jugador+3&jugador4=Jugador+4&mano=1',
   );
 });
 
@@ -79,4 +84,16 @@ test('cargar una partida reemplaza la actual y conserva las opciones', () => {
   assert.deepEqual(next.teams, game.teams);
   assert.deepEqual(next.history, [], 'no se puede deshacer hacia la partida anterior');
   assert.equal(next.options.vibrate, false);
+});
+
+test('la mesa viaja solo si está completa y la mano es un lugar', () => {
+  const base = '#a=15&de=4&puntos1=0&puntos2=0&jugador1=Juan&jugador2=Pedro&jugador3=Ana&jugador4=%20';
+  const full = gameFromHash(`${base}&mano=2`);
+  assert.deepEqual(full.players, ['Juan', 'Pedro', 'Ana', 'Jugador 4']);
+  assert.equal(full.manoSeat, 1);
+  for (const hash of [base, `${base}&mano=0`, `${base}&mano=5`, '#a=15&de=4&puntos1=0&puntos2=0&jugador1=Juan&mano=1']) {
+    const game = gameFromHash(hash);
+    assert.equal('players' in game, false, hash);
+    assert.equal('manoSeat' in game, false, hash);
+  }
 });

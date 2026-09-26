@@ -15,6 +15,8 @@ Tocá la columna de un equipo para sumar, mantené apretado para borrar.
 - Sigue las manos: número (se corrige tocándolo) y, de a 6 u 8, pica pica entre los 5 y los 25. Se puede apagar para solo contar puntos
 - Se pueden ocultar los botones y usar solo tocar y mantener
 - Ayuda corta con lo básico
+- La mesa: quién se sienta dónde (los equipos se alternan), quién es mano y quién da;
+  se editan los nombres, se cambian de lugar o se tiran reyes
 - Cuatro temas (Paño, Madera, Noche y Argento), cada uno claro u oscuro; por defecto sigue al celular
 
 ## Correrlo local
@@ -46,6 +48,7 @@ site/                   lo que se publica en GitHub Pages, tal cual
     main.js             arranque: estado, dispatch() y conexión de las vistas
     game.js             estado, puntaje y reduce(state, action)
     hands.js            manos, pica pica y pase automático (lo usa reduce)
+    table.js            la mesa: lugares, equipos, mano y tirar reyes (lo usa reduce)
     storage.js          guardar/cargar en localStorage (valida; si algo no sirve, de cero)
     share.js            partida ⇄ link (#a=30&de=4&equipo1=…&puntos1=…)
     device.js           vibración y wake lock
@@ -62,6 +65,7 @@ site/                   lo que se publica en GitHub Pages, tal cual
       help.js           ayuda (carrusel)
       hand.js           chip con el número de mano y el pica pica
       mano-toast.js     aviso del pase automático (cuenta regresiva y deshacer)
+      table.js          la mesa: lugares, nombres y quién es mano
       appearance.js     tema y modo oscuro (data-palette y data-mode en <html>)
 tests/                  reglas, manos y pica pica, guardado, links, fósforos, tamaño del
                         tablero e invariantes con acciones al azar
@@ -87,7 +91,8 @@ evento ──▶ dispatch(action) ──▶ reduce(state, action) ──▶ nuev
 
 1. **Estado**: agregá el campo en `createInitialState()` y su validación en
    `isValidGame()` (storage.js), y subí `VERSION`. Todavía no migramos: lo guardado con
-   otra versión se descarta. Las opciones nuevas no necesitan nada de esto.
+   otra versión se descarta. Las opciones nuevas no necesitan nada de esto (tampoco la
+   mesa: se completa sola si falta, ver `knownTable()`).
 2. **Regla**: agregá un `case` en `reduce()` y su test. Si es de manos o pica pica, va en
    `hands.js`. El test de invariantes (`tests/invariants.test.js`) prueba miles de
    acciones al azar: sumá la acción nueva a `randomAction()`.

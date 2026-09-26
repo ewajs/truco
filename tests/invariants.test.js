@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { createInitialState, reduce, winner, TARGETS, PLAYER_COUNTS, HISTORY_LIMIT } from '../site/js/game.js';
 import { duelsPerPicaPica, isPicaPicaHand, picaPicaEnabled } from '../site/js/hands.js';
 import { fromSaved } from '../site/js/storage.js';
+import { drawTable, MAX_PLAYERS } from '../site/js/table.js';
 
 const SEEDS = 200;
 const STEPS = 250; // menos que HISTORY_LIMIT, así el historial explica todos los puntos
@@ -21,9 +22,18 @@ function random(seed) {
   };
 }
 
-function randomAction(rand) {
+function randomAction(rand, state) {
   const pick = list => list[Math.floor(rand() * list.length)];
   const team = pick([0, 1]);
+  const seat = () => pick([0, 1, 2, 3, 4, 5, 6, 7, 9]); // a veces uno que no está en la mesa
+  if (rand() < 0.08) {
+    return pick([
+      { type: 'renamePlayer', seat: seat(), name: pick(['', 'Juan', 'Un nombre larguísimo de más']) },
+      { type: 'swapSeats', a: seat(), b: seat() },
+      { type: 'setManoSeat', seat: seat() },
+      { type: 'setTable', ...drawTable(state, rand) },
+    ]);
+  }
   const roll = rand();
   if (roll < 0.40) return { type: 'add', team, points: pick([1, 1, 1, 2, 3, 4]) };
   if (roll < 0.50) return { type: 'subtract', team };
@@ -62,6 +72,12 @@ function checkInvariants(state) {
   }
   if (isPicaPicaHand(state)) assert.ok(picaPicaEnabled(state));
 
+  assert.equal(state.players.length, MAX_PLAYERS);
+  assert.ok(state.players.every(name => typeof name === 'string' && name.trim() !== ''));
+  assert.ok(Number.isInteger(state.manoSeat) && state.manoSeat >= 0 && state.manoSeat < state.playerCount,
+    `lugar de la mano ${state.manoSeat}`);
+  assert.equal(mano, state.manoSeat % 2, 'el equipo mano es el del lugar de la mano');
+
   // lo que se guarda siempre se puede volver a cargar igual
   assert.deepEqual(fromSaved({ ...JSON.parse(JSON.stringify(state)), version: 3 }), state);
 }
@@ -71,12 +87,12 @@ test(`invariantes con ${SEEDS} partidas de ${STEPS} acciones al azar`, () => {
     const rand = random(seed);
     let state = createInitialState();
     for (let step = 0; step < STEPS; step++) {
-      const action = randomAction(rand);
+      const action = randomAction(rand, state);
       const before = state;
       state = reduce(state, action);
       // a veces, "Deshacer" en el aviso justo después de un pase
       if (action.type === 'passMano' && rand() < 0.3) {
-        state = reduce(state, { type: 'restoreHand', mano: before.mano, hand: before.hand });
+        state = reduce(state, { type: 'restoreHand', mano: before.mano, manoSeat: before.manoSeat, hand: before.hand });
       }
       try {
         checkInvariants(state);
