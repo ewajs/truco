@@ -122,6 +122,7 @@ function actionFor(button) {
     case 'undo': return { type: 'undo' };
     case 'newGame': return { type: 'newGame' };
     case 'setTarget': return { type: 'setTarget', target: Number(button.dataset.target) };
+    case 'setPlayers': return { type: 'setPlayers', players: Number(button.dataset.players) };
     case 'passMano': return { type: 'passMano' };
     default: throw new Error(`data-action desconocida: ${button.dataset.action}`);
   }

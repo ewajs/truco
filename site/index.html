@@ -221,6 +221,17 @@
           </div>
 
           <div class="field">
+            <span class="field-label">De a cuántos</span>
+            <div class="seg" role="radiogroup" aria-label="De a cuántos se juega">
+              <button role="radio" data-action="setPlayers" data-players="2">2</button>
+              <button role="radio" data-action="setPlayers" data-players="4">4</button>
+              <button role="radio" data-action="setPlayers" data-players="6">6</button>
+              <button role="radio" data-action="setPlayers" data-players="8">8</button>
+            </div>
+            <p class="help" id="players-help"></p>
+          </div>
+
+          <div class="field">
             <span class="field-label">Equipos</span>
             <div class="names">
               <div><label for="name-0">Izquierda</label><input id="name-0" maxlength="14" autocomplete="off" enterkeyhint="done"></div>

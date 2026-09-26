@@ -44,6 +44,7 @@ test('migra una partida guardada por el prototipo (v1)', () => {
   };
   assert.deepEqual(fromSaved(v1), {
     target: 15,
+    players: 4,
     teams: [
       { name: 'Primos', score: 7, wins: 2 },
       { name: 'Tíos', score: 3, wins: 0 },
@@ -58,6 +59,12 @@ test('migra una partida guardada por el prototipo (v1)', () => {
       keepAwake: true,
     },
   });
+});
+
+test('de a cuántos: se guarda y un valor inválido vuelve a 4', () => {
+  assert.equal(fromSaved({ version: 2, players: 6 }).players, 6);
+  assert.equal(fromSaved({ version: 2, players: 5 }).players, 4);
+  assert.equal(fromSaved({ version: 2 }).players, 4, 'partidas guardadas antes de existir');
 });
 
 test('mano: se guarda y un valor inválido vuelve al primer equipo', () => {

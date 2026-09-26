@@ -1,8 +1,9 @@
-// Hoja de ajustes con dos pestañas: "Partida" (a cuántos se juega, nombres y reinicios)
-// y "Opciones" (cómo se ve y se comporta la app).
-// Los botones de "Partida a" usan data-action y los maneja main.js; el resto se maneja acá.
+// Hoja de ajustes con dos pestañas: "Partida" (a cuántos puntos, de a cuántos jugadores,
+// nombres y reinicios) y "Opciones" (cómo se ve y se comporta la app).
+// Los botones de "Partida a" y "De a cuántos" usan data-action y los maneja main.js; el
+// resto se maneja acá.
 
-import { isFresh, hasBuenas } from '../game.js';
+import { isFresh, hasBuenas, playersLabel } from '../game.js';
 import { SUPPORTS } from '../device.js';
 
 const SLIDE_MS = 320; // duración de la animación de apertura (ver .sheet en CSS)
@@ -14,6 +15,8 @@ export function createSettings({ dispatch }) {
   const sheet = document.getElementById('settings');
   const targetButtons = sheet.querySelectorAll('[data-action="setTarget"]');
   const targetHelp = document.getElementById('target-help');
+  const playersButtons = sheet.querySelectorAll('[data-action="setPlayers"]');
+  const playersHelp = document.getElementById('players-help');
   const nameInputs = [0, 1].map(team => document.getElementById(`name-${team}`));
   const optionToggles = sheet.querySelectorAll('[data-option]');
   let current = null; // último estado renderizado
@@ -119,6 +122,11 @@ export function createSettings({ dispatch }) {
       ? 'Se juega en malas y buenas, 15 y 15.'
       : 'Una sola vuelta de 15.';
     if (!isFresh(state)) targetHelp.textContent += ' Cambiarlo empieza una partida nueva.';
+
+    playersButtons.forEach(button => {
+      button.setAttribute('aria-checked', String(Number(button.dataset.players) === state.players));
+    });
+    playersHelp.textContent = `${playersLabel(state.players)}.`;
 
     nameInputs.forEach((input, team) => {
       // no pisar lo que se está escribiendo

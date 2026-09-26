@@ -11,12 +11,14 @@
 //   { type: 'newGame' }                  puntos a cero (conserva las ganadas)
 //   { type: 'clearWins' }                ganadas a cero
 //   { type: 'setTarget', target }        jugar a 15 o a 30 (reinicia si había puntos)
+//   { type: 'setPlayers', players }      de a cuántos se juega (no toca los puntos)
 //   { type: 'rename', team, name }
 //   { type: 'setOption', option, value }
 //   { type: 'loadGame', game }           cargar una partida compartida por link (ver share.js)
 //   { type: 'passMano' }                 la mano pasa al otro equipo
 
 export const TARGETS = [15, 30];
+export const PLAYERS = [2, 4, 6, 8]; // de a 8 no existe, pero se juega igual
 export const POINTS_PER_GROUP = 5; // cada cuadrado de fósforos vale 5
 export const HISTORY_LIMIT = 300;
 export const DEFAULT_NAMES = ['Nosotros', 'Ellos'];
@@ -25,6 +27,7 @@ export const MAX_NAME_LENGTH = 14;
 export function createInitialState() {
   return {
     target: 30,
+    players: 4, // de a cuántos se juega: por ahora solo se muestra, no cambia el puntaje
     teams: DEFAULT_NAMES.map(name => ({ name, score: 0, wins: 0 })),
     history: [], // [{ team, delta }], para deshacer
     mano: 0, // equipo que es mano en esta ronda
@@ -85,6 +88,7 @@ export function reduce(state, action) {
     case 'newGame': return newGame(state);
     case 'clearWins': return updateTeams(state, () => ({ wins: 0 }));
     case 'setTarget': return setTarget(state, action.target);
+    case 'setPlayers': return setPlayers(state, action.players);
     case 'rename': return rename(state, action.team, action.name);
     case 'setOption': return { ...state, options: { ...state.options, [action.option]: action.value } };
     case 'loadGame': return loadGame(state, action.game);
@@ -149,16 +153,33 @@ function setTarget(state, target) {
   return { ...newGame(state), target };
 }
 
+function setPlayers(state, players) {
+  if (!PLAYERS.includes(players) || players === state.players) return state;
+  return { ...state, players };
+}
+
+// "Dos contra dos"
+export function playersLabel(players) {
+  const perTeam = ['Uno', 'Dos', 'Tres', 'Cuatro'][players / 2 - 1];
+  return `${perTeam} contra ${perTeam.toLowerCase()}`;
+}
+
 function rename(state, team, name) {
   const clean = cleanName(name, team);
   if (clean === state.teams[team].name) return state;
   return updateTeam(state, team, () => ({ name: clean }));
 }
 
-// `game` ya viene validado por share.js: { target, teams: [{ name, score, wins }] }.
-// Las opciones se conservan; el historial arranca de cero.
+// `game` ya viene validado por share.js: { target, players?, teams: [{ name, score, wins }] }.
+// Las opciones se conservan; el historial arranca de cero. Links viejos no traen players.
 function loadGame(state, game) {
-  return { ...state, target: game.target, teams: game.teams.map(team => ({ ...team })), history: [] };
+  return {
+    ...state,
+    target: game.target,
+    players: game.players ?? state.players,
+    teams: game.teams.map(team => ({ ...team })),
+    history: [],
+  };
 }
 
 // ---- Pase automático de la mano ----
