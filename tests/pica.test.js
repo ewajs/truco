@@ -73,10 +73,11 @@ test('el pica pica dura un duelo por pareja y recién ahí pasa la mano', () => 
   assert.equal(state.mano, 1 - mano);
 });
 
-test('de a 8 son 4 duelos', () => {
+test('de a 8 son 2 duelos (dos contra dos)', () => {
   let state = hand(game(8), 0, 5);
-  for (let i = 0; i < 3; i++) state = hand(state, i % 2, 1);
-  assert.equal(isPicaPicaHand(state), true, 'faltan duelos');
+  state = hand(state, 0, 1);
+  assert.equal(isPicaPicaHand(state), true, 'falta un duelo');
+  assert.equal(state.hand.duels, 1);
   state = hand(state, 1, 1);
   assert.equal(isPicaPicaHand(state), false);
 });

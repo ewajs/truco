@@ -78,9 +78,10 @@ export function picaPicaEnabled(state) {
   return state.options.picaPica && state.players >= 6;
 }
 
-// Duelos de un pica pica: cada jugador contra el de enfrente (3 de a 6, 4 de a 8).
+// Duelos de un pica pica. De a 6: cada uno contra el de enfrente (3 duelos de uno contra
+// uno). De a 8: dos partidas de dos contra dos.
 export function duelsPerPicaPica(players) {
-  return players / 2;
+  return players === 8 ? 2 : 3;
 }
 
 // Si la mano actual se muestra como pica pica.
