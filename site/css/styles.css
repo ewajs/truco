@@ -287,9 +287,11 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 
 .team-head {
   position: relative;
+  z-index: 1; /* el badge de mano siempre queda arriba del tablero */
   text-align: center;
   flex: none;
   padding-top: 2px;
+  min-height: 88px; /* alcanza para el badge aunque se oculten los números */
 }
 
 .name {
@@ -331,14 +333,16 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 /*
   Badge de mano/mazo: fijo a un costado del puntaje (donde sobra lugar), del lado de
   afuera de cada columna, así no mueve nada al pasar la mano. El equipo que es mano
-  muestra la mano; el otro, el mazo.
+  muestra la mano; el otro, el mazo. El área de toque (el botón) es más grande que el
+  círculo que se ve (::before), y el encabezado le deja lugar para que nunca quede
+  debajo del tablero.
 */
 .mano {
   position: absolute;
-  top: 36px;
-  left: -8px;
-  width: 44px;  /* área de toque cómoda; el círculo visible es el ::before */
-  height: 44px;
+  top: 32px;
+  left: -12px;
+  width: 56px;
+  height: 56px;
   display: grid;
   place-items: center;
   color: var(--muted);
@@ -347,7 +351,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 .mano::before {
   content: "";
   position: absolute;
-  inset: 8px;
+  inset: 10px;
   border-radius: 50%;
   border: 1px solid var(--line);
   transition: background .2s;
@@ -355,13 +359,13 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 
 .team + .team .mano {
   left: auto;
-  right: -8px;
+  right: -12px;
 }
 
 .mano svg {
   position: relative;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   fill: none;
   stroke: currentColor;
   stroke-width: 2;
@@ -393,6 +397,10 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 
 .hide-mano .mano {
   display: none;
+}
+
+.hide-mano .team-head {
+  min-height: 0;
 }
 
 .score {
