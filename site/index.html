@@ -190,7 +190,7 @@
     </div>
   </div>
 
-  <!-- Ajustes (js/view/settings.js) -->
+  <!-- Ajustes (js/view/settings.js): dos pestañas, la partida y las opciones de la app -->
   <div class="sheet-wrap" id="settings">
     <div class="backdrop" id="settings-backdrop"></div>
     <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="settings-title">
@@ -201,51 +201,63 @@
           <h2 id="settings-title">Ajustes</h2>
           <button class="btn-done" id="close-settings">Listo</button>
         </div>
-      </div>
-
-      <div class="field">
-        <span class="field-label">Partida a</span>
-        <div class="seg" role="radiogroup" aria-label="Partida a">
-          <button role="radio" data-action="setTarget" data-target="15">15 puntos</button>
-          <button role="radio" data-action="setTarget" data-target="30">30 puntos</button>
-        </div>
-        <p class="help" id="target-help"></p>
-      </div>
-
-      <div class="field">
-        <span class="field-label">Equipos</span>
-        <div class="names">
-          <div><label for="name-0">Izquierda</label><input id="name-0" maxlength="14" autocomplete="off" enterkeyhint="done"></div>
-          <div><label for="name-1">Derecha</label><input id="name-1" maxlength="14" autocomplete="off" enterkeyhint="done"></div>
+        <div class="tabs" role="tablist" aria-label="Ajustes">
+          <button role="tab" id="tab-game" data-tab="game" aria-controls="panel-game">Partida</button>
+          <button role="tab" id="tab-options" data-tab="options" aria-controls="panel-options">Opciones</button>
+          <span class="tab-indicator" aria-hidden="true"></span>
         </div>
       </div>
 
-      <!--
-        data-requires: la opción solo se puede cambiar si la otra está activada.
-        data-feature: la opción se oculta si el navegador no lo soporta (ver device.js).
-      -->
-      <div class="field">
-        <span class="field-label">Pantalla</span>
-        <label class="toggle"><span>Mostrar números</span><input type="checkbox" data-option="showNumbers"><i></i></label>
-        <label class="toggle"><span>Mostrar botones<small>Tocá para sumar y mantené para borrar</small></span><input type="checkbox" data-option="showButtons"><i></i></label>
-        <label class="toggle sub"><span>Botones +2, +3 y +4<small>Para anotar un truco o un envido de una</small></span><input type="checkbox" data-option="quickButtons" data-requires="showButtons"><i></i></label>
-      </div>
+      <!-- Los dos paneles ocupan el mismo lugar: la hoja no cambia de alto al cambiar de pestaña -->
+      <div class="tab-panels">
+        <section class="tab-panel" role="tabpanel" id="panel-game" aria-labelledby="tab-game">
+          <div class="field">
+            <span class="field-label">Partida a</span>
+            <div class="seg" role="radiogroup" aria-label="Partida a">
+              <button role="radio" data-action="setTarget" data-target="15">15 puntos</button>
+              <button role="radio" data-action="setTarget" data-target="30">30 puntos</button>
+            </div>
+            <p class="help" id="target-help"></p>
+          </div>
 
-      <div class="field">
-        <span class="field-label">Mano</span>
-        <label class="toggle"><span>Mostrar quién es mano<small>Tocá la mano o el mazo para pasarla</small></span><input type="checkbox" data-option="showMano"><i></i></label>
-        <label class="toggle sub"><span>Pasar la mano sola<small>Unos segundos después de anotar</small></span><input type="checkbox" data-option="autoMano" data-requires="showMano"><i></i></label>
-      </div>
+          <div class="field">
+            <span class="field-label">Equipos</span>
+            <div class="names">
+              <div><label for="name-0">Izquierda</label><input id="name-0" maxlength="14" autocomplete="off" enterkeyhint="done"></div>
+              <div><label for="name-1">Derecha</label><input id="name-1" maxlength="14" autocomplete="off" enterkeyhint="done"></div>
+            </div>
+          </div>
 
-      <div class="field" data-feature-group>
-        <span class="field-label">Celular</span>
-        <label class="toggle" data-feature="vibrate"><span>Vibrar al anotar</span><input type="checkbox" data-option="vibrate"><i></i></label>
-        <label class="toggle" data-feature="keepAwake"><span>Mantener la pantalla encendida<small>Útil con el celu apoyado en la mesa</small></span><input type="checkbox" data-option="keepAwake"><i></i></label>
-      </div>
+          <div class="field">
+            <button class="btn-danger" id="reset-game">Reiniciar partida</button>
+            <button class="btn-text" id="clear-wins">Borrar partidas ganadas</button>
+          </div>
+        </section>
 
-      <div class="field">
-        <button class="btn-danger" id="reset-game">Reiniciar partida</button>
-        <button class="btn-text" id="clear-wins">Borrar partidas ganadas</button>
+        <section class="tab-panel" role="tabpanel" id="panel-options" aria-labelledby="tab-options">
+          <!--
+            data-requires: la opción solo se puede cambiar si la otra está activada.
+            data-feature: la opción se oculta si el navegador no lo soporta (ver device.js).
+          -->
+          <div class="field">
+            <span class="field-label">Pantalla</span>
+            <label class="toggle"><span>Mostrar números</span><input type="checkbox" data-option="showNumbers"><i></i></label>
+            <label class="toggle"><span>Mostrar botones<small>Tocá para sumar y mantené para borrar</small></span><input type="checkbox" data-option="showButtons"><i></i></label>
+            <label class="toggle sub"><span>Botones +2, +3 y +4<small>Para anotar un truco o un envido de una</small></span><input type="checkbox" data-option="quickButtons" data-requires="showButtons"><i></i></label>
+          </div>
+
+          <div class="field">
+            <span class="field-label">Mano</span>
+            <label class="toggle"><span>Mostrar quién es mano<small>Tocá la mano o el mazo para pasarla</small></span><input type="checkbox" data-option="showMano"><i></i></label>
+            <label class="toggle sub"><span>Pasar la mano sola<small>Unos segundos después de anotar</small></span><input type="checkbox" data-option="autoMano" data-requires="showMano"><i></i></label>
+          </div>
+
+          <div class="field" data-feature-group>
+            <span class="field-label">Celular</span>
+            <label class="toggle" data-feature="vibrate"><span>Vibrar al anotar</span><input type="checkbox" data-option="vibrate"><i></i></label>
+            <label class="toggle" data-feature="keepAwake"><span>Mantener la pantalla encendida<small>Útil con el celu apoyado en la mesa</small></span><input type="checkbox" data-option="keepAwake"><i></i></label>
+          </div>
+        </section>
       </div>
     </div>
   </div>
