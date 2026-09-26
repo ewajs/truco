@@ -150,7 +150,7 @@ test('otras acciones no tocan la espera', () => {
   );
 });
 
-test('con pica pica, las manos se siguen contando aunque no se muestre la mano', () => {
+test('con Pica Pica, las manos se siguen contando aunque no se muestre la mano', () => {
   let state = reduce(createInitialState(), { type: 'setPlayerCount', count: 6 });
   state = reduce(state, { type: 'setOption', option: 'showMano', value: false });
   const { state: after } = simulate([add(0, 2), WAIT], state);
@@ -178,24 +178,46 @@ test('el aviso aparece a mitad de la espera, y a lo sumo a los 3 segundos', () =
   assert.equal(noticeDelay(12000), NOTICE_MAX_MS);
 });
 
-test('el aviso dice a quién pasa la mano', () => {
-  const { state: before } = simulate([add(0, 2)]);
+test('el aviso dice qué mano termina con sus puntos, y después quién es mano y quién da', () => {
+  const { state: first } = simulate([add(0, 2), add(1), WAIT]); // mano 1
+  const before = reduce(reduce(first, add(0, 3)), add(1));      // mano 2: 3 a 1
   const after = reduce(before, passMano);
-  assert.deepEqual(passNotice(before, after), { coming: 'Mano para Jugador 2', done: 'Es mano Jugador 2' });
+  assert.deepEqual(passNotice(before, after), {
+    coming: { title: 'Terminando Mano 2…', detail: 'Nosotros 3 | Ellos 1' },
+    done: { title: 'Mano 3', detail: 'Jugador 3 es mano. Jugador 2 da.' },
+  });
 });
 
-test('el aviso avisa si la mano que viene es de pica pica', () => {
+test('el aviso avisa si la mano que viene es de Pica Pica', () => {
   const six = reduce(createInitialState(), { type: 'setPlayerCount', count: 6 });
   const { state: before } = simulate([add(0, 5)], six);
   const after = reduce(before, passMano);
-  assert.equal(passNotice(before, after).done, 'Es mano Jugador 2 · Pica pica');
+  assert.deepEqual(passNotice(before, after).done,
+    { title: 'Mano 2 | Pica Pica | Duelo 1/3', detail: 'Jugador 2 es mano. Jugador 5 da.' });
 });
 
-test('en el pica pica, el aviso habla del duelo (la mano no cambia)', () => {
+test('Pica Pica de a 6: el aviso nombra a los del duelo con sus puntos', () => {
   const six = reduce(createInitialState(), { type: 'setPlayerCount', count: 6 });
-  const { state: pica } = simulate([add(0, 5), WAIT], six); // mano 2: pica pica
-  const before = reduce(pica, add(1));
+  const { state: pica } = simulate([add(0, 5), WAIT], six); // mano 2: Pica Pica, J2 contra J5
+  const before = reduce(pica, add(1, 2));
   const after = reduce(before, passMano);
   assert.equal(after.mano, before.mano);
-  assert.deepEqual(passNotice(before, after), { coming: 'Fin del duelo 1/3', done: 'Duelo 2/3: es mano Jugador 3' });
+  assert.deepEqual(passNotice(before, after), {
+    coming: { title: 'Terminando Mano 2…', detail: 'Jugador 5 0 | Jugador 2 2' },
+    done: { title: 'Mano 2 | Pica Pica | Duelo 2/3', detail: 'Jugador 3 es mano. Jugador 6 da.' },
+  });
+});
+
+test('Pica Pica de a 8: el aviso nombra las parejas y quiénes juegan además de mano y pie', () => {
+  const eight = reduce(createInitialState(), { type: 'setPlayerCount', count: 8 });
+  const { state: pica } = simulate([add(0, 5), WAIT], eight); // mano 2: J2, J3, J4 y J5
+  const before = reduce(pica, add(1));
+  const after = reduce(before, passMano);
+  assert.deepEqual(passNotice(before, after), {
+    coming: { title: 'Terminando Mano 2…', detail: 'Jugador 3 y Jugador 5 / Jugador 2 y Jugador 4' },
+    done: {
+      title: 'Mano 2 | Pica Pica | Duelo 2/2',
+      detail: 'Jugador 6 es mano. Jugador 1 da. Juegan Jugador 7 y Jugador 8',
+    },
+  });
 });

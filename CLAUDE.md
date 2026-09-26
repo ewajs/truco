@@ -39,7 +39,7 @@ site/                   lo que se publica en GitHub Pages, tal cual
   js/
     main.js             arranque: estado, dispatch(), timers del pase y conexión de las vistas
     game.js             estado, puntaje y reduce(state, action)
-    hands.js            manos, pica pica, duelos y pase automático (lo usa reduce)
+    hands.js            manos, Pica Pica, duelos y pase automático (lo usa reduce)
     table.js            la mesa: lugares, equipos, turnos y tirar reyes (lo usa reduce)
     storage.js          guardar/cargar en localStorage (valida; si algo no sirve, de cero)
     share.js            partida ⇄ link (#a=30&de=4&equipo1=…&jugador1=…&mano=1)
@@ -48,7 +48,7 @@ site/                   lo que se publica en GitHub Pages, tal cual
                         matches (SVG de fósforos), layout, gestures, settings, winner,
                         share, install, help, hand (chip y corrección), mano-toast,
                         table (la mesa), appearance (tema y modo)
-tests/                  node:test: reglas, manos, pica pica, mesa, guardado, links,
+tests/                  node:test: reglas, manos, Pica Pica, mesa, guardado, links,
                         fósforos, tamaño del tablero e invariantes con acciones al azar
 scripts/capturas.mjs    capturas de referencia (ver abajo)
 docs/capturas/          capturas: de referencia (iphone/, samsung/) y de cada PR (prs/<n>/)
@@ -70,7 +70,7 @@ evento ──▶ dispatch(action) ──▶ reduce(state, action) ──▶ nuev
 
 1. **Estado**: el campo en `createInitialState()`, su validación en `isValidGame()` y
    subir `VERSION` (salvo opciones y mesa, ver arriba).
-2. **Regla**: un `case` en `reduce()` y su test. Si es de manos o pica pica, en
+2. **Regla**: un `case` en `reduce()` y su test. Si es de manos o Pica Pica, en
    `hands.js`; si es de la mesa, en `table.js`. Sumar la acción a `randomAction()` en
    `tests/invariants.test.js`.
 3. **UI**: un botón con `data-action` o un listener que llame a `dispatch()`, y dibujarlo

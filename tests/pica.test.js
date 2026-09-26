@@ -52,9 +52,9 @@ test('partida nueva vuelve a la mano 1', () => {
   assert.deepEqual(state.hand, { number: 1, pica: false, duels: 0, startScores: [0, 0] });
 });
 
-// ---- Pica pica ----
+// ---- Pica Pica ----
 
-test('de a 6: al llegar a 5 en una redonda, la próxima es pica pica', () => {
+test('de a 6: al llegar a 5 en una redonda, la próxima es Pica Pica', () => {
   let state = hand(game(6), 0, 3);
   assert.equal(isPicaPicaHand(state), false, 'con 3 todavía no');
   state = hand(state, 0, 2);
@@ -62,16 +62,16 @@ test('de a 6: al llegar a 5 en una redonda, la próxima es pica pica', () => {
   assert.equal(isPicaPicaHand(state), true);
 });
 
-test('el pica pica dura un duelo por pareja y recién ahí pasa la mano', () => {
-  let state = hand(game(6), 0, 5); // mano 2: pica pica
+test('el Pica Pica dura un duelo por pareja y recién ahí pasa la mano', () => {
+  let state = hand(game(6), 0, 5); // mano 2: Pica Pica
   const mano = state.mano;
   state = hand(state, 1, 1); // duelo 1
   assert.deepEqual([state.hand.number, state.hand.duels, state.mano], [2, 1, mano]);
   state = hand(state, 0, 1); // duelo 2
   assert.deepEqual([state.hand.number, state.hand.duels, state.mano], [2, 2, mano]);
-  state = hand(state, 0, 3); // duelo 3: termina el pica pica
+  state = hand(state, 0, 3); // duelo 3: termina el Pica Pica
   assert.equal(state.hand.number, 3);
-  assert.equal(isPicaPicaHand(state), false, 'después de un pica pica viene una redonda');
+  assert.equal(isPicaPicaHand(state), false, 'después de un Pica Pica viene una redonda');
   assert.equal(state.mano, 1 - mano);
 });
 
@@ -84,7 +84,7 @@ test('de a 8 son 2 duelos (dos contra dos)', () => {
   assert.equal(isPicaPicaHand(state), false);
 });
 
-test('alterna redonda y pica pica mientras nadie llegue a 25', () => {
+test('alterna redonda y Pica Pica mientras nadie llegue a 25', () => {
   let state = hand(game(6), 0, 5); // → pica
   const kinds = [];
   for (let round = 0; round < 4; round++) {
@@ -95,7 +95,7 @@ test('alterna redonda y pica pica mientras nadie llegue a 25', () => {
   assert.deepEqual(kinds, ['pica', 'redonda', 'pica', 'redonda']);
 });
 
-test('llegar a 25 en una redonda: no hay más pica pica', () => {
+test('llegar a 25 en una redonda: no hay más Pica Pica', () => {
   let state = game(6);
   state = reduce(state, { type: 'loadGame', game: { target: 30, playerCount: 6, teams: [{ name: 'A', score: 22, wins: 0 }, { name: 'B', score: 10, wins: 0 }] } });
   state = hand(state, 0, 3); // 25 en redonda
@@ -104,41 +104,41 @@ test('llegar a 25 en una redonda: no hay más pica pica', () => {
   assert.equal(isPicaPicaHand(state), false);
 });
 
-test('llegar a 25 durante un pica pica: termina el pica pica y no hay más', () => {
+test('llegar a 25 durante un Pica Pica: termina el Pica Pica y no hay más', () => {
   let state = game(6);
   state = reduce(state, { type: 'loadGame', game: { target: 30, playerCount: 6, teams: [{ name: 'A', score: 20, wins: 0 }, { name: 'B', score: 10, wins: 0 }] } });
   state = hand(state, 1, 1); // redonda → pica
   assert.equal(isPicaPicaHand(state), true);
-  state = hand(hand(hand(state, 0, 2), 0, 2), 0, 1); // 25 en el pica pica
+  state = hand(hand(hand(state, 0, 2), 0, 2), 0, 1); // 25 en el Pica Pica
   assert.equal(isPicaPicaHand(state), false);
   state = hand(state, 1, 1);
   assert.equal(isPicaPicaHand(state), false);
 });
 
-test('a 15 hay pica pica hasta el final (nunca se llega a 25)', () => {
+test('a 15 hay Pica Pica hasta el final (nunca se llega a 25)', () => {
   let state = hand(game(6, 15), 0, 5);
   assert.equal(isPicaPicaHand(state), true);
-  state = hand(hand(hand(state, 1, 1), 1, 1), 1, 1); // termina el pica pica
+  state = hand(hand(hand(state, 1, 1), 1, 1), 1, 1); // termina el Pica Pica
   state = hand(state, 0, 4); // redonda: 9-3
   assert.equal(isPicaPicaHand(state), true);
 });
 
-test('de a 2 o 4 no hay pica pica', () => {
+test('de a 2 o 4 no hay Pica Pica', () => {
   assert.equal(isPicaPicaHand(hand(game(4), 0, 5)), false);
   assert.equal(isPicaPicaHand(hand(game(2), 0, 5)), false);
 });
 
-test('sin seguir las manos no hay pica pica', () => {
+test('sin seguir las manos no hay Pica Pica', () => {
   const off = reduce(game(6), { type: 'setOption', option: 'trackHands', value: false });
   assert.equal(isPicaPicaHand(reduce(off, setHandAction({ number: 2, pica: true, duel: 1 }))), false);
 });
 
-test('con la opción apagada no hay pica pica', () => {
+test('con la opción apagada no hay Pica Pica', () => {
   const off = reduce(game(6), { type: 'setOption', option: 'picaPica', value: false });
   assert.equal(isPicaPicaHand(hand(off, 0, 5)), false);
 });
 
-test('corregir la mano en un pica pica no cuenta un duelo', () => {
+test('corregir la mano en un Pica Pica no cuenta un duelo', () => {
   let state = hand(game(6), 0, 5);
   state = reduce(state, pass); // sin puntos
   assert.equal(state.hand.duels, 0);
@@ -158,7 +158,7 @@ test('corregir el número de mano en una redonda', () => {
   assert.deepEqual(next.hand.startScores, state.hand.startScores, 'el próximo pase cuenta bien');
 });
 
-test('corregir el tipo y el duelo del pica pica', () => {
+test('corregir el tipo y el duelo del Pica Pica', () => {
   const state = hand(game(6), 0, 3); // mano 2, redonda (3-0)
   const next = reduce(state, setHand({ number: 2, pica: true, duel: 2 }));
   assert.equal(isPicaPicaHand(next), true);
@@ -176,7 +176,7 @@ test('la corrección ajusta valores fuera de rango', () => {
   assert.equal(reduce(state, setHand({ number: 0, pica: false })).hand.number, 1);
   assert.equal(reduce(state, setHand({ number: 4, pica: true, duel: 9 })).hand.duels, 2, 'de a 6, hasta el duelo 3');
   const four = reduce(game(4), setHand({ number: 4, pica: true, duel: 2 }));
-  assert.equal(four.hand.pica, false, 'de a 4 no hay pica pica');
+  assert.equal(four.hand.pica, false, 'de a 4 no hay Pica Pica');
   assert.equal(four.hand.duels, 0);
 });
 
@@ -186,11 +186,11 @@ test('corregir sin cambios no hace nada', () => {
 });
 
 test('cambiar de a 6 a de a 8 en el último duelo lo ajusta a los duelos que hay', () => {
-  let state = hand(game(6), 0, 5);       // pica pica de a 6
+  let state = hand(game(6), 0, 5);       // Pica Pica de a 6
   state = hand(hand(state, 1, 1), 1, 1); // duelo 3 de 3
   assert.equal(state.hand.duels, 2);
   state = reduce(state, { type: 'setPlayerCount', count: 8 });
   assert.equal(state.hand.duels, 1, 'duelo 2 de 2');
   state = hand(state, 0, 1);
-  assert.equal(isPicaPicaHand(state), false, 'termina el pica pica');
+  assert.equal(isPicaPicaHand(state), false, 'termina el Pica Pica');
 });

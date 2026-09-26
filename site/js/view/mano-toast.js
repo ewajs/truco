@@ -1,16 +1,19 @@
 // Aviso del pase automático de la mano. Va arriba, sobre el encabezado: lejos de los
-// tableros y los botones de sumar, que es donde está el dedo. Tiene dos formas:
-//   - countdown(): "Mano para Ellos" con cancelar y "ya", y una barra abajo que se vacía
-//   - done(): "Es mano Ellos" con deshacer y cerrar, unos segundos
+// tableros y los botones de sumar, que es donde está el dedo. Tiene dos formas, cada una
+// con un título y abajo el detalle (los textos salen de passNotice() en hands.js):
+//   - countdown(): "Terminando Mano 7…" y los puntos de la mano, con cancelar y "ya", y
+//     una barra abajo que se vacía
+//   - done(): "Mano 8" y quién es mano y quién da, con deshacer y cerrar, unos segundos
 // Solo muestra: cuándo aparece y qué hace cada botón lo decide main.js.
 
 import { passNotice } from '../hands.js';
 
-const DONE_MS = 4000; // cuánto queda a la vista el "Es mano…"
+const DONE_MS = 4000; // cuánto queda a la vista el aviso de la mano nueva
 
 export function createManoToast({ onNow, onCancel, onUndo }) {
   const toast = document.getElementById('mano-toast');
-  const text = document.getElementById('mano-toast-text');
+  const title = document.getElementById('mano-toast-title');
+  const detail = document.getElementById('mano-toast-detail');
   const bar = document.getElementById('mano-toast-bar');
   const nowButton = document.getElementById('mano-toast-now');
   const cancelButton = document.getElementById('mano-toast-cancel');
@@ -19,15 +22,16 @@ export function createManoToast({ onNow, onCancel, onUndo }) {
   let doneTimer = null;
 
   nowButton.addEventListener('click', onNow);
-  // la cruz cancela el pase pendiente, o cierra el "Es mano…"
+  // la cruz cancela el pase pendiente, o cierra el aviso de la mano nueva
   cancelButton.addEventListener('click', () => (mode === 'done' ? hide() : onCancel()));
   undoButton.addEventListener('click', onUndo);
 
-  function show(nextMode, message) {
+  function show(nextMode, notice) {
     clearTimeout(doneTimer);
     mode = nextMode;
     toast.dataset.mode = nextMode;
-    text.textContent = message;
+    title.textContent = notice.title;
+    detail.textContent = notice.detail;
     nowButton.hidden = nextMode !== 'countdown';
     undoButton.hidden = nextMode !== 'done';
     cancelButton.setAttribute('aria-label', nextMode === 'done' ? 'Cerrar' : 'Cancelar el pase');

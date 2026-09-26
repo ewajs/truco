@@ -10,7 +10,7 @@
   Cada tema define solo estos colores: felt (fondo), panel (tarjetas), ink (texto),
   muted (texto secundario), accent (botones), accent-ink (texto sobre accent),
   accent-shadow (borde inferior de los botones), sun (quién es mano y el chip de la
-  mano) y pica (el chip en una mano de pica pica), los dos con su -ink. En oscuro
+  mano) y pica (el chip en una mano de Pica Pica), los dos con su -ink. En oscuro
   cambian felt, panel, ink, muted y pica. El resto sale de ahí o es común: los fósforos
   y danger (borrar y lo que hace perder la partida), rojo en todos los temas.
 */
@@ -41,7 +41,7 @@
   --ui: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-/* ---- Paño: verde de mesa de juego (el de siempre); mano celeste, pica pica violeta ---- */
+/* ---- Paño: verde de mesa de juego (el de siempre); mano celeste, Pica Pica violeta ---- */
 :root,
 [data-palette="pano"] {
   --felt: #E3EBE0;
@@ -87,7 +87,7 @@
   }
 }
 
-/* ---- Madera: mesa de bodegón, cálida; mano mostaza, pica pica petróleo ---- */
+/* ---- Madera: mesa de bodegón, cálida; mano mostaza, Pica Pica petróleo ---- */
 [data-palette="madera"] {
   --felt: #EDE3D6;
   --panel: #FAF5EE;
@@ -112,7 +112,7 @@
   --pica-ink: #0B2A30;
 }
 
-/* ---- Noche: azul índigo con verde agua; mano luna dorada, pica pica magenta ---- */
+/* ---- Noche: azul índigo con verde agua; mano luna dorada, Pica Pica magenta ---- */
 [data-palette="noche"] {
   --felt: #E4E6F1;
   --panel: #F6F7FC;
@@ -137,7 +137,7 @@
   --pica-ink: #3A0C26;
 }
 
-/* ---- Argento: celeste de la bandera sobre un blanco apagado; mano sol de mayo, pica pica violeta ---- */
+/* ---- Argento: celeste de la bandera sobre un blanco apagado; mano sol de mayo, Pica Pica violeta ---- */
 [data-palette="argento"] {
   --felt: #DCE5EE;
   --panel: #EBF1F6;
@@ -431,7 +431,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 
 /*
   Chip de la mano: centrado sobre la línea que divide los equipos, a la altura de los
-  puntajes (ahí sobra lugar). Discreto en una mano redonda; en pica pica toma el color de
+  puntajes (ahí sobra lugar). Discreto en una mano redonda; en Pica Pica toma el color de
   acento, muestra el ícono y el duelo que se está jugando.
 */
 .hand-chip {
@@ -487,7 +487,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   stroke-linejoin: round;
 }
 
-/* pica pica: el color propio del tema, para que se distinga de una redonda */
+/* Pica Pica: el color propio del tema, para que se distinga de una redonda */
 .hand-chip.pica {
   background: var(--pica);
   color: var(--pica-ink);
@@ -605,7 +605,7 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
   white-space: nowrap;
 }
 
-/* el duelo se oculta sin sacarlo: el popup no cambia de alto entre redonda y pica pica */
+/* el duelo se oculta sin sacarlo: el popup no cambia de alto entre redonda y Pica Pica */
 .hand-editor-duels.off {
   visibility: hidden;
 }
@@ -1121,9 +1121,24 @@ button:focus-visible, .board:focus-visible, input:focus-visible, .toggle input:f
 .toast-text {
   flex: 1;
   min-width: 0;
-  font-size: 15px;
-  font-weight: 700;
+  padding: 4px 0;
   line-height: 1.25;
+}
+
+/* una línea cada uno; si no entran (pantallas chicas, nombres largos), el detalle hasta dos */
+.toast-text strong {
+  display: block;
+  font-size: 15px;
+}
+
+.toast-text small {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
 }
 
 .toast-button {

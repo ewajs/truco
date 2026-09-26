@@ -3,7 +3,7 @@
 // Todo el estado de la partida vive en un objeto plano. La única forma de cambiarlo es
 // `reduce(state, action)`, que devuelve un estado NUEVO (o el mismo objeto si la acción
 // no cambia nada). No toca el DOM, así que se testea directo con Node. Lo de las manos
-// y el pica pica está en hands.js.
+// y el Pica Pica está en hands.js.
 //
 // Acciones:
 //   { type: 'add', team, points }        sumar puntos
@@ -16,7 +16,7 @@
 //   { type: 'rename', team, name }
 //   { type: 'setOption', option, value }
 //   { type: 'loadGame', game }           cargar una partida compartida por link (ver share.js)
-//   { type: 'passMano' }                 terminó la mano (o un duelo del pica pica)
+//   { type: 'passMano' }                 terminó la mano (o un duelo del Pica Pica)
 //   { type: 'setHand', number, pica, duel }  corregir a mano la mano actual
 //   { type: 'restoreHand', mano, manoSeat, hand }  deshacer un pase de mano
 //   (las tres últimas están en hands.js)
@@ -49,7 +49,7 @@ export const OPTION_CHOICES = {
 export function createInitialState() {
   return {
     target: 30,
-    playerCount: 4, // de a cuántos se juega (el pica pica es de a 6 u 8)
+    playerCount: 4, // de a cuántos se juega (el Pica Pica es de a 6 u 8)
     teams: DEFAULT_NAMES.map(name => ({ name, score: 0, wins: 0 })),
     history: [], // [{ team, delta }], para deshacer
     mano: 0, // equipo que es mano en esta ronda (el de manoSeat)
@@ -60,13 +60,13 @@ export function createInitialState() {
       showNumbers: true,
       showButtons: true,  // −, +1 y los rápidos; sin botones se usa tocar y mantener
       quickButtons: true, // +2, +3 y +4 (solo si showButtons)
-      trackHands: true,   // seguir las manos: número, quién es mano y pica pica.
+      trackHands: true,   // seguir las manos: número, quién es mano y Pica Pica.
                           // Apagado, la app solo cuenta puntos.
       showMano: true,     // badges de mano/mazo (si trackHands)
       autoMano: true,     // pasar la mano sola después de anotar (si trackHands)
       autoManoSeconds: 5, // cuánto esperar después del último punto para pasarla
       autoManoNotice: true, // avisar antes del pase, con cancelar, ya y deshacer (si autoMano)
-      picaPica: true,     // de a 6 u 8: alternar manos redondas y de pica pica (si trackHands)
+      picaPica: true,     // de a 6 u 8: alternar manos redondas y de Pica Pica (si trackHands)
       vibrate: true,
       keepAwake: false,
       palette: 'pano',    // tema de colores (PALETTES)
@@ -194,7 +194,7 @@ function setTarget(state, target) {
   return { ...newGame(state), target };
 }
 
-// Si cambia en medio de un pica pica, el duelo actual se ajusta a los que hay ahora
+// Si cambia en medio de un Pica Pica, el duelo actual se ajusta a los que hay ahora
 // (de a 6 son 3 duelos, de a 8 son 2).
 function setPlayerCount(state, count) {
   if (!PLAYER_COUNTS.includes(count) || count === state.playerCount) return state;

@@ -1,4 +1,4 @@
-// Manos, pica pica y pase automático de la mano. Funciones puras: se testean con Node.
+// Manos, Pica Pica y pase automático de la mano. Funciones puras: se testean con Node.
 // game.js las usa desde reduce(); este módulo no depende de game.js.
 //
 // Pasar la mano la corre al lugar siguiente de la mesa (ver table.js), y con eso al otro
@@ -8,16 +8,16 @@
 // que no haya habido puntos desde el pase anterior: en truco toda mano da puntos, así que
 // eso es alguien corrigiendo quién es mano. Entonces solo cambia la mano, sin contar.
 //
-// De a 6 u 8, entre los 5 y los 25 puntos se alterna una mano redonda y una de pica pica.
-// En el pica pica cada pase es un duelo terminado; la mano termina (y recién ahí pasa)
+// De a 6 u 8, entre los 5 y los 25 puntos se alterna una mano redonda y una de Pica Pica.
+// En el Pica Pica cada pase es un duelo terminado; la mano termina (y recién ahí pasa)
 // cuando se jugaron todos los duelos.
 
-import { nextMano } from './table.js';
+import { nextMano, teamOfSeat } from './table.js';
 
-export const PICA_PICA_FROM = 5;   // el pica pica arranca cuando alguien llega a 5…
+export const PICA_PICA_FROM = 5;   // el Pica Pica arranca cuando alguien llega a 5…
 export const PICA_PICA_UNTIL = 25; // …y se termina cuando alguien llega a 25
 
-// Mano número `number`. `pica`: si es de pica pica; `duels`: duelos del pica pica ya
+// Mano número `number`. `pica`: si es de Pica Pica; `duels`: duelos del Pica Pica ya
 // jugados; `startScores`: puntajes al empezar la mano o el último duelo.
 export function newHand(startScores, number = 1, pica = false) {
   return { number, pica, duels: 0, startScores };
@@ -26,7 +26,7 @@ export function newHand(startScores, number = 1, pica = false) {
 // ---- Consultas ----
 
 // Si la app sigue las manos. Si no, solo cuenta puntos: no hay mano, número, pase
-// automático ni pica pica.
+// automático ni Pica Pica.
 export function tracksHands(state) {
   return state.options.trackHands;
 }
@@ -36,25 +36,25 @@ export function showsMano(state) {
   return tracksHands(state) && state.options.showMano;
 }
 
-// El pica pica se juega de a 6 u 8, si está activado y se siguen las manos.
+// El Pica Pica se juega de a 6 u 8, si está activado y se siguen las manos.
 export function picaPicaEnabled(state) {
   return tracksHands(state) && state.options.picaPica && state.playerCount >= 6;
 }
 
-// Duelos de un pica pica. De a 6: cada uno contra el de enfrente (3 duelos de uno contra
+// Duelos de un Pica Pica. De a 6: cada uno contra el de enfrente (3 duelos de uno contra
 // uno). De a 8: dos partidas de dos contra dos.
 export function duelsPerPicaPica(playerCount) {
   return playerCount === 8 ? 2 : 3;
 }
 
-// Si la mano actual se muestra como pica pica.
+// Si la mano actual se muestra como Pica Pica.
 export function isPicaPicaHand(state) {
   return picaPicaEnabled(state) && state.hand.pica;
 }
 
 // Quiénes juegan lo que se está jugando ahora: { mano, dealer, seats } (lugares de la mesa,
 // ver table.js). En una redonda juegan todos: es mano el lugar de la mano y da el
-// anterior. En el pica pica, el duelo actual:
+// anterior. En el Pica Pica, el duelo actual:
 // - de a 6, cada uno contra el de enfrente: el primer duelo es el de la mano y después
 //   siguen en orden (siempre te toca el mismo rival);
 // - de a 8, la mesa se parte en dos grupos de a 4 seguidos desde la mano, cada uno con
@@ -72,14 +72,14 @@ export function currentDeal(state) {
   return { mano: seat(first), dealer: seat(first + 3), seats: [seat(first), seat(first + 3)] };
 }
 
-// Cuántos lugares después de la mano arranca el duelo `duels` (desde 0) del pica pica.
+// Cuántos lugares después de la mano arranca el duelo `duels` (desde 0) del Pica Pica.
 export function duelOffset(playerCount, duels) {
   return (playerCount === 8 ? 4 : 1) * duels;
 }
 
 // ---- Acciones (las llama reduce() en game.js) ----
 
-// { type: 'passMano' }: terminó la mano o un duelo del pica pica.
+// { type: 'passMano' }: terminó la mano o un duelo del Pica Pica.
 export function passMano(state) {
   const scores = state.teams.map(team => team.score);
   const played = scores.some((score, i) => score !== state.hand.startScores[i]);
@@ -97,7 +97,7 @@ export function passMano(state) {
 }
 
 // { type: 'setHand', number, pica, duel }: corrección a mano de la mano actual, por si el
-// conteo automático pifió: número, si es pica pica y en qué duelo va (desde 1). Reemplaza
+// conteo automático pifió: número, si es Pica Pica y en qué duelo va (desde 1). Reemplaza
 // la mano actual sin tocar los puntos ni quién es mano. Los valores fuera de rango se
 // ajustan al más cercano.
 export function setHand(state, { number, pica, duel }) {
@@ -167,23 +167,41 @@ export function noticeDelay(waitMs) {
   return Math.min(waitMs / 2, NOTICE_MAX_MS);
 }
 
-// Qué dice el aviso según lo que hace el pase (`before` → `after`): pasar la mano, o
-// terminar un duelo del pica pica (ahí la mano no cambia hasta que se juegan todos).
-// `coming` se muestra durante la espera; `done`, después del pase.
+// Qué dice el aviso según lo que hace el pase (`before` → `after`), en dos líneas:
+// { title, detail }. `coming` se muestra durante la espera: qué mano termina y cómo le
+// fue a cada uno en ella (los puntos de esa mano, o de ese duelo en el Pica Pica).
+// `done`, después del pase: qué se juega ahora y quién es mano y quién da.
 export function passNotice(before, after) {
-  if (after.manoSeat === before.manoSeat) {
-    const total = duelsPerPicaPica(before.playerCount);
-    const next = after.players[currentDeal(after).mano];
-    return {
-      coming: `Fin del duelo ${before.hand.duels + 1}/${total}`,
-      done: `Duelo ${after.hand.duels + 1}/${total}: es mano ${next}`,
-    };
+  return { coming: endingNotice(before), done: startingNotice(after) };
+}
+
+function endingNotice(state) {
+  const title = `Terminando Mano ${state.hand.number}…`;
+  const points = team => state.teams[team].score - state.hand.startScores[team];
+  if (!isPicaPicaHand(state)) {
+    return { title, detail: state.teams.map((team, i) => `${team.name} ${points(i)}`).join(' | ') };
   }
-  const name = after.players[after.manoSeat];
-  return {
-    coming: `Mano para ${name}`,
-    done: isPicaPicaHand(after) ? `Es mano ${name} · Pica pica` : `Es mano ${name}`,
-  };
+  // los del duelo, de a un equipo por lado (como en el tablero)
+  const byTeam = [0, 1].map(team => currentDeal(state).seats
+    .filter(seat => teamOfSeat(seat) === team)
+    .map(seat => state.players[seat]));
+  if (state.playerCount === 8) {
+    return { title, detail: byTeam.map(names => names.join(' y ')).join(' / ') };
+  }
+  return { title, detail: byTeam.map(([name], team) => `${name} ${points(team)}`).join(' | ') };
+}
+
+function startingNotice(state) {
+  const { hand, players } = state;
+  const deal = currentDeal(state);
+  let title = `Mano ${hand.number}`;
+  let detail = `${players[deal.mano]} es mano. ${players[deal.dealer]} da.`;
+  if (isPicaPicaHand(state)) {
+    title += ` | Pica Pica | Duelo ${hand.duels + 1}/${duelsPerPicaPica(state.playerCount)}`;
+    const others = deal.seats.filter(seat => seat !== deal.mano && seat !== deal.dealer);
+    if (others.length) detail += ` Juegan ${others.map(seat => players[seat]).join(' y ')}`;
+  }
+  return { title, detail };
 }
 
 function scoreKey(state) {

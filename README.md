@@ -2,18 +2,18 @@
 
 Los fósforos de siempre, en el celular apoyado en la mesa. Tocás la columna de tu equipo
 para sumar, mantenés para borrar, y el anotador se encarga del resto: malas y buenas,
-quién es mano, el pica pica y quién gana.
+quién es mano, el Pica Pica y quién gana.
 
 **[Abrir el anotador](https://ewajs.github.io/truco/)** · [Manual](#manual)
 
 | | | | |
 |:-:|:-:|:-:|:-:|
-| <img src="docs/capturas/iphone/tablero.png" width="180" alt="Tablero con una partida en buenas"> | <img src="docs/capturas/iphone/aviso.png" width="180" alt="Aviso del pase de mano"> | <img src="docs/capturas/iphone/pica-pica.png" width="180" alt="Pica pica de a 6, tema Noche en oscuro"> | <img src="docs/capturas/iphone/mesa.png" width="180" alt="La mesa en Ajustes"> |
-| Una partida en buenas | La mano pasa sola | Pica pica de a 6 | La mesa |
+| <img src="docs/capturas/iphone/tablero.png" width="180" alt="Tablero con una partida en buenas"> | <img src="docs/capturas/iphone/aviso.png" width="180" alt="Aviso del pase de mano"> | <img src="docs/capturas/iphone/pica-pica.png" width="180" alt="Pica Pica de a 6, tema Noche en oscuro"> | <img src="docs/capturas/iphone/mesa.png" width="180" alt="La mesa en Ajustes"> |
+| Una partida en buenas | La mano pasa sola | Pica Pica de a 6 | La mesa |
 
 - **Rápido**: un toque, un punto. +2, +3 y +4 para el envido o el truco de una vez.
 - **Sigue la mano**: quién es mano y quién da, la pasa solo después de anotar, y de a 6 u
-  8 lleva el pica pica.
+  8 lleva el Pica Pica.
 - **La mesa**: los jugadores en sus lugares, los equipos cruzados y tirar reyes.
 - **Tuyo**: cuatro temas, claro u oscuro, y lo que no uses se apaga.
 - **Anda siempre**: se instala como app, funciona sin conexión y guarda la partida sola.
@@ -24,7 +24,7 @@ quién es mano, el pica pica y quién gana.
 2. [Anotar](#anotar)
 3. [Malas y buenas](#malas-y-buenas)
 4. [La mano](#la-mano)
-5. [Pica pica](#pica-pica)
+5. [Pica Pica](#pica-pica)
 6. [La mesa](#la-mesa)
 7. [Compartir](#compartir)
 8. [Opciones](#opciones)
@@ -64,16 +64,17 @@ falta. A 15 es una sola vuelta.
   **mazo**. Tocalo para pasar la mano a mano.
 - El **chip del medio** dice qué mano se juega ("Mano 7"), quién es mano y quién da, cada
   uno del lado de su equipo. Tocalo para corregir cualquier cosa: quién es mano, el número
-  de mano o si es de pica pica.
+  de mano o si es de Pica Pica.
 - **La mano pasa sola** unos segundos después del último punto (3, 5, 8 o 12, se elige
-  en Opciones). Antes de pasar aparece un aviso arriba para **pasarla ya** o
-  **cancelar**; después, uno para **deshacer**.
+  en Opciones). Antes de pasar aparece un aviso arriba con los puntos que se hicieron en
+  la mano, para **pasarla ya** o **cancelar**; después, uno con la mano nueva, quién es
+  mano y quién da, para **deshacer**.
 - Borrar o deshacer puntos nunca pasa la mano: se entiende que fue un toque de más.
 
-### Pica pica
+### Pica Pica
 
 De a 6 u 8, desde que alguien llega a 5 y hasta que alguien llega a 25, se alterna una
-mano redonda y una de pica pica. El chip se pinta de otro color y dice qué duelo se juega:
+mano redonda y una de Pica Pica. El chip se pinta de otro color y dice qué duelo se juega:
 
 - **De a 6**: tres duelos, cada uno contra el de enfrente. Arranca el de la mano y siguen
   en orden, así que siempre te toca el mismo rival.
@@ -81,7 +82,7 @@ mano redonda y una de pica pica. El chip se pinta de otro color y dice qué duel
   otros cuatro. Las parejas rotan.
 
 Cada pase de mano cierra un duelo; cuando se jugaron todos, la mano pasa como siempre. El
-pica pica se puede apagar en **Ajustes → Partida**.
+Pica Pica se puede apagar en **Ajustes → Partida**.
 
 ### La mesa
 

@@ -153,7 +153,7 @@ export function createSettings({ dispatch }) {
       button.setAttribute('aria-checked', String(Number(button.dataset.count) === state.playerCount));
     });
     playersHelp.textContent = `${playerCountLabel(state.playerCount)}.`;
-    picaField.hidden = state.playerCount < 6; // el pica pica es solo de a 6 u 8
+    picaField.hidden = state.playerCount < 6; // el Pica Pica es solo de a 6 u 8
 
     nameInputs.forEach((input, team) => {
       // no pisar lo que se está escribiendo

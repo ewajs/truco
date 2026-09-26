@@ -66,11 +66,11 @@
 
     <div class="table">
       <main class="teams" id="teams"></main>
-      <!-- Número de mano y pica pica (js/view/hand.js). Tocarlo abre la corrección. -->
+      <!-- Número de mano y Pica Pica (js/view/hand.js). Tocarlo abre la corrección. -->
       <button class="hand-chip" id="hand-chip" aria-live="polite" hidden>
         <!-- Lo de todos, centrado sobre la línea que divide los equipos: la mano y el duelo -->
         <span class="hand-number" id="hand-number"></span>
-        <span class="hand-kind"><svg class="hand-icon"><use href="#icon-pica"/></svg>Pica pica <span id="hand-duel"></span></span>
+        <span class="hand-kind"><svg class="hand-icon"><use href="#icon-pica"/></svg>Pica Pica <span id="hand-duel"></span></span>
         <!-- Quién es mano y quién da, cada uno del lado de su equipo. Lo arma view/hand.js. -->
         <span class="hand-players" id="hand-players"></span>
       </button>
@@ -165,7 +165,10 @@
 
   <!-- Aviso del pase automático de la mano (js/view/mano-toast.js) -->
   <div class="toast" id="mano-toast" role="status" hidden>
-    <span class="toast-text" id="mano-toast-text"></span>
+    <span class="toast-text">
+      <strong id="mano-toast-title"></strong>
+      <small id="mano-toast-detail"></small>
+    </span>
     <button class="icon-btn toast-button" id="mano-toast-cancel" aria-label="Cancelar el pase">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
     </button>
@@ -213,7 +216,7 @@
       <div class="hand-editor-pica" id="hand-editor-pica">
         <div class="seg" role="radiogroup" aria-label="Tipo de mano">
           <button role="radio" data-pica="false">Redonda</button>
-          <button role="radio" data-pica="true">Pica pica</button>
+          <button role="radio" data-pica="true">Pica Pica</button>
         </div>
         <div class="hand-editor-duels" id="hand-editor-duels">
           <span class="field-label">Duelo</span>
@@ -310,8 +313,8 @@
           </div>
 
           <div class="field" id="pica-field">
-            <label class="toggle"><span>Pica pica<small>Del 5 al 25 alterna una mano redonda y una de pica pica</small></span><input type="checkbox" data-option="picaPica" data-requires="trackHands"><i></i></label>
-            <!-- Aparece solo si el pica pica está deshabilitado; "Activar" prende la opción que falta -->
+            <label class="toggle"><span>Pica Pica<small>Del 5 al 25 alterna una mano redonda y una de Pica Pica</small></span><input type="checkbox" data-option="picaPica" data-requires="trackHands"><i></i></label>
+            <!-- Aparece solo si el Pica Pica está deshabilitado; "Activar" prende la opción que falta -->
             <p class="requires-note" data-note-for="picaPica" hidden>
               Necesita seguir las manos.
               <button class="link" data-enable="trackHands">Activar</button>
@@ -390,7 +393,7 @@
 
           <div class="field">
             <span class="field-label">Mano</span>
-            <label class="toggle"><span>Seguir las manos<small>Número de mano (tocalo para corregirlo), quién es mano y pica pica. Apagado, solo se cuentan los puntos</small></span><input type="checkbox" data-option="trackHands"><i></i></label>
+            <label class="toggle"><span>Seguir las manos<small>Número de mano (tocalo para corregirlo), quién es mano y Pica Pica. Apagado, solo se cuentan los puntos</small></span><input type="checkbox" data-option="trackHands"><i></i></label>
             <label class="toggle sub"><span>Mostrar quién es mano<small>Tocá la mano o el mazo para pasarla</small></span><input type="checkbox" data-option="showMano" data-requires="trackHands"><i></i></label>
             <label class="toggle sub"><span>Pasar la mano sola<small>Unos segundos después de anotar</small></span><input type="checkbox" data-option="autoMano" data-requires="trackHands"><i></i></label>
             <div class="sub-choice">
